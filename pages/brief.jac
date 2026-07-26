@@ -1,6 +1,8 @@
 """Brief — the written artifact a company owes an auditor. Prose, not a console."""
 
-import "./brief.css";
+cl import "./brief.css";
+
+cl {
 import from ..risk.store { useRisk }
 import from ..risk.ui { LoadState }
 
@@ -118,4 +120,5 @@ def:pub page() -> JsxPage {
             </section>
         </article>
     </div>;
+}
 }

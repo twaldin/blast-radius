@@ -31,8 +31,6 @@ default_model = "${BYLLM_DEFAULT_MODEL:-openrouter/openai/gpt-4.1-mini}"
 temperature = 0.0
 seed = 0
 
-[serve]
-base_route_app = "app"
 
 # Pinned, not "latest": the JacHammer builder reported
 # `bun install ... No packages! Deleted empty lockfile`, and a lockfile-less

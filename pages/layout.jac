@@ -1,7 +1,9 @@
 """Shared chrome. The provider lives here so every view reads one crawl."""
 
-import "./base.css";
-import from "@jac/runtime" { Outlet, Link, useLocation }
+cl import "./base.css";
+cl import from "@jac/runtime" { Outlet, Link, useLocation }
+
+cl {
 import from ..risk.store { RiskProvider, useRisk }
 
 def:pub ViewNav() -> JsxElement {
@@ -44,4 +46,5 @@ def:pub layout() -> JsxLayout {
             </main>
         </div>
     </RiskProvider>;
+}
 }

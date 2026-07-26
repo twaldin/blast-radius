@@ -4,6 +4,7 @@ Everything else that used to live here was an abstraction with no consumer:
 each view renders its own markup because each view is a different document.
 """
 
+cl {
 import from .store { useRisk }
 
 def:pub LoadState() -> JsxElement {
@@ -13,4 +14,5 @@ def:pub LoadState() -> JsxElement {
     # a blocking overlay there would hide the only way out
     if not meta["loading"] and not meta["crawling"] { return <span></span>; }
     return <div className="loadstate">{"Reading subprocessor filings…" if meta["crawling"] else "Loading…"}</div>;
+}
 }

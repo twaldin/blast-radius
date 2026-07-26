@@ -1259,8 +1259,3 @@ walker:priv diff_monitor {
         }
     }
 }
-
-# ------------------------------------------------------------------ client mount (C)
-def:pub app(children: any) -> JsxElement {
-    return <>{children}</>;
-}

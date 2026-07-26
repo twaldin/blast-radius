@@ -4,6 +4,7 @@ Static SVG, same geometry helpers as the Atlas figure. No interaction and no
 outage state: this one exists to show the convergence, not to be operated.
 """
 
+cl {
 import from .store { useRisk }
 import from .graph_core { burst_layout, node_radius, place_x, place_y, label_side, trace_path }
 
@@ -62,4 +63,5 @@ def:pub MiniGraph() -> JsxElement {
             }}
         </svg>
     </div>;
+}
 }

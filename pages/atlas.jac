@@ -4,7 +4,9 @@ Data-maximalist panel grid, Swiss editorial skin. Every panel here is backed
 by a real field from the walker contract; nothing here is invented data.
 """
 
-import "./atlas.css";
+cl import "./atlas.css";
+
+cl {
 import from ..risk.DependencyGraph { DependencyGraph }
 import from ..risk.store { useRisk }
 import from ..risk.ui { LoadState }
@@ -270,4 +272,5 @@ def:pub page() -> JsxPage {
             }}
         </div>
     </div>;
+}
 }

@@ -8,8 +8,9 @@ Every surface consumes the same generic interface: state / actions / meta.
 and it doubles as the live build animation without needing a socket.
 """
 
-import from react { createContext, use }
+cl import from react { createContext, use }
 
+cl {
 glob RiskCtx = createContext(None);
 glob PRUNE_ABOVE: int = 10;
 glob SEED_DOMAIN: str = "jachammer.ai";
@@ -268,4 +269,5 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
 
 def:pub useRisk() -> any {
     return use(RiskCtx);
+}
 }

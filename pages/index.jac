@@ -1,7 +1,9 @@
 """Landing — the front door. Swiss editorial memo; the working app lives at /atlas."""
 
-import "./index.css";
-import from "@jac/runtime" { useNavigate }
+cl import "./index.css";
+cl import from "@jac/runtime" { useNavigate }
+
+cl {
 import from ..risk.store { useRisk }
 import from ..risk.MiniGraph { MiniGraph }
 
@@ -164,4 +166,5 @@ def:pub page() -> JsxPage {
             </footer>
         </div>
     </div>;
+}
 }

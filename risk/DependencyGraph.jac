@@ -14,6 +14,7 @@ squares and blast treatment follow the Swiss memo. The two bands bow toward
 each other so the field pinches at the shared provider.
 """
 
+cl {
 import from .store { useRisk }
 import from .graph_core { burst_layout, node_radius, place_x, place_y, label_side, trace_path }
 
@@ -232,4 +233,5 @@ def:pub DependencyGraph() -> JsxElement {
             }}
         </svg>
     </div>;
+}
 }
