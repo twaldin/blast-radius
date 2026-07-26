@@ -1,14 +1,15 @@
 .brief {
   height: 100%;
   overflow-y: auto;
-  background: var(--bg);
+  background: var(--paper);
 }
 
 .brief-doc {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 72px 24px 96px;
-  color: var(--muted);
+  padding: 80px 24px 120px;
+  color: var(--ink-2);
+  font-family: var(--sans);
   font-size: 15px;
   line-height: 1.7;
 }
@@ -21,72 +22,82 @@
 .brief-eyebrow {
   display: block;
   font-size: 11px;
-  letter-spacing: 0.16em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dim);
-  margin-bottom: 14px;
+  color: var(--red);
+  margin-bottom: 16px;
 }
 
 .brief-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 42px;
+  font-family: var(--display);
+  font-size: 44px;
   font-weight: 400;
   color: var(--ink);
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   letter-spacing: -0.01em;
+  text-transform: uppercase;
 }
 
 .brief-meta {
   font-size: 13px;
-  color: var(--dim);
+  color: var(--ink-3);
   margin: 0;
+  max-width: 52ch;
 }
 
 .brief-copy {
   position: absolute;
   top: 0;
   right: 0;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  border-radius: 6px;
-  padding: 7px 13px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.brief-copy:hover {
-  color: var(--ink);
-  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .brief-lead {
   font-size: 19px;
-  line-height: 1.6;
+  line-height: 1.55;
   color: var(--ink);
-  margin: 0 0 48px;
+  margin: 0 0 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--line);
 }
 
 .brief-section {
-  margin-bottom: 48px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
+  margin-bottom: 40px;
 }
 
-.brief-section h2 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
+.brief-h {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   margin: 0 0 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.brief-n {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--red);
+}
+
+.brief-t {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.brief-fill {
+  flex: 1;
 }
 
 .brief-finding {
   display: flex;
   gap: 16px;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 
 .brief-finding:last-child {
@@ -96,18 +107,19 @@
 .brief-finding-num {
   flex: none;
   width: 22px;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: 14px;
-  color: var(--dim);
+  color: var(--red);
   padding-top: 2px;
 }
 
 .brief-finding-body h3 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  font-size: 17px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 15px;
   color: var(--ink);
   margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .brief-finding-body p {
@@ -116,40 +128,24 @@
 
 .brief-finding-names {
   font-size: 12.5px;
-  color: var(--dim);
-}
-
-.brief-figure {
-  margin: 0 0 48px;
-}
-
-.brief-figure-frame {
-  position: relative;
-  height: 420px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.brief-figure figcaption {
-  margin-top: 10px;
-  font-size: 12px;
-  font-style: italic;
-  color: var(--dim);
-  text-align: center;
+  color: var(--ink-3);
 }
 
 .brief-exposure {
   margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--hair);
 }
 
 .brief-exposure:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .brief-exposure-pair {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--sans);
+  font-weight: 700;
   font-size: 15px;
   color: var(--ink);
   margin: 0 0 4px;
@@ -157,16 +153,18 @@
 
 .brief-exposure-reason {
   font-size: 13px;
-  color: var(--warn);
+  color: var(--red);
   margin: 0 0 4px;
 }
 
 .brief-exposure-breaks {
   margin: 0;
+  color: var(--ink-3);
 }
 
 .brief-remediation p {
   color: var(--ink);
-  font-size: 16px;
+  font-size: 17px;
+  line-height: 1.55;
   margin: 0;
 }
