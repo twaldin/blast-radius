@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Okta",
+    "domain": "okta.com",
+    "subprocessor_url": "https://www.okta.com/en-gb/legal/trustandcompliance/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Okta legal disclosure with named subprocessors, processing purposes, service applicability, and data-center locations; effective May 2026."
+  },
+  {
+    "name": "Palo Alto Networks",
+    "domain": "paloaltonetworks.com",
+    "subprocessor_url": "https://www.paloaltonetworks.com/content/dam/pan/en_US/assets/pdf/services/list-of-sub-processors-sheet.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official April 2026 product, Unit 42, customer-support, affiliate, and generative-AI subprocessor PDF with named entities, locations, and processing activities."
+  },
+  {
+    "name": "Zscaler",
+    "domain": "zscaler.com",
+    "subprocessor_url": "https://www.zscaler.com/privacy-compliance/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Zscaler privacy and compliance page with named subprocessors, applicable products, services provided, and processing locations; updated July 20, 2026."
+  },
+  {
+    "name": "Vanta",
+    "domain": "vanta.com",
+    "subprocessor_url": "https://trust.vanta.com/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Vanta Trust Center subprocessor directory with named vendors, product scope, purpose, processing region, and vendor website."
+  },
+  {
+    "name": "Secureframe",
+    "domain": "secureframe.com",
+    "subprocessor_url": "https://secureframe.com/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Secureframe authorized-subprocessor page with named third parties, purposes, and entity countries."
+  },
+  {
+    "name": "Arctic Wolf",
+    "domain": "arcticwolf.com",
+    "subprocessor_url": "https://arcticwolf.com/terms/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Arctic Wolf terms disclosure with named vendors, platforms, purposes, data residency, and applicable products; updated June 30, 2026."
+  },
+  {
+    "name": "Snyk",
+    "domain": "snyk.io",
+    "subprocessor_url": "https://snyk.io/policies/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Snyk legal policy with named software and affiliate subprocessors, processing locations, data processed, and purposes; dated February 3, 2026."
+  },
+  {
+    "name": "Fortinet",
+    "domain": "fortinet.com",
+    "subprocessor_url": "https://trust.fortinet.com/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Fortinet Trust Resource Center exposes a searchable subprocessor table with named companies, purposes, locations, and applicable Fortinet products."
+  },
+  {
+    "name": "Tenable",
+    "domain": "tenable.com",
+    "subprocessor_url": "https://www.tenable.com/gdpr-alignment/third-party-data-sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Tenable GDPR disclosure with named third-party subprocessors and affiliates, use cases, personal-data types, processing locations, and justification."
+  },
+  {
+    "name": "Rapid7",
+    "domain": "rapid7.com",
+    "subprocessor_url": "https://www.rapid7.com/legal/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Rapid7 legal list with named subprocessors and affiliates, use cases, personal-data types, processing locations, and further information."
+  },
+  {
+    "name": "Qualys",
+    "domain": "qualys.com",
+    "subprocessor_url": "https://cdn2.qualys.com/docs/mktg/qualys-dpa-agreement.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Qualys Data Privacy Addendum; Annex III names subprocessors and gives their addresses and processing purposes."
+  },
+  {
+    "name": "SentinelOne",
+    "domain": "sentinelone.com",
+    "subprocessor_url": "https://www.sentinelone.com/legal/sentinelone-sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official SentinelOne legal page with named third-party and affiliate subprocessors, activities, registered addresses, and processing countries; dated May 20, 2026."
+  },
+  {
+    "name": "Proofpoint",
+    "domain": "proofpoint.com",
+    "subprocessor_url": "https://www.proofpoint.com/us/legal/trust/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Proofpoint Trust disclosure mapping named subprocessors and locations to Proofpoint products and services; updated July 10, 2026."
+  },
+  {
+    "name": "Abnormal Security",
+    "domain": "abnormal.ai",
+    "subprocessor_url": "https://abnormal.ai/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Abnormal legal disclosure with named subprocessors grouped by processing role, including service purpose and location details."
+  },
+  {
+    "name": "Axonius",
+    "domain": "axonius.com",
+    "subprocessor_url": "https://www.axonius.com/legal/subprocessor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Axonius legal page embeds its May 14, 2026 subprocessor list with named vendors, headquarters, services, and applicable cloud regions."
+  },
+  {
+    "name": "Tailscale",
+    "domain": "tailscale.com",
+    "subprocessor_url": "https://tailscale.com/dpa-subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Tailscale legal list with named subprocessors, purposes, data processed, and locations; last updated September 2, 2025."
+  },
+  {
+    "name": "BeyondTrust",
+    "domain": "beyondtrust.com",
+    "subprocessor_url": "https://www.beyondtrust.com/privacy-center/sub-processors-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official BeyondTrust Privacy Center list with named subprocessors and affiliates, addresses, hosting locations, processing purposes, and contacts."
+  },
+  {
+    "name": "CyberArk",
+    "domain": "cyberark.com",
+    "subprocessor_url": "https://www.cyberark.com/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official CyberArk subprocessor page with named service subprocessors, affiliates, and third-party contractors, including activities and locations; updated March 24, 2026."
+  },
+  {
+    "name": "Netskope",
+    "domain": "netskope.com",
+    "subprocessor_url": "https://www.netskope.com/wp-content/uploads/2026/02/Netskope-sub-processors-march-2026.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official February 2026 Netskope PDF with named product, hosting, customer-support, and affiliate subprocessors, plus applicability, activities, and locations."
+  },
+  {
+    "name": "Sophos",
+    "domain": "sophos.com",
+    "subprocessor_url": "https://www.sophos.com/en-us/legal/sub-processor",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Sophos legal list with named subprocessors, processing locations, purposes, and product relevance; last updated May 2026."
+  },
+  {
+    "name": "Keeper Security",
+    "domain": "keepersecurity.com",
+    "subprocessor_url": "https://www.keepersecurity.com/legal/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Keeper Security legal list with named software, support, marketing, optional-service, and affiliate subprocessors, including locations and purposes."
+  },
+  {
+    "name": "Malwarebytes",
+    "domain": "malwarebytes.com",
+    "subprocessor_url": "https://www.malwarebytes.com/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Malwarebytes legal list with named approved contractors, service scopes, and locations."
+  },
+  {
+    "name": "Kolide",
+    "domain": "kolide.com",
+    "subprocessor_url": "https://www.kolide.com/legal/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Kolide by 1Password legal list with named subprocessors, purposes, and GDPR-compliance links; last updated January 16, 2025."
+  },
+  {
+    "name": "Teleport",
+    "domain": "goteleport.com",
+    "subprocessor_url": "https://trust.goteleport.com/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Teleport Trust Center subprocessor directory with named vendors, processing purposes, locations, and vendor websites."
+  },
+  {
+    "name": "Verkada",
+    "domain": "verkada.com",
+    "subprocessor_url": "https://docs.verkada.com/docs/Subprocessor%20List%20v06.2026.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official June 2026 Verkada subprocessor PDF linked from Verkada's Privacy Center disclosure page."
+  }
+]

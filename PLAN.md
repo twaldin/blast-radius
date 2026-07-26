@@ -81,7 +81,18 @@ Everything from "a domain" to "clean canonical records." **Returns values, never
 5. `extract_subprocessors` (`by llm`, `sem`) → `list[SubprocessorRecord]`.
 6. `canonicalize` (`by llm`) — the load-bearing entity-resolution call.
 7. `extract_and_resolve(page_text, known) -> list[ResolvedSubprocessor]` — the single export A calls.
-8. **Agentic fallback (§4.3, the Agentic-AI hero):** `resolve_url` = exact registry → fuzzy match → `find_dpa_url` ReAct agent (`tools=[list_sitemap, check_trust_subdomain, guess_paths, fetch_page, web_search]`). Keep it off the rehearsed path.
+8. **Browser-backed ReAct fallback (§4.3, the Agentic-AI hero):**
+   `resolve_url` = exact registry/alias → plain fetch → Browser Use render for
+   unreadable known URLs → a `find_dpa_url` ReAct agent for registry misses.
+   The agent uses bounded `browser_search`, `browser_read`, and
+   `browser_search_github` tools and accepts only the official company domain
+   or verified GitHub sources. Deterministic validation rejects snippets,
+   aggregators, login walls, and change notices without a complete current
+   named list. B returns typed evidence and updates only the learned registry;
+   A alone upserts graph nodes. Limit the fallback to 4 searches, 8 pages, and
+   30–45 seconds; cache positive results by source hash and negative results
+   with a short TTL. If no authoritative complete list is found, return
+   `notfound`. Keep this entire path off the rehearsed demo.
 9. Defense adapter — DoD prime → sub → tier-3 (renders on the same canvas).
 
 ### Person C — Interface, Deploy & Pitch (`app.jac`)

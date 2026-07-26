@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Salesforce",
+    "domain": "salesforce.com",
+    "subprocessor_url": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the general official Salesforce Infrastructure and Sub-processors PDF, published July 8, 2026, and confirmed named providers, infrastructure, processing locations, and product applicability across Salesforce online services and managed packages."
+  },
+  {
+    "name": "HubSpot",
+    "domain": "hubspot.com",
+    "subprocessor_url": "https://legal.hubspot.com/sub-processors-page",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page and confirmed named infrastructure, feature-specific, and affiliate subprocessors."
+  },
+  {
+    "name": "Intercom",
+    "domain": "intercom.com",
+    "subprocessor_url": "https://www.intercom.com/legal/subprocessors-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page and confirmed named subprocessors for US, EU, and Australian hosting plus affiliate subprocessors."
+  },
+  {
+    "name": "Zendesk",
+    "domain": "zendesk.com",
+    "subprocessor_url": "https://support.zendesk.com/hc/en-us/articles/4408883061530-Sub-processor-Policy",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Zendesk's official policy and confirmed named infrastructure, service-specific, innovation-service, and group subprocessors."
+  },
+  {
+    "name": "Freshworks",
+    "domain": "freshworks.com",
+    "subprocessor_url": "https://www.freshworks.com/privacy/sub-processor-july31-2025/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official Freshworks privacy page and confirmed a named list of infrastructure, service, and group subprocessors."
+  },
+  {
+    "name": "Gainsight",
+    "domain": "gainsight.com",
+    "subprocessor_url": "https://www.gainsight.com/policy/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official policy page, last updated April 2026, and confirmed its named third-party subprocessor table."
+  },
+  {
+    "name": "Gong",
+    "domain": "gong.io",
+    "subprocessor_url": "https://www.gong.io/legal/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page and confirmed named subprocessors with purposes and processing locations."
+  },
+  {
+    "name": "Pipedrive",
+    "domain": "pipedrive.com",
+    "subprocessor_url": "https://www.pipedrive.com/en/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official repository page, current as of July 13, 2026, and confirmed named hosting, feature, AI, support, and affiliate subprocessors."
+  },
+  {
+    "name": "Klaviyo",
+    "domain": "klaviyo.com",
+    "subprocessor_url": "https://www.klaviyo.com/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, updated April 10, 2026, and confirmed named third-party and affiliate subprocessors."
+  },
+  {
+    "name": "Braze",
+    "domain": "braze.com",
+    "subprocessor_url": "https://cdn.sanity.io/files/b7pblshe/marketing-prod/56073d92ae50195865f0258019982d5c3263bb0a.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the current official PDF linked by Braze's legal center; it was revised June 1, 2026 and contains named third-party and Braze-group subprocessors."
+  },
+  {
+    "name": "Customer.io",
+    "domain": "customer.io",
+    "subprocessor_url": "https://customer.io/legal/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, revised March 2026, and confirmed named infrastructure, AI-feature, and platform subprocessors."
+  },
+  {
+    "name": "Iterable",
+    "domain": "iterable.com",
+    "subprocessor_url": "https://iterable.com/legal/iterable-sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page and confirmed its named subprocessor list with processing activities and locations."
+  },
+  {
+    "name": "ActiveCampaign",
+    "domain": "activecampaign.com",
+    "subprocessor_url": "https://www.activecampaign.com/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, last updated April 2, 2026, and confirmed named infrastructure, network, support, feature-specific, and affiliate subprocessors."
+  },
+  {
+    "name": "Adobe",
+    "domain": "adobe.com",
+    "subprocessor_url": "https://www.adobe.com/privacy/sub-processors.html",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Adobe's official privacy page and confirmed named third-party Cloud Services subprocessors and Adobe affiliates."
+  },
+  {
+    "name": "Sprout Social",
+    "domain": "sproutsocial.com",
+    "subprocessor_url": "https://sproutsocial.com/legal/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, last updated January 21, 2026, and confirmed named subprocessors for the core, advocacy, and influencer platforms."
+  },
+  {
+    "name": "Hootsuite",
+    "domain": "hootsuite.com",
+    "subprocessor_url": "https://www.hootsuite.com/legal/subprocessor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, last updated June 24, 2026, and confirmed named core and service-specific subprocessors."
+  },
+  {
+    "name": "Typeform",
+    "domain": "typeform.com",
+    "subprocessor_url": "https://help.typeform.com/hc/en-us/articles/360029617191-What-other-companies-do-we-share-data-with",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Typeform's official help-center disclosure and confirmed named subprocessors for response data, optional services, and customer data."
+  },
+  {
+    "name": "SurveyMonkey",
+    "domain": "surveymonkey.com",
+    "subprocessor_url": "https://www.surveymonkey.com/mp/legal/subprocessor-list/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, effective December 27, 2025, and confirmed the named onward-subprocessor table."
+  },
+  {
+    "name": "Qualtrics",
+    "domain": "qualtrics.com",
+    "subprocessor_url": "https://www.qualtrics.com/subprocessor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official Qualtrics page and confirmed named mandatory, CDN, optional technical, professional-services, and affiliate subprocessors."
+  },
+  {
+    "name": "Help Scout",
+    "domain": "helpscout.com",
+    "subprocessor_url": "https://www.helpscout.com/company/legal/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page and confirmed its named subprocessor list with purposes and locations."
+  },
+  {
+    "name": "Contentsquare",
+    "domain": "contentsquare.com",
+    "subprocessor_url": "https://contentsquare.com/privacy-center/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official privacy-center page, last updated June 2026, and confirmed named affiliate, third-party, and professional-services subprocessors by product."
+  },
+  {
+    "name": "Fullstory",
+    "domain": "fullstory.com",
+    "subprocessor_url": "https://www.fullstory.com/legal/subprocessor-list/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, last updated June 2, 2026, and confirmed named subprocessors with purposes, processed data, and locations."
+  },
+  {
+    "name": "Dixa",
+    "domain": "dixa.com",
+    "subprocessor_url": "https://www.dixa.com/legal/3rd-party-services-used-by-dixa",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page, last updated December 10, 2025, and confirmed named minimum, group-company, and modular subprocessors."
+  },
+  {
+    "name": "Optimizely",
+    "domain": "optimizely.com",
+    "subprocessor_url": "https://www.optimizely.com/legal/sub-processors/third-party",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official legal page and confirmed its named third-party subprocessors with service, hosting, data, and product applicability details."
+  },
+  {
+    "name": "UserTesting",
+    "domain": "usertesting.com",
+    "subprocessor_url": "https://www.usertesting.com/privacy-center/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened the official privacy-center page, last updated March 20, 2026, and confirmed named affiliates and platform-delivery subprocessors."
+  }
+]
