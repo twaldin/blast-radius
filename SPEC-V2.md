@@ -186,7 +186,7 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
 ## 6. Lanes
 
 ### A — graph, traversal, contract *(me)*
-1. **Fix the 5 `[0]` errors, push immediately.** Unblocks C's deploy. *(10 min)*
+1. ~~**Fix the 5 `[0]` errors.**~~ **DONE** — pushed at `3108554`, tree is green.
 2. Migrate `Org`/`Vendor`/`Provider` → `Company`; computed tiers; keep wire shape identical. *(~90 min)*
 3. `graph {domain}` — unbounded BFS read.
 4. `expand {domain, max_new}` — budget-bounded crawl, replaces the depth cap.
@@ -194,7 +194,11 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
 6. Add `domain` to the four existing read walkers, defaulted for back-compat.
 7. Delete `Feature`/`Powers`; `features_down` from edge `purpose`.
 8. Degrade gracefully: unsourced downtime/compliance → zero/empty, never fabricated.
-9. *(if time)* Vendor/Provider subgraph onto `root.shared` — `DECISIONS-A.md` §4.
+9. **`seed_atlas` — import committed seed data into the graph (§11).** Without this the
+   deployed instance is empty and every redeploy wipes the atlas. Non-optional.
+10. `search {q}` walker (B owns the matching behind it).
+11. *(post-MVP)* `industry_map` endpoint for §10.
+12. *(post-MVP)* `root.shared` migration — `DECISIONS-A.md` §4.
 
 ### B — data, fetching, search *(that is the whole lane now)*
 1. **Fix `extract.jac:261` + the byLLM import/install.** Blocking. *(25 min)*
@@ -209,7 +213,7 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
    from public status-page history) for the top ~15 providers. **If it isn't cited by
    freeze, we ship the field empty** — see §2.
 6. Keep the ReAct/browser discovery path off the rehearsed run.
-7. *(subagent play)* Expand the registry well past 150 — see §8.
+7. **The 20-company real-data run — §12.** Highest-value data task.
 
 ### C — frontend → deploy *(that is the whole lane now)*
 1. **Deploy the moment A's fix lands.** Before the restyle, before the atlas. Non-negotiable.
@@ -218,11 +222,16 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
 3. **Restyle everything to the Swiss-editorial design system — §9.**
 4. **Replace the tier-pinned graph with the free-form render — §9.3.**
 5. Atlas landing: featured graphs, rotating headline, company selector, search box.
-6. **Build the Map view — §10.**
-7. Pass `domain` through every walker call.
-8. **Update `docs/demo-script.md`:** remove the 9.2h AWS claim and the Fastly SOC 2 /
+6. Pass `domain` through every walker call.
+7. **Update `docs/demo-script.md`:** remove the 9.2h AWS claim and the Fastly SOC 2 /
    watchlist claim unless B lands cited replacements. Re-point the script at the atlas.
-9. `min_replicas = 1` is already set — good, no cold start on stage.
+8. ⚠️ **`max_replicas = 4` with no Mongo configured is a data-splitting bug.** `jac.toml`
+   has `[scale.kubernetes]` but no `[plugins.scale.database]`, so each replica gets its own
+   SQLite and users see different graphs depending on which pod they hit. **Either set
+   `max_replicas = 1` for the demo, or configure `MONGODB_URI` + `REDIS_URL`.** For today,
+   pin to 1 — it is one line and it cannot fail on stage.
+9. `min_replicas = 1` is already set — good, no cold start.
+10. *(post-MVP)* Build the Map view — §10.
 
 ---
 
@@ -244,21 +253,44 @@ rehearsals.**
 
 ---
 
-## 8. Open — needs your call
+## 8. Definition of done, and what is still open
 
-1. **Registry breadth via subagents.** Parallel subagents, one per vertical, each producing
-   verified `{name, domain, subprocessor_url, source_type, verified_on}` rows — the same
-   shape as the existing `research/*.json`. That's how the current 150 were built, so the
-   pipeline exists. Realistically 8–12 subagents → several hundred more companies inside an
-   hour. **Recommend yes, but only after B's precompute is running** — a wider registry with
+### Done = all of this is true
+
+1. `jac check` clean on every `.jac` file; `jac start` boots.
+2. A public JacHammer URL serves the app.
+3. That deployed instance has a **non-empty atlas** — ≥20 real companies imported from
+   committed seed data (§11), surviving a redeploy.
+4. Landing page: Swiss-editorial styling, rotating headline, company selector, free-form
+   graph. No company name hardcoded in static copy.
+5. Selecting a company drives graph + chokepoints + blast radius + one-look off that
+   company's real data.
+6. Every number on screen traces to a `source_url`, or is not shown.
+7. `docs/demo-script.md` matches what the deployed app actually does.
+8. Two rehearsals completed **on the deployed URL**.
+
+If 1–8 hold we are deployed, honest, and iterating on a real MVP. The Map (§10),
+`root.shared`, auth, the diff monitor, and the defense adapter are all **explicitly outside
+this line** and are what we build next.
+
+### Resolved this round
+
+- **The Map** → post-MVP. Build after §0–§9 land. (§10)
+- **Subagent play** → §12: 20 companies, one subagent each, headless render, real data into
+  committed seed files. Replaces the "crawl 150 automatically" milestone as the *first* data
+  target.
+- **Persistence** → §11. SQLite now, Mongo+Redis under `--scale`; shared cache is free while
+  we stay `:pub`; committed seed data closes the redeploy gap.
+
+### Still open
+
+1. **Featured set for the landing rotation** — I suggest `lindy.ai` (you can vouch for it),
+   `anthropic.com`, `openai.com`, `stripe.com`, `vercel.com`, plus `jachammer.ai` for the
+   meta beat. Confirm or swap.
+2. **Compliance panel** — if B can't source cited SOC 2 / watchlist facts by freeze, ship
+   the panel empty or cut it from the UI? **I'd cut it** — an empty panel reads as broken.
+3. **Registry breadth past 150** — worth doing only *after* §12 lands. A wider registry with
    nothing crawled adds no demo value.
-2. **Your other subagent idea** — you mentioned one but didn't say what it was. What is it?
-3. **Featured set** — which companies lead the landing rotation? I'd suggest
-   `lindy.ai` (you can vouch), `anthropic.com`, `openai.com`, `stripe.com`, `vercel.com`,
-   plus `jachammer.ai` for the meta beat.
-4. **Compliance panel** — if B can't source cited SOC 2 / watchlist facts by freeze, do we
-   ship the panel empty, or cut it from the UI entirely? I'd cut it from the UI; an empty
-   panel reads as broken.
 
 ---
 
@@ -333,9 +365,11 @@ payload and palette prop — the component already accepts `palette`, so keep th
 
 ---
 
-## 10. The Map — third view, the industry map
+## 10. The Map — the industry map *(POST-MVP — build only once §0–§9 are done)*
 
-*(New — this had not come up with me before now.)*
+> **Scope call: this ships after the MVP is deployed and green.** It is the thing we
+> iterate toward on top of a working deployment, not a launch requirement. Nothing in
+> §0–§9 may slip for it.
 
 **Every company and every disclosed dependency in one canvas.** Not one org's graph — the
 whole crawled corpus. This is the payoff of the wideness pivot and it is the single most
@@ -357,3 +391,92 @@ keeps three tabs, which is what `pages/layout.jac` already renders.
 **Honesty guard:** the Map shows only what we actually crawled. Put the real count in the
 furniture — *"N companies · M disclosed dependencies · sourced from public Article 28
 filings"* — and it reads as rigor rather than decoration.
+
+---
+
+## 11. Persistence — where the atlas actually lives
+
+*Answering the question directly: it is **not** CDN JSON. It is a real graph database, and
+`jac` provides it with no code from us.*
+
+### What exists today (verified)
+
+| Mode | Backend | Notes |
+|---|---|---|
+| `jac start` (now) | **SQLite** at `.jac/data/blast-radius.db` | Already real — 94 KB on my box after the smoke runs. Graph + users. Zero setup. |
+| `jac start --scale` | **MongoDB + Redis**, auto-provisioned as k8s StatefulSets | Required the moment you have >1 replica. |
+
+Writes persist automatically inside endpoints — no save/commit call. The graph *is* the
+database; there is no ORM and no migration step.
+
+### "If two people search the same company, do they share the cache?"
+
+**Today, yes.** All walkers are `walker:pub`, so anonymous callers land on the shared guest
+root. Two people searching `stripe.com` hit the same `Company` node, and the second one
+pays nothing: `last_crawled` + TTL says it is fresh, and `content_hash` means even a forced
+refresh skips extraction if the filing is byte-identical.
+
+**This breaks the moment auth is added.** `walker:priv` gives each user their own root, and
+the cache fragments per-user. That is `DECISIONS-A.md` §4 (`root.shared` migration) and it
+is why that item exists. For the MVP we stay `:pub` and the sharing is free.
+
+### ⚠️ The gap nobody owned — and it is deploy-fatal
+
+Three facts that combine badly:
+1. `.jac/` is **gitignored** — the crawled atlas never travels with the repo.
+2. A crawl run on someone's laptop does **not** populate the deployed instance.
+3. `jac destroy` **deletes the persistent volumes**, and any redeploy starts empty.
+
+So "B precomputes 150 companies" and "C deploys" produce a **deployed app with an empty
+atlas**, and neither lane is wrong — the handoff between them was simply never specified.
+
+**Fix — committed seed data:**
+
+```
+seed/atlas/<domain>.json     # {domain, name, subprocessor_url, fetched_at,
+                             #  raw_text_sha, subprocessors:[{name, purpose, region}]}
+```
+
+- Checked into git, so it survives every redeploy and every fresh clone.
+- `seed_atlas` walker (A, lane item 9) imports the directory into the graph, idempotently,
+  keyed by `domain`. Safe to re-run.
+- Called once after deploy, or from a boot hook.
+- The rehearsed demo therefore **never touches the network**, which is what spec §10 of the
+  original build spec demanded anyway.
+- Live crawling still works on top for anything a judge types — it just writes into the
+  same graph.
+
+This also makes the data reviewable: a real filing snapshot in a PR, not a number someone
+typed into a fixture.
+
+---
+
+## 12. The 20-company real-data run *(the subagent play)*
+
+Replaces "crawl 150 automatically" as the **first** data milestone — 20 verified companies
+beat 150 half-parsed ones, and this produces the seed corpus §11 needs.
+
+**Shape:** one subagent per company, run locally, in parallel.
+
+- **Input:** company domain + its `subprocessor_url` from `registry.jac` when present.
+- **Tools:** browser-harness / headless render — necessary because Vanta and SafeBase trust
+  centers are client-rendered and return an empty shell to a plain GET. This is the exact
+  failure mode called out in the original spec §4.3.
+- **Output, per company:** `seed/atlas/<domain>.json` in the §11 shape, **plus** the raw
+  extracted filing text as a fixture.
+- **Non-goal:** subagents do not touch the graph and do not invent data. If a filing cannot
+  be found or rendered, the row is marked `crawl_status: "unreadable"` and shipped as such.
+  A visible coverage gap is fine; a fabricated row is not (§2).
+
+**Why raw text as well as the parsed list:** it lets B's real `extract_and_resolve` run over
+it afterwards, which both proves our own pipeline works and gives us a cross-check. If the
+subagent's list and our extractor's list disagree, that is a bug worth knowing about before
+stage.
+
+**Company set (20):** the 8 current demo vendors, plus `lindy.ai` and the highest-recognition
+registry entries — Notion, Slack, Figma, Linear, Twilio, Snowflake, Cloudflare, Auth0/Okta,
+HubSpot, Intercom, Segment, Zoom. Recognition matters more than coverage here: a judge should
+know every name on the landing rotation.
+
+**Sequencing:** run this *concurrently* with C's deploy and restyle. It is pure data
+gathering and blocks nothing, but nothing downstream is real until it lands.
