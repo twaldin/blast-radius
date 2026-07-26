@@ -54,7 +54,6 @@ def build_graph(raw_nodes: any, raw_edges: any) -> any {
             "soc2": True,
             "supply_chain_risk": "",
             "downtime_hours_ytd": 0.0,
-            "features": []
         }];
     }
 

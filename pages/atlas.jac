@@ -31,11 +31,27 @@ def:pub page() -> JsxPage {
     nodes: any = st["nodes"];
     max_exp: float = (chokes[0]["exposure"] as float) if chokes and len(chokes as list) > 0 else 1.0;
 
+    # Vendor nodes no longer carry a `features` list -- SPEC-V2 section 2 cut
+    # the hand-mapped Feature type. The real text is the `purpose` recorded on
+    # each subprocesses edge, straight from the filing, so derive from that.
+    label_of: dict = {};
+    for n in nodes { label_of[n["id"]] = n["label"]; }
+
     feature_rows: list[any] = [];
-    for v in st["vendors"] {
-        for f in v["features"] {
-            feature_rows = feature_rows + [{"feature": f, "vendor": v["label"], "id": v["id"]}];
-        }
+    seen_purpose: dict = {};
+    for l in st["links"] {
+        if l["kind"] != "subprocesses" { continue; }
+        purpose: str = ((l["purpose"] or "") as str);
+        if not purpose { continue; }
+        src: str = (l["source"] as str);
+        key: str = src + "|" + purpose;
+        if key in seen_purpose { continue; }
+        seen_purpose[key] = True;
+        feature_rows = feature_rows + [{
+            "feature": purpose,
+            "vendor": label_of[src] if src in label_of else src,
+            "id": key
+        }];
     }
 
     edge_set: dict = st["edge_keys"] or {};
@@ -225,7 +241,7 @@ def:pub page() -> JsxPage {
                     skip;
                 }}
 
-                {if not o {
+                {if not o and len(feature_rows) > 0 {
                     <section className="pan pan-grow">
                         <div className="pan-h"><span><span className="pan-n">06</span><span className="pan-t">Feature exposure</span></span><span className="pan-meta fig">{str(len(feature_rows)) + " surfaces"}</span></div>
                         <div className="pan-b">
