@@ -493,3 +493,84 @@
   color: var(--ink-3);
   line-height: 1.5;
 }
+
+/* ------------------------------------------------------------ blast strip */
+
+.canvas-f.hot {
+  border-top-color: var(--red);
+  background: rgba(229, 35, 27, 0.05);
+}
+
+.blast-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  min-width: 0;
+  flex: 1;
+  padding: 2px 0;
+}
+
+.blast-line b {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+  white-space: nowrap;
+}
+
+.blast-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.blast-feats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.blast-feat {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border: 1px solid rgba(229, 35, 27, 0.35);
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+/* the figure sits on the paper, not on a card -- a white slab under it made
+   the graph read as a widget dropped into the page */
+.canvas.pan {
+  background: transparent;
+}
+
+.canvas-b {
+  background: transparent;
+}
+
+/* rails: a panel must end on a whole row, never mid-item, and the tail panel
+   needs breathing room so its last line is not shaved by the viewport */
+.rail {
+  padding-bottom: 10px;
+}
+
+/* the feature list scrolls inside its own panel instead of running off the
+   bottom of the rail and getting cut through the middle of a row */
+.pan-b:has(.feat) {
+  max-height: 176px;
+}
+
+.gap:last-child {
+  padding-bottom: 2px;
+}
+
+.gap-tag {
+  margin-bottom: 2px;
+}

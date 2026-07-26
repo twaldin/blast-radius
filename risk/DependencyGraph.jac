@@ -1,170 +1,235 @@
-"""The Atlas canvas — interactive, labelled, and wired to the outage state."""
+"""The dependency figure, drawn as SVG.
 
-import from "react-force-graph-2d" { default as ForceGraph2D }
-import from react { useEffect, useMemo }
+This used to run on react-force-graph. That was the wrong tool: every position
+here is computed exactly, so a physics engine bought us nothing and cost a
+great deal -- it re-seeded the simulation on every render, swallowed wheel
+events, and repainted the whole canvas per frame, which is what produced the
+flashing and the clipped animation.
+
+Plain SVG instead. Deterministic geometry, real DOM nodes for hover and click,
+and CSS transitions for the outage choreography.
+
+Flow and massing follow the data-maximalist draft; the orthogonal traces,
+squares and blast treatment follow the Swiss memo. The two bands bow toward
+each other so the field pinches at the shared provider.
+"""
+
 import from .store { useRisk }
-import from .graph_core { radial_layout, node_radius, ink, tau }
+import from .graph_core { burst_layout, node_radius, place_x, place_y, label_side, trace_path }
+
+glob VB_W: float = 1000.0;
+glob VB_H: float = 720.0;
 
 def:pub DependencyGraph() -> JsxElement {
     risk: any = useRisk();
     st: any = risk["state"];
     acts: any = risk["actions"];
 
-    has width: int = 900;
-    has height: int = 620;
     has hovered: str = "";
-    has box: Ref[any] = Ref();
-
-    useEffect(lambda {
-        measure: any = lambda {
-            if box.current {
-                width = box.current.clientWidth;
-                height = box.current.clientHeight;
-            }
-        };
-        measure.call(None);
-        window.addEventListener("resize", measure);
-        return lambda { window.removeEventListener("resize", measure); };
-    }, []);
-
-    C: any = ink();
-    TAU: float = tau();
 
     nodes: any = st["nodes"];
     links: any = st["links"];
-    top: any = st["top"];
-    core_id: str = (top["provider_id"] as str) if top else "";
+    core_id: str = (st["top"]["provider_id"] as str) if st["top"] else "";
     selected: str = st["selected"] as str;
     outage: any = st["outage"];
     hop: int = st["outage_hop"] as int;
     down_ids: any = st["down_ids"];
     failed_id: str = (outage["provider_id"] as str) if outage else "";
+    active: any = st["active"];
 
-    data: any = useMemo(lambda {
-        return {"nodes": radial_layout(nodes, links, core_id), "links": links};
-    }, [nodes, links, core_id]);
+    ranked_ids: list[str] = [c["provider_id"] as str for c in st["chokes"]];
+    placed: any = burst_layout(nodes, links, ranked_ids);
 
-    def is_down(n: any) -> bool {
+    pos: dict = {};
+    for n in placed {
+        pos[n["id"]] = {"x": place_x(n), "y": place_y(n), "n": n};
+    }
+
+    vendor_n: int = len([n for n in nodes if n["tier"] == "vendor"]);
+    provider_n: int = len([n for n in nodes if n["tier"] == "provider"]);
+
+    def down_now(n: any) -> bool {
         if not outage { return False; }
-        if n.id == failed_id { return hop >= 0; }
-        if n.tier == "vendor" { return hop >= 1 and down_ids.includes(n.id); }
-        if n.tier == "org" { return hop >= 2; }
+        if n["id"] == failed_id { return hop >= 0; }
+        if n["tier"] == "vendor" { return hop >= 1 and down_ids.includes(n["id"]); }
+        if n["tier"] == "org" { return hop >= 2; }
         return False;
     }
 
-    def draw_node(n: any, ctx: any, scale: float) {
-        r = node_radius(n, core_id, 1.0);
-        active = n.id == selected or n.id == hovered;
-        down = is_down(n);
-        muted = outage and not down;
-
-        if down and n.id == failed_id {
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, r * 1.9, 0, TAU, False);
-            ctx.fillStyle = "rgba(229,35,27,0.12)";
-            ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, r, 0, TAU, False);
-
-        if down {
-            ctx.fillStyle = C["down"];
-            ctx.fill();
-        } elif muted {
-            ctx.fillStyle = C["mute"];
-            ctx.fill();
-        } elif n.id == core_id {
-            ctx.fillStyle = C["core"];
-            ctx.fill();
-        } elif n.tier == "vendor" {
-            ctx.fillStyle = C["vendor"];
-            ctx.fill();
-            ctx.lineWidth = 1.4 / scale;
-            ctx.strokeStyle = C["flag"] if (n.supply_chain_risk or (not n.soc2)) else C["vendorEdge"];
-            ctx.stroke();
-        } else {
-            ctx.fillStyle = C["flag"] if (n.supply_chain_risk or (not n.soc2)) else C["provider"];
-            ctx.fill();
-        }
-
-        if active and not outage {
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, r + 5 / scale, 0, TAU, False);
-            ctx.lineWidth = 1.2 / scale;
-            ctx.strokeStyle = C["core"];
-            ctx.stroke();
-        }
-
-        if n.tier == "vendor" and outage and not down { return; }
-
-        size = (12.0 if n.id == core_id else 10.0) / scale;
-        ctx.font = "600 " + str(size) + "px Archivo, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-        ctx.fillStyle = C["mute"] if muted else (C["labelOn"] if (active or n.id == core_id) else C["label"]);
-        label_txt: any = n.label;
-        ctx.fillText(label_txt.toUpperCase(), n.x, n.y + r + 7 / scale);
-
-        if n.id == core_id and not outage {
-            ctx.font = "500 " + str(8.5 / scale) + "px 'IBM Plex Mono', monospace";
-            ctx.fillStyle = C["core"];
-            ctx.fillText("CHOKEPOINT", n.x, n.y + r + 22 / scale);
+    # hover reads one path at a time; a click keeps that path lit after the
+    # pointer leaves, which is what "selected" has to mean on a diagram
+    focus_id: str = hovered if hovered else selected;
+    lit: dict = {};
+    if focus_id {
+        lit[focus_id] = True;
+        for l in links {
+            s = l["source"] as str;
+            t = l["target"] as str;
+            if s == focus_id { lit[t] = True; }
+            if t == focus_id { lit[s] = True; }
         }
     }
 
-    def link_color(l: any) -> str {
-        if not outage { return C["edge"] as str; }
-        tid = l.target.id if l.target.id else "";
-        sid = l.source.id if l.source.id else "";
-        hot = (tid == failed_id and hop >= 1) or (hop >= 2 and down_ids.includes(sid));
-        return (C["edgeHot"] as str) if hot else (C["edgeSoft"] as str);
+    def touches(l: any) -> bool {
+        if not focus_id { return False; }
+        return (l["source"] as str) == focus_id or (l["target"] as str) == focus_id;
     }
 
-    def link_width(l: any) -> float {
-        if not outage { return 1.0; }
-        tid = l.target.id if l.target.id else "";
-        return 1.8 if tid == failed_id and hop >= 1 else 0.7;
+    def cls_for(n: any) -> str {
+        c = "gnode gnode-" + (n["tier"] as str);
+        if n["id"] == core_id { c = c + " is-core"; }
+        if n["id"] == selected { c = c + " is-sel"; }
+        if n["id"] == hovered { c = c + " is-hov"; }
+        if down_now(n) { c = c + " is-down"; }
+        if outage and not down_now(n) { c = c + " is-mute"; }
+        # only the pointer dims the field; a selection stays legible in context
+        if hovered and not (n["id"] in lit) { c = c + " is-dim"; }
+        if n["supply_chain_risk"] or (not n["soc2"]) { c = c + " is-flag"; }
+        return c;
     }
 
-    def handle_tick() {
-        span = (Math.min(width, height) * 0.40) as float;
-        for n in data["nodes"] {
-            n.fx = Math.cos(n.__a) * span * n.__r;
-            n.fy = Math.sin(n.__a) * span * n.__r;
+    def trace_cls(l: any) -> str {
+        if outage {
+            if (l["target"] as str) == failed_id and hop >= 1 { return "trace is-hot"; }
+            return "trace is-mute";
         }
+        if touches(l) { return "trace is-lit"; }
+        if hovered { return "trace is-dim"; }
+        return "trace";
     }
 
-    def handle_click(n: any) {
-        if n.tier == "provider" { acts["select"](n.id as str); }
+    def pick(n: any) -> None {
+        if n["tier"] == "provider" { acts["select"](n["id"] as str); }
     }
+    return <div className="graph-surface">
+        <svg className="fig" viewBox={"0 0 " + str(VB_W) + " " + str(VB_H)} preserveAspectRatio="xMidYMid meet">
+            {#* ------------------------------------------- ring furniture *#}
+            <g className="fig-furniture">
+                <ellipse className="ring" cx={500} cy={360} rx={178} ry={164} />
+                <ellipse className="ring" cx={500} cy={360} rx={292} ry={269} />
+            </g>
 
-    def handle_hover(n: any) {
-        hovered = n.id as str if n else "";
-    }
-
-    return <div className="graph-surface" ref={box}>
-        <ForceGraph2D
-            graphData={data}
-            width={width}
-            height={height}
-            backgroundColor="rgba(0,0,0,0)"
-            nodeCanvasObject={draw_node}
-            nodePointerAreaPaint={lambda (n: any, color: str, ctx: any) {
-                ctx.beginPath();
-                ctx.arc(n.x, n.y, node_radius(n, core_id, 1.0) + 6, 0, TAU, False);
-                ctx.fillStyle = color;
-                ctx.fill();
+            {#* ------------------------------- affected wedges during a blast *#}
+            {if outage and hop >= 1 {
+                <g className="fig-wash">
+                    {for n in placed {
+                        if n["tier"] == "vendor" and down_ids.includes(n["id"]) {
+                            <circle key={n["id"]} cx={place_x(n)} cy={place_y(n)} r={26} />
+                        }
+                    }}
+                </g>
+                skip;
             }}
-            linkColor={link_color}
-            linkWidth={link_width}
-            linkCurvature={0.24}
-            cooldownTicks={50}
-            enableZoomInteraction={False}
-            enablePanInteraction={False}
-            onEngineTick={handle_tick}
-            onNodeClick={handle_click}
-            onNodeHover={handle_hover}
-        />
+
+            {#* ---------------------------------------------- orthogonal traces *#}
+            <g className="fig-traces">
+                {for l in links {
+                    <path
+                        key={(l["source"] as str) + ">" + (l["target"] as str)}
+                        className={trace_cls(l)}
+                        d={trace_path(pos, l["source"] as str, l["target"] as str, core_id, l["kind"] as str)}
+                    />
+                }}
+            </g>
+
+            {#* ---------------------------------------------- nodes *#}
+            {for n in placed {
+                <g
+                    key={n["id"]}
+                    className={cls_for(n)}
+                    role={"button" if n["tier"] == "provider" else "img"}
+                    tabIndex={0 if n["tier"] == "provider" else -1}
+                    aria-label={(n["label"] as str) + (" — select to trace its blast radius" if n["tier"] == "provider" else "")}
+                    onMouseEnter={lambda { hovered = n["id"] as str; }}
+                    onMouseLeave={lambda { hovered = ""; }}
+                    onFocus={lambda { hovered = n["id"] as str; }}
+                    onBlur={lambda { hovered = ""; }}
+                    onClick={lambda { pick(n); }}
+                    onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter" or e.key == " " { pick(n); } }}
+                >
+                    {#* a generous invisible target: the glyphs are far too
+                        small to be a reliable click area on a projector *#}
+                    <circle
+                        className="hit"
+                        cx={place_x(n)}
+                        cy={place_y(n)}
+                        r={node_radius(n, core_id, 1.0) + 16}
+                    />
+                    {if n["tier"] == "provider" {
+                        <circle cx={place_x(n)} cy={place_y(n)} r={node_radius(n, core_id, 1.0)} />
+                        skip;
+                    }}
+                    {if n["tier"] != "provider" {
+                        <rect
+                            x={place_x(n) - node_radius(n, core_id, 1.0)}
+                            y={place_y(n) - node_radius(n, core_id, 1.0)}
+                            width={node_radius(n, core_id, 1.0) * 2}
+                            height={node_radius(n, core_id, 1.0) * 2}
+                        />
+                        skip;
+                    }}
+
+                    {if n["tier"] == "provider" {
+                        <text
+                            className={"lbl-name" + (" lbl-end" if label_side(n) < 0 else "")}
+                            x={place_x(n) + (node_radius(n, core_id, 1.0) + 12) * label_side(n)}
+                            y={place_y(n) - 1}
+                        >
+                            {(n["label"] as any).toUpperCase()}
+                        </text>
+                        <text
+                            className={"lbl-meta" + (" lbl-end" if label_side(n) < 0 else "")}
+                            x={place_x(n) + (node_radius(n, core_id, 1.0) + 12) * label_side(n)}
+                            y={place_y(n) + 13}
+                        >
+                            {"IN-DEGREE " + str(n["inbound_degree"] or 0)}
+                        </text>
+                        if n["id"] == core_id and not outage {
+                            <text
+                                className={"lbl-choke" + (" lbl-end" if label_side(n) < 0 else "")}
+                                x={place_x(n) + (node_radius(n, core_id, 1.0) + 12) * label_side(n)}
+                                y={place_y(n) + 26}
+                            >CHOKEPOINT</text>
+                            skip;
+                        }
+                        skip;
+                    }}
+                    {if n["tier"] == "org" {
+                        <text className="lbl-org" x={place_x(n)} y={place_y(n) + node_radius(n, core_id, 1.0) + 18}>
+                            {(n["label"] as any).toUpperCase()}
+                        </text>
+                        skip;
+                    }}
+                    {if n["tier"] == "vendor" {
+                        <text
+                            className={"lbl-vend" + (" lbl-end" if label_side(n) < 0 else "")}
+                            x={place_x(n) + (node_radius(n, core_id, 1.0) + 9) * label_side(n)}
+                            y={place_y(n) + 3}
+                        >
+                            {(n["label"] as any).toUpperCase()}
+                        </text>
+                        if down_now(n) {
+                            <text className="lbl-x" x={place_x(n)} y={place_y(n) - node_radius(n, core_id, 1.0) - 7}>✕</text>
+                            skip;
+                        }
+                        skip;
+                    }}
+                </g>
+            }}
+
+            {#* ---------------------------------------------- blast stamp *#}
+            {if outage and active and failed_id in pos {
+                fx: float = pos[failed_id]["x"] as float;
+                fy: float = pos[failed_id]["y"] as float;
+                <g className="fig-stamp">
+                    <rect x={fx - 168.0} y={fy - 26.0} width={116} height={52} />
+                    <text className="stamp-pct" x={fx - 110.0} y={fy + 2.0}>
+                        {str(round((active["share"] as float) * 100)) + "%"}
+                    </text>
+                    <text className="stamp-cap" x={fx - 110.0} y={fy + 17.0}>OF STACK DOWN</text>
+                </g>
+                skip;
+            }}
+        </svg>
     </div>;
 }

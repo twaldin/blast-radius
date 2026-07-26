@@ -38,10 +38,7 @@ def:pub Atlas() -> JsxPage {
         }
     }
 
-    edge_set: dict = {};
-    for l in st["links"] {
-        edge_set[(l["source"] as str) + ">" + (l["target"] as str)] = True;
-    }
+    edge_set: dict = st["edge_keys"] or {};
 
     return <div className="atlas">
         {#* ---------------------------------------------------------- header strip *#}
@@ -139,7 +136,7 @@ def:pub Atlas() -> JsxPage {
                     {if len(nodes) == 0 and not meta["loading"] and not meta["crawling"] {
                         <div className="intake">
                             <p className={"intake-k" + (" bad" if meta["failed"] else "")}>{"Detection failed" if meta["failed"] else "No graph yet"}</p>
-                            <p className="intake-say">{"The server rejected the request — check it is running, then try again." if meta["failed"] else "Load the seeded stack, or add vendor domains by hand. Either way the crawl then reads each vendor's own subprocessor filing."}</p>
+                            <p className="intake-say">{"The server rejected the request — check it is running, then try again." if meta["failed"] else "Load the seeded demo stack, or add vendor domains by hand."}</p>
                             <div className="intake-row">
                                 <input
                                     className="intake-in"
@@ -160,18 +157,27 @@ def:pub Atlas() -> JsxPage {
                                 />
                                 <button className="btn btn-quiet" onClick={lambda { acts["addManual"](manual_in); }}>Add manually</button>
                             </div>
-                            <p className="intake-fine">Automatic detection currently resolves jachammer.ai. Any other domain needs its vendors entered by hand until DNS and header detection ships.</p>
+                            <p className="intake-fine">The seeded stack is fixture data, not crawled filings. Live detection and real subprocessor crawling are still landing.</p>
                         </div>
                         skip;
                     }}
                 </div>
-                <div className="canvas-f">
-                    <span>Click a provider to select · Simulate to trace its blast radius</span>
+                <div className={"canvas-f" + (" hot" if o else "")}>
                     {if o {
-                        <button className="btn btn-quiet" onClick={acts["clear"]}>Reset simulation</button>
+                        <span className="blast-line">
+                            <b>Blast radius — {(o["provider"] as str)} down</b>
+                            <span className="blast-count">{"→ " + str(len(o["vendors_down"])) + "/" + str(st["vendor_total"]) + " vendors"}</span>
+                            <span className="blast-feats">
+                                {for f in o["features_down"] {
+                                    <span className="blast-feat" key={f}>{f}</span>
+                                }}
+                            </span>
+                        </span>
+                        <button className="btn btn-quiet" onClick={acts["clear"]}>Reset</button>
                         skip;
                     }}
                     {if not o {
+                        <span>Click a provider to select · simulate to trace its blast radius</span>
                         <button className="btn" onClick={acts["simulate"]} disabled={not a}>Simulate outage →</button>
                         skip;
                     }}

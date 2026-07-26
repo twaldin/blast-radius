@@ -239,3 +239,276 @@ input:focus-visible {
   outline: 2px solid var(--red);
   outline-offset: 2px;
 }
+
+/* ---------------------------------------------------------------- figure
+   Plain SVG. State lives in classes, so the outage is a CSS transition
+   rather than a per-frame canvas repaint. */
+
+.graph-surface .fig {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: var(--sans);
+}
+
+.fig-furniture line {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+
+.fig-zone {
+  fill: var(--ink-3);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-anchor: middle;
+}
+
+.fig-wash rect {
+  fill: rgba(229, 35, 27, 0.07);
+}
+
+.trace {
+  fill: none;
+  stroke: rgba(22, 21, 15, 0.28);
+  stroke-width: 1;
+  transition: stroke 0.35s ease, stroke-width 0.35s ease;
+}
+
+.trace.is-mute {
+  stroke: rgba(22, 21, 15, 0.07);
+}
+
+.trace.is-hot {
+  stroke: var(--red);
+  stroke-width: 2;
+}
+
+.gnode {
+  transition: opacity 0.35s ease;
+}
+
+.gnode-provider {
+  cursor: pointer;
+}
+
+.gnode circle:not(.hit),
+.gnode rect {
+  fill: var(--ink);
+  transition: fill 0.35s ease;
+}
+
+.gnode-vendor rect {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 1.4;
+}
+
+.gnode.is-flag circle:not(.hit) {
+  fill: var(--amber);
+}
+
+.gnode.is-flag rect {
+  stroke: var(--amber);
+}
+
+.gnode.is-core circle:not(.hit) {
+  fill: var(--red);
+}
+
+.gnode.is-sel circle:not(.hit),
+.gnode.is-hov circle:not(.hit) {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  paint-order: stroke;
+}
+
+.gnode.is-mute {
+  opacity: 0.28;
+}
+
+.gnode.is-down circle:not(.hit),
+.gnode.is-down rect {
+  fill: var(--red);
+  stroke: var(--red);
+}
+
+.lbl-name {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lbl-meta {
+  fill: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 8.5px;
+}
+
+.lbl-vend {
+  fill: var(--ink-2);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.lbl-end {
+  text-anchor: end;
+}
+
+.lbl-choke {
+  fill: var(--red);
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+}
+
+.lbl-x {
+  fill: var(--red);
+  font-size: 12px;
+}
+
+.fig-stamp rect {
+  fill: var(--red);
+}
+
+.stamp-pct {
+  fill: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.stamp-cap {
+  fill: rgba(255, 255, 255, 0.9);
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: 0.1em;
+  text-anchor: middle;
+}
+
+.trace.is-lit {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+}
+
+.trace.is-dim {
+  stroke: rgba(22, 21, 15, 0.06);
+}
+
+.gnode.is-dim {
+  opacity: 0.22;
+}
+
+/* invisible, generous click target -- must beat .gnode circle's fill */
+.gnode .hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
+.gnode:focus {
+  outline: none;
+}
+
+.gnode:focus-visible .hit {
+  stroke: var(--red);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+/* Rest state is a solid hairline. Motion is reserved for meaning: a hovered
+   or selected path flows, and a blast flows faster. Animating every edge at
+   once turned the whole figure into noise. */
+.trace {
+  stroke-dasharray: none;
+  animation: none;
+}
+
+.trace.is-lit {
+  stroke-dasharray: 7 6;
+  animation: trace-flow 1.5s linear infinite;
+}
+
+.trace.is-dim,
+.trace.is-mute {
+  animation: none;
+  stroke-dasharray: none;
+}
+
+.trace.is-hot {
+  stroke-dasharray: 8 5;
+  animation: trace-flow 0.55s linear infinite;
+}
+
+@keyframes trace-flow {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace,
+  .trace.is-lit,
+  .trace.is-hot {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
+
+/* selection has to survive the pointer leaving */
+.gnode.is-sel circle:not(.hit) {
+  stroke: var(--red);
+  stroke-width: 2.5;
+}
+
+.gnode.is-sel .lbl-name {
+  fill: var(--ink);
+}
+
+.lbl-org {
+  fill: var(--ink);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-anchor: middle;
+}
+
+/* concentric guides for the burst; an unstyled SVG ellipse fills black */
+.fig-furniture .ring {
+  fill: none;
+  stroke: rgba(22, 21, 15, 0.18);
+  stroke-width: 1;
+  stroke-dasharray: 3 7;
+}
+
+.fig-wash circle {
+  fill: rgba(229, 35, 27, 0.10);
+  animation: wash-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes wash-in {
+  from { opacity: 0; transform: scale(0.6); transform-box: fill-box; transform-origin: center; }
+  to   { opacity: 1; transform: scale(1);   transform-box: fill-box; transform-origin: center; }
+}
+
+/* the blast stamp lands rather than appears */
+.fig-stamp {
+  animation: stamp-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes stamp-in {
+  from { opacity: 0; transform: scale(1.12); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig-wash circle,
+  .fig-stamp {
+    animation: none;
+  }
+}
