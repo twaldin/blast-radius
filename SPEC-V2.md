@@ -17,20 +17,38 @@ below them. A owns §4–5, B owns the data/search lane, C owns §9–10.
 
 ---
 
-## 0. BLOCKING — the tree does not boot. Fix before anything else.
+## 0. BLOCKING — ✅ ALL CLEAR. The tree boots.
 
-Three independent breakages. Nobody can `jac start` right now.
+All three breakages are fixed and pushed (`3108554`, `2f1a9f4`). `jac check` is clean on
+every `.jac` file and `jac start main.jac --no_client --port 8000` boots.
 
-| # | Where | Error | Owner | Est |
-|---|---|---|---|---|
-| 1 | `main.jac` ×5 | `E1002`/`E1001` — `++>` returns a **list**; the `[0]` was removed | **A** | 10 min |
-| 2 | `extract.jac:261` | `E1054` — lambda sort key overload | **B** | 10 min |
-| 3 | `extract.jac:6` | `No module named 'jaclang.byllm'` — byLLM not installed in the jac tool env, and the import path is likely `byllm.lib`, not `jaclang.byllm.lib` | **B** | 15 min |
+| # | Where | Error | Fix |
+|---|---|---|---|
+| 1 | `main.jac` ×5 | `E1002`/`E1001` — `++>` returns a **list**; the `[0]` was dropped | ✅ restored |
+| 2 | `extract.jac:261` | `E1054` — block lambda as sort key (and it was missing its `return`, so it sorted on `None`) | ✅ named typed fn |
+| 3 | `extract.jac:6` | `No module named 'jaclang.byllm'` | ✅ path is `byllm.lib`; installed via `uv tool install jaclang --with byllm` |
 
-> #1 is a real 0.16.7 gotcha, already in the team gotcha list: **`++>` returns a LIST — index `[0]`.**
-> #3 is the known packaging hole: byLLM must be installed into `.jac/venv` (or on `PYTHONPATH`).
+> **Anyone setting up a fresh machine must run `uv tool install jaclang --with byllm`** —
+> byLLM is not in the `jac` tool env by default and nothing boots without it.
 
-**A fixes #1 immediately and pushes, so C can deploy while the rest of this lands.**
+**C: you are unblocked. Deploy now.**
+
+---
+
+## 0.5 Lane A status — ✅ COMPLETE (`2f1a9f4`)
+
+`Company` model, write-time canonicalization, unbounded depth, seeding, and the new
+endpoints are all landed and verified against real data. Details in §4/§5/§11/§12.
+Live numbers from a cold boot:
+
+```
+seed_atlas   20 filings -> 19 ok, 555 disclosed dependencies, 293 companies
+atlas        19 mapped companies                             2.9 s
+graph        176 nodes / 259 edges (lindy.ai)                729 ms
+chokepoints  122 ms   one_look 201 ms   blast_radius 98 ms   search 60 ms
+```
+
+Remaining for A, both post-MVP: `root.shared` migration, and Map tuning if §10 gets built.
 
 ---
 
