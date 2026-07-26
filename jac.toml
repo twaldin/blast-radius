@@ -26,3 +26,18 @@ react-router-dom = "latest"
 react-error-boundary = "latest"
 zod = "latest"
 "@tanstack/react-form" = "latest"
+react-force-graph-2d = "latest"
+
+[scale.server]
+docs_enabled = true
+suppress_health_check_logs = true
+
+[scale.kubernetes]
+app_name = "blast-radius"
+namespace = "blast-radius"
+min_replicas = 1
+max_replicas = 4
+cpu_request = "250m"
+cpu_utilization_target = 70
+memory_limit = "1Gi"
+health_check_path = "/healthz"

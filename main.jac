@@ -117,3 +117,8 @@ walker:pub one_look {
         };
     }
 }
+
+# ------------------------------------------------------------------ client mount (C)
+def:pub app(children: any) -> JsxElement {
+    return <>{children}</>;
+}
