@@ -25,6 +25,7 @@ obj ProviderProfile {
     has hipaa: bool = False;
     has supply_chain_risk: str = "";      # "" | watchlist | sanctioned | foreign-owned
     has slug: str = "";                   # UI id override; blank = A slugifies the name
+    has is_sink: bool = False;            # terminal hyperscaler: no information one layer down
 }
 
 # jachammer.ai's externally-visible SaaS stack (the "I found your vendors" moment).
@@ -57,9 +58,9 @@ glob DEMO_SUBPROCESSORS: dict[str, list[ResolvedSubprocessor]] = {
 
 # curated provider risk/downtime asset (same curated data as the registry).
 glob PROVIDER_REGISTRY: dict[str, ProviderProfile] = {
-    "AWS":             ProviderProfile(category="cloud", downtime_hours_ytd=9.2, soc2=True,  hipaa=True,  supply_chain_risk="", slug="aws"),
-    "Microsoft Azure": ProviderProfile(category="cloud", downtime_hours_ytd=5.1, soc2=True,  hipaa=True,  supply_chain_risk="", slug="azure"),
-    "Google Cloud":    ProviderProfile(category="cloud", downtime_hours_ytd=3.4, soc2=True,  hipaa=True,  supply_chain_risk="", slug="gcp"),
+    "AWS":             ProviderProfile(category="cloud", downtime_hours_ytd=9.2, soc2=True,  hipaa=True,  supply_chain_risk="", slug="aws",        is_sink=True),
+    "Microsoft Azure": ProviderProfile(category="cloud", downtime_hours_ytd=5.1, soc2=True,  hipaa=True,  supply_chain_risk="", slug="azure",      is_sink=True),
+    "Google Cloud":    ProviderProfile(category="cloud", downtime_hours_ytd=3.4, soc2=True,  hipaa=True,  supply_chain_risk="", slug="gcp",        is_sink=True),
     "Cloudflare":      ProviderProfile(category="cdn",   downtime_hours_ytd=7.7, soc2=True,  hipaa=False, supply_chain_risk="", slug="cloudflare"),
     "Fastly":          ProviderProfile(category="cdn",   downtime_hours_ytd=4.3, soc2=False, hipaa=False, supply_chain_risk="watchlist", slug="fastly")
 };
