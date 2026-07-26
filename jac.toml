@@ -1,0 +1,28 @@
+[project]
+name = "blast-radius"
+version = "0.1.0"
+description = "Blast Radius supply-chain risk visualizer"
+entry-point = "main.jac"
+kind = "web-app"
+jac-version = "==0.34.7"
+
+[dependencies]
+
+[dev-dependencies]
+watchdog = ">=3.0.0"
+
+
+[serve]
+base_route_app = "app"
+
+[dependencies.npm.dev]
+vite = "latest"
+"@vitejs/plugin-react" = "latest"
+
+[dependencies.npm]
+react = "latest"
+react-dom = "latest"
+react-router-dom = "latest"
+react-error-boundary = "latest"
+zod = "latest"
+"@tanstack/react-form" = "latest"
