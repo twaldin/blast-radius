@@ -2,62 +2,214 @@
   "domain": "figma.com",
   "name": "Figma",
   "subprocessor_url": "https://www.figma.com/sub-processors/",
+  "fetched_at": "2026-07-26T14:30:00-07:00",
+  "raw_text_sha": "d3ae9aba3ee286446040850fa4691acf23525222cd70857be0a961e2ddd26eac",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:30:00",
   "subprocessors": [
-    {"name": "Agora, Inc.", "purpose": "In product audio conference and speech to text transcription features", "region": "United States"},
-    {"name": "Amazon Web Services, Inc.", "purpose": "Cloud infrastructure provider", "region": "United States (or, for Enterprise plans, the hosting location selected)"},
-    {"name": "Amazon Web Services, Inc. (Bedrock)", "purpose": "Content moderation and safety filtering", "region": "United States"},
-    {"name": "Cloudflare, Ltd.", "purpose": "Web infrastructure", "region": "United States"},
-    {"name": "Datadog, Inc.", "purpose": "Infrastructure monitoring", "region": "United States"},
-    {"name": "Functional Software, Inc. (Sentry)", "purpose": "Application error tracking and monitoring", "region": "United States"},
-    {"name": "Castle Global, Inc (Hive)", "purpose": "Content moderation and safety filtering", "region": "United States"},
-    {"name": "Modal Labs, Inc.", "purpose": "Cloud infrastructure provider for customer sandbox environments", "region": "United States"},
-    {"name": "OpenAI, LLC", "purpose": "Content moderation and safety filtering", "region": "United States"},
-    {"name": "Snowflake, Inc.", "purpose": "Cloud-based data warehouse", "region": "United States"},
-    {"name": "Twilio, Inc. (Segment)", "purpose": "Data analytics", "region": "United States"},
-    {"name": "Twilio, Inc.", "purpose": "Identity management", "region": "United States"},
-    {"name": "Anthropic PBC", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Cerebras Systems, Inc.", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Fireworks.ai, Inc.", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Google LLC (Vertex)", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Groq, Inc.", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Jasper AI, Inc.", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Microsoft Corporation (Azure)", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Recraft, Inc.", "purpose": "AI model provider", "region": "United States*"},
-    {"name": "Bria Artificial Intelligence Ltd", "purpose": "Selectable AI model provider", "region": "United States"},
-    {"name": "BytePlus Sdn. Bhd.", "purpose": "Selectable AI model provider", "region": "EU, Indonesia, Malaysia"},
-    {"name": "Features & Labels, Inc. (FAL)", "purpose": "Platform hosting selectable AI image generation Verified models from third party providers", "region": "United States"},
-    {"name": "Freepik, Inc.", "purpose": "Selectable AI model provider", "region": "Belgium, Netherlands, Spain"},
-    {"name": "Kling AI Pte. Ltd.", "purpose": "Selectable AI model provider", "region": "Singapore"},
-    {"name": "Lightricks Ltda AI, Inc.", "purpose": "Selectable AI model provider", "region": "EU, Israel, United Kingdom, United States"},
-    {"name": "Luma AI, Inc.", "purpose": "Selectable AI model provider", "region": "United States"},
-    {"name": "Decagon AI, Inc.", "purpose": "Self-serve automation for customer support inquiries", "region": "United States"},
-    {"name": "Gainsight, Inc.", "purpose": "Public support forum hosting (https://forum.figma.com/)", "region": "United States"},
-    {"name": "Google LLC (Firebase)", "purpose": "Customer push notifications on mobile apps", "region": "United States"},
-    {"name": "Hex, Inc", "purpose": "Data analytics for support issues", "region": "United States"},
-    {"name": "Intercom, Inc.", "purpose": "Customer service and technical support", "region": "United States"},
-    {"name": "IntouchCX, Inc.", "purpose": "Customer service and technical support", "region": "Canada, The Philippines"},
-    {"name": "PostHog, Inc.", "purpose": "Customer support data analytics", "region": "Germany"},
-    {"name": "Premier Talent Partners", "purpose": "Customer service and technical support", "region": "United States"},
-    {"name": "Pylon Labs, Inc", "purpose": "Customer service and technical support", "region": "United States"},
-    {"name": "SendGrid, Inc.", "purpose": "Customer email notifications", "region": "United States"},
-    {"name": "Sprinklr, Inc.", "purpose": "Customer service and technical support", "region": "United States"},
-    {"name": "Zendesk, Inc.", "purpose": "Customer service and technical support", "region": "United States"},
-    {"name": "Figma Australia Pty Ltd", "purpose": "", "region": "Australia"},
-    {"name": "FIGMA BRASIL LTDA.", "purpose": "", "region": "Brazil"},
-    {"name": "Figma Canada Ltd.", "purpose": "", "region": "Canada"},
-    {"name": "Figma France SAS", "purpose": "", "region": "France"},
-    {"name": "Figma GmbH", "purpose": "", "region": "Germany"},
-    {"name": "Figma, Inc.", "purpose": "", "region": "EEA, United States"},
-    {"name": "Figma India Private", "purpose": "", "region": "India"},
-    {"name": "Figma International LLC", "purpose": "", "region": "United States, New Zealand"},
-    {"name": "Figma Ireland Limited", "purpose": "", "region": "Ireland"},
-    {"name": "Figma Japan K.K", "purpose": "", "region": "Japan"},
-    {"name": "Figma Singapore Pte. Limited", "purpose": "", "region": "Singapore"},
-    {"name": "Figma Korea Ltd.", "purpose": "", "region": "South Korea"},
-    {"name": "Vmlapp Sweden AB", "purpose": "", "region": "Sweden"},
-    {"name": "Weavy AI Ltd", "purpose": "", "region": "Israel"},
-    {"name": "Figma UK Limited", "purpose": "", "region": "United Kingdom"}
+    {
+      "name": "Agora, Inc.",
+      "purpose": "In product audio conference and speech to text transcription features",
+      "region": "United States"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Cloud infrastructure provider",
+      "region": "United States (or, for Enterprise plans, the hosting location selected)"
+    },
+    {
+      "name": "Amazon Web Services, Inc. (Bedrock)",
+      "purpose": "Content moderation and safety filtering",
+      "region": "United States"
+    },
+    {
+      "name": "Anthropic PBC",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Bria Artificial Intelligence Ltd",
+      "purpose": "Selectable AI model provider",
+      "region": "United States"
+    },
+    {
+      "name": "BytePlus Sdn. Bhd.",
+      "purpose": "Selectable AI model provider",
+      "region": "EU, Indonesia, Malaysia"
+    },
+    {
+      "name": "Castle Global, Inc (Hive)",
+      "purpose": "Content moderation and safety filtering",
+      "region": "United States"
+    },
+    {
+      "name": "Cerebras Systems, Inc.",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Cloudflare, Ltd.",
+      "purpose": "Web infrastructure",
+      "region": "United States"
+    },
+    {
+      "name": "Datadog, Inc.",
+      "purpose": "Infrastructure monitoring",
+      "region": "United States"
+    },
+    {
+      "name": "Decagon AI, Inc.",
+      "purpose": "Self-serve automation for customer support inquiries",
+      "region": "United States"
+    },
+    {
+      "name": "Features & Labels, Inc. (FAL)",
+      "purpose": "Platform hosting selectable AI image generation Verified models from third party providers",
+      "region": "United States"
+    },
+    {
+      "name": "Fireworks.ai, Inc.",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Freepik, Inc.",
+      "purpose": "Selectable AI model provider",
+      "region": "Belgium, Netherlands, Spain"
+    },
+    {
+      "name": "Functional Software, Inc. (Sentry)",
+      "purpose": "Application error tracking and monitoring",
+      "region": "United States"
+    },
+    {
+      "name": "Gainsight, Inc.",
+      "purpose": "Public support forum hosting (https://forum.figma.com/)",
+      "region": "United States"
+    },
+    {
+      "name": "Google LLC (Firebase)",
+      "purpose": "Customer push notifications on mobile apps",
+      "region": "United States"
+    },
+    {
+      "name": "Google LLC (Vertex)",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Groq, Inc.",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Hex, Inc",
+      "purpose": "Data analytics for support issues",
+      "region": "United States"
+    },
+    {
+      "name": "Intercom, Inc.",
+      "purpose": "Customer service and technical support",
+      "region": "United States"
+    },
+    {
+      "name": "IntouchCX, Inc.",
+      "purpose": "Customer service and technical support",
+      "region": "Canada, The Philippines"
+    },
+    {
+      "name": "Jasper AI, Inc.",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Kling AI Pte. Ltd.",
+      "purpose": "Selectable AI model provider",
+      "region": "Singapore"
+    },
+    {
+      "name": "Lightricks Ltda AI, Inc.",
+      "purpose": "Selectable AI model provider",
+      "region": "EU, Israel, United Kingdom, United States"
+    },
+    {
+      "name": "Luma AI, Inc.",
+      "purpose": "Selectable AI model provider",
+      "region": "United States"
+    },
+    {
+      "name": "Microsoft Corporation (Azure)",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "Modal Labs, Inc.",
+      "purpose": "Cloud infrastructure provider for customer sandbox environments",
+      "region": "United States"
+    },
+    {
+      "name": "OpenAI, LLC",
+      "purpose": "Content moderation and safety filtering",
+      "region": "United States"
+    },
+    {
+      "name": "PostHog, Inc.",
+      "purpose": "Customer support data analytics",
+      "region": "Germany"
+    },
+    {
+      "name": "Premier Talent Partners",
+      "purpose": "Customer service and technical support",
+      "region": "United States"
+    },
+    {
+      "name": "Pylon Labs, Inc",
+      "purpose": "Customer service and technical support",
+      "region": "United States"
+    },
+    {
+      "name": "Recraft, Inc.",
+      "purpose": "AI model provider",
+      "region": "United States*"
+    },
+    {
+      "name": "SendGrid, Inc.",
+      "purpose": "Customer email notifications",
+      "region": "United States"
+    },
+    {
+      "name": "Snowflake, Inc.",
+      "purpose": "Cloud-based data warehouse",
+      "region": "United States"
+    },
+    {
+      "name": "Sprinklr, Inc.",
+      "purpose": "Customer service and technical support",
+      "region": "United States"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "Identity management",
+      "region": "United States"
+    },
+    {
+      "name": "Twilio, Inc. (Segment)",
+      "purpose": "Data analytics",
+      "region": "United States"
+    },
+    {
+      "name": "Vmlapp Sweden AB",
+      "purpose": "",
+      "region": "Sweden"
+    },
+    {
+      "name": "Weavy AI Ltd",
+      "purpose": "",
+      "region": "Israel"
+    },
+    {
+      "name": "Zendesk, Inc.",
+      "purpose": "Customer service and technical support",
+      "region": "United States"
+    }
   ]
 }

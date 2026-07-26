@@ -50,6 +50,7 @@ test "deduplicates canonical subprocessors and merges details" {
     assert resolved[0].purpose == "Hosting";
     assert resolved[0].region == "United States";
     assert resolved[0].confidence == 1.0;
+    assert resolved[0].canonical_domain == "amazon.com";
 }
 
 

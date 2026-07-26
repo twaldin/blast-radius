@@ -2,7 +2,8 @@
   "domain": "openrouter.ai",
   "name": "OpenRouter",
   "subprocessor_url": "https://trust.openrouter.ai/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57",
+  "fetched_at": "2026-07-26T14:24:02-07:00",
+  "raw_text_sha": "bebef168f1dcea5957de2235e0abb140696e5a5272dab6a5150ffbf216a8a0a6",
   "crawl_status": "unreadable",
-  "fetched_at": "2026-07-26T14:24:02",
   "subprocessors": []
 }

@@ -2,51 +2,89 @@
   "domain": "intercom.com",
   "name": "Intercom",
   "subprocessor_url": "https://www.intercom.com/legal/subprocessors-list",
+  "fetched_at": "2026-07-26T21:22:26-07:00",
+  "raw_text_sha": "d4e20f0ae2a7916bc975cfc96ebf535502a771e4e968ac9c4ca7dea72b4c1a25",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T21:22:26",
   "subprocessors": [
-    {"name": "Amazon Web Services, Inc.", "purpose": "Hosting, storage and processing (including AI processing) of Customer Data", "region": "USA"},
-    {"name": "Snowflake Inc.", "purpose": "Data warehouse services and processing (including AI processing)", "region": "USA"},
-    {"name": "Mailgun Technologies, L.L.C.", "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services", "region": "USA"},
-    {"name": "Message Systems, Inc. (d/b/a Sparkpost)", "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services", "region": "USA"},
-    {"name": "Twilio, Inc.", "purpose": "SMS and Phone functionality", "region": "USA"},
-    {"name": "Cloudflare, Inc.", "purpose": "Transport Layer Security (\"TLS\") protection for customers using a custom domain to host their Intercom Articles", "region": "USA"},
-    {"name": "OpenAI, L.L.C.", "purpose": "AI processing", "region": "USA"},
-    {"name": "PlanetScale Inc.", "purpose": "Database storage and caching", "region": "USA"},
-    {"name": "Anthropic, PBC", "purpose": "AI processing", "region": "USA"},
-    {"name": "Google L.L.C.", "purpose": "AI processing", "region": "USA"},
-    {"name": "Microsoft Corporation", "purpose": "AI processing", "region": "USA"},
-    {"name": "Eleven Labs, Inc.", "purpose": "AI processing (text to speech)", "region": "USA"},
-    {"name": "Ably Realtime Ltd.", "purpose": "message delivery service to support real-time delivery of messages via messenger products", "region": "USA"},
-    {"name": "Cartesia AI, Inc.", "purpose": "AI processing (text to speech)", "region": "USA"},
-    {"name": "Amazon Web Services (AWS)", "purpose": "Hosting, storage and processing (including AI processing) of Customer Data (EU Data Hosting)", "region": "Ireland"},
-    {"name": "Snowflake Inc.", "purpose": "Data warehouse services and processing (including AI processing) (EU Data Hosting)", "region": "Ireland"},
-    {"name": "Mailgun Technologies, L.L.C.", "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (EU Data Hosting)", "region": "Belgium"},
-    {"name": "Message Systems, Inc. (d/b/a Sparkpost)", "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (EU Data Hosting)", "region": ""},
-    {"name": "Twilio, Inc.", "purpose": "SMS and Phone functionality (EU Data Hosting; only if Customer elects SMS/Phone features)", "region": "USA"},
-    {"name": "Cloudflare, Inc.", "purpose": "Transport Layer Security (\"TLS\") protection for customers using a custom domain to host their Intercom Articles; Compute and storage infrastructure for Intercom MCP server (EU Data Hosting)", "region": "Ireland"},
-    {"name": "Microsoft Corporation", "purpose": "AI processing (EU Data Hosting)", "region": "EU"},
-    {"name": "PlanetScale Inc.", "purpose": "Database storage and caching (EU Data Hosting)", "region": "Ireland"},
-    {"name": "Google", "purpose": "AI processing (EU Data Hosting)", "region": "EU"},
-    {"name": "OpenAI, L.L.C.", "purpose": "AI processing (EU Data Hosting)", "region": "EU"},
-    {"name": "Eleven Labs, Inc.", "purpose": "AI processing (text to speech) (EU Data Hosting)", "region": "EU"},
-    {"name": "Ably Realtime Ltd.", "purpose": "message delivery service to support real-time delivery of messages via messenger products (EU Data Hosting)", "region": "EU"},
-    {"name": "Cartesia AI, Inc.", "purpose": "AI processing (text to speech) (EU Data Hosting)", "region": "EU"},
-    {"name": "Amazon Web Services (AWS)", "purpose": "Hosting, storage and processing (including AI processing) of Customer Data (Australia Data Hosting; AI processing via models hosted on AWS Bedrock services occurs in the USA)", "region": "Australia"},
-    {"name": "Snowflake Inc.", "purpose": "Data warehouse services and processing (including AI processing) (Australia Data Hosting)", "region": "Australia"},
-    {"name": "Message Systems, Inc. (d/b/a Sparkpost)", "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (Australia Data Hosting)", "region": "USA"},
-    {"name": "Twilio, Inc.", "purpose": "SMS and Phone functionality (Australia Data Hosting; only if Customer elects SMS/Phone features)", "region": "USA"},
-    {"name": "Cloudflare, Inc.", "purpose": "Transport Layer Security (\"TLS\") protection for customers using a custom domain to host their Intercom Articles (Australia Data Hosting)", "region": "Australia"},
-    {"name": "OpenAI, L.L.C.", "purpose": "AI processing (Australia Data Hosting)", "region": "USA"},
-    {"name": "Anthropic, PBC", "purpose": "AI processing (Australia Data Hosting)", "region": "USA"},
-    {"name": "PlanetScale Inc.", "purpose": "Database storage and caching (Australia Data Hosting)", "region": "Australia"},
-    {"name": "Google", "purpose": "AI processing (Australia Data Hosting)", "region": "USA"},
-    {"name": "Eleven Labs, Inc.", "purpose": "AI processing (text to speech) (Australia Data Hosting)", "region": "USA"},
-    {"name": "Ably Realtime Ltd.", "purpose": "message delivery service to support real-time delivery of messages via messenger products (Australia Data Hosting)", "region": "Australia"},
-    {"name": "Cartesia AI, Inc.", "purpose": "AI processing (text to speech) (Australia Data Hosting)", "region": "USA"},
-    {"name": "Intercom, Inc.", "purpose": "Intercom Affiliate which may function as sub-processor in providing the services and/or for support", "region": "USA"},
-    {"name": "Intercom R&D Unlimited Company", "purpose": "Intercom Affiliate which may function as sub-processor in providing the services and/or for support", "region": "Ireland"},
-    {"name": "Intercom Software Australia Pty Ltd", "purpose": "Intercom Affiliate which may function as sub-processor in providing the services and/or for support", "region": "Australia"},
-    {"name": "Intercom Software UK Limited", "purpose": "Intercom Affiliate which may function as sub-processor in providing the services and/or for support", "region": "UK"}
+    {
+      "name": "Ably Realtime Ltd.",
+      "purpose": "message delivery service to support real-time delivery of messages via messenger products | message delivery service to support real-time delivery of messages via messenger products (EU Data Hosting) | message delivery service to support real-time delivery of messages via messenger products (Australia Data Hosting)",
+      "region": "USA | EU | Australia"
+    },
+    {
+      "name": "Amazon Web Services (AWS)",
+      "purpose": "Hosting, storage and processing (including AI processing) of Customer Data (EU Data Hosting) | Hosting, storage and processing (including AI processing) of Customer Data (Australia Data Hosting; AI processing via models hosted on AWS Bedrock services occurs in the USA)",
+      "region": "Ireland | Australia"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting, storage and processing (including AI processing) of Customer Data",
+      "region": "USA"
+    },
+    {
+      "name": "Anthropic, PBC",
+      "purpose": "AI processing | AI processing (Australia Data Hosting)",
+      "region": "USA"
+    },
+    {
+      "name": "Cartesia AI, Inc.",
+      "purpose": "AI processing (text to speech) | AI processing (text to speech) (EU Data Hosting) | AI processing (text to speech) (Australia Data Hosting)",
+      "region": "USA | EU"
+    },
+    {
+      "name": "Cloudflare, Inc.",
+      "purpose": "Transport Layer Security (\"TLS\") protection for customers using a custom domain to host their Intercom Articles | Transport Layer Security (\"TLS\") protection for customers using a custom domain to host their Intercom Articles; Compute and storage infrastructure for Intercom MCP server (EU Data Hosting) | Transport Layer Security (\"TLS\") protection for customers using a custom domain to host their Intercom Articles (Australia Data Hosting)",
+      "region": "USA | Ireland | Australia"
+    },
+    {
+      "name": "Eleven Labs, Inc.",
+      "purpose": "AI processing (text to speech) | AI processing (text to speech) (EU Data Hosting) | AI processing (text to speech) (Australia Data Hosting)",
+      "region": "USA | EU"
+    },
+    {
+      "name": "Google",
+      "purpose": "AI processing (EU Data Hosting) | AI processing (Australia Data Hosting)",
+      "region": "EU | USA"
+    },
+    {
+      "name": "Google L.L.C.",
+      "purpose": "AI processing",
+      "region": "USA"
+    },
+    {
+      "name": "Mailgun Technologies, L.L.C.",
+      "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services | Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (EU Data Hosting)",
+      "region": "USA | Belgium"
+    },
+    {
+      "name": "Message Systems, Inc. (d/b/a Sparkpost)",
+      "purpose": "Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services | Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (EU Data Hosting) | Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (Australia Data Hosting)",
+      "region": "USA"
+    },
+    {
+      "name": "Microsoft Corporation",
+      "purpose": "AI processing | AI processing (EU Data Hosting)",
+      "region": "USA | EU"
+    },
+    {
+      "name": "OpenAI, L.L.C.",
+      "purpose": "AI processing | AI processing (EU Data Hosting) | AI processing (Australia Data Hosting)",
+      "region": "USA | EU"
+    },
+    {
+      "name": "PlanetScale Inc.",
+      "purpose": "Database storage and caching | Database storage and caching (EU Data Hosting) | Database storage and caching (Australia Data Hosting)",
+      "region": "USA | Ireland | Australia"
+    },
+    {
+      "name": "Snowflake Inc.",
+      "purpose": "Data warehouse services and processing (including AI processing) | Data warehouse services and processing (including AI processing) (EU Data Hosting) | Data warehouse services and processing (including AI processing) (Australia Data Hosting)",
+      "region": "USA | Ireland | Australia"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "SMS and Phone functionality | SMS and Phone functionality (EU Data Hosting; only if Customer elects SMS/Phone features) | SMS and Phone functionality (Australia Data Hosting; only if Customer elects SMS/Phone features)",
+      "region": "USA"
+    }
   ]
 }

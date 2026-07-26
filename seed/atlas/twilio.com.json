@@ -2,8 +2,9 @@
   "domain": "twilio.com",
   "name": "Twilio",
   "subprocessor_url": "https://www.twilio.com/en-us/legal/sub-processors",
+  "fetched_at": "2026-07-26T14:40:00-07:00",
+  "raw_text_sha": "bea3a19fdd6c6016ff091e1719225bb3b371bc6737cb980e23ab2acc2fa20558",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:40:00",
   "subprocessors": [
     {
       "name": "Adaptive Mobile",
@@ -11,17 +12,12 @@
       "region": "USA"
     },
     {
-      "name": "AWS",
-      "purpose": "Infrastructure Provider providing hosting services and storage.; Text to speech functionality for customers using Amazon Polly, Amazon Comprehend, and Amazon Transcribe.; Streaming and interactive video.; Automation and storage services for marketing campaigns.; Routing and transmission of emails.",
-      "region": "USA*; USA; USA, EU; USA or EU (Dublin) as selected by customers"
+      "name": "Amazon Bedrock",
+      "purpose": "Infrastructure Provider providing hosting services and storage.; Text to speech functionality for customers using Amazon Polly, Amazon Comprehend, and Amazon Transcribe.; Streaming and interactive video.; Automation and storage services for marketing campaigns.; Routing and transmission of emails. | Vendor for AI functionality in product",
+      "region": "USA*; USA; USA, EU; USA or EU (Dublin) as selected by customers | USA"
     },
     {
       "name": "Anthropic",
-      "purpose": "Vendor for AI functionality in product",
-      "region": "USA"
-    },
-    {
-      "name": "Amazon Bedrock",
       "purpose": "Vendor for AI functionality in product",
       "region": "USA"
     },
@@ -31,19 +27,29 @@
       "region": "USA, EU"
     },
     {
+      "name": "DataBank",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "North America"
+    },
+    {
       "name": "Datadog",
       "purpose": "Operational monitoring",
       "region": "USA"
     },
     {
-      "name": "DVELP/Sabio",
-      "purpose": "Connectivity services to customer’s Google CCAI instance.",
-      "region": "UK (provision of the services), Belgium, Finland, Germany, Netherlands, and Poland (data persistence/backups)"
-    },
-    {
       "name": "Deepgram",
       "purpose": "Speech to text and text to speech APIs",
       "region": "USA"
+    },
+    {
+      "name": "Digital Realty",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "North America, EU"
+    },
+    {
+      "name": "DVELP/Sabio",
+      "purpose": "Connectivity services to customer’s Google CCAI instance.",
+      "region": "UK (provision of the services), Belgium, Finland, Germany, Netherlands, and Poland (data persistence/backups)"
     },
     {
       "name": "Elastic",
@@ -91,14 +97,9 @@
       "region": "USA"
     },
     {
-      "name": "Postmark",
-      "purpose": "Outbound email messaging service.",
-      "region": "USA"
-    },
-    {
-      "name": "Sinch",
-      "purpose": "Outbound SMS messaging service",
-      "region": "USA"
+      "name": "Lumen",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "North America"
     },
     {
       "name": "Meta",
@@ -126,13 +127,13 @@
       "region": "UK"
     },
     {
-      "name": "Snowflake",
-      "purpose": "Automation and storage services for Marketing Campaigns.; Storage services",
+      "name": "Postmark",
+      "purpose": "Outbound email messaging service.",
       "region": "USA"
     },
     {
-      "name": "Temporal Cloud",
-      "purpose": "Scheduling and execution of the customer defined workflows.",
+      "name": "Sinch",
+      "purpose": "Outbound SMS messaging service",
       "region": "USA"
     },
     {
@@ -141,34 +142,24 @@
       "region": "USA"
     },
     {
+      "name": "Snowflake",
+      "purpose": "Automation and storage services for Marketing Campaigns.; Storage services",
+      "region": "USA"
+    },
+    {
       "name": "Svix",
       "purpose": "Event delivery (webhooks as a Service)",
+      "region": "USA"
+    },
+    {
+      "name": "Temporal Cloud",
+      "purpose": "Scheduling and execution of the customer defined workflows.",
       "region": "USA"
     },
     {
       "name": "VoiceBase",
       "purpose": "Transcription services for customers who have enabled transcriptions on supported products.",
       "region": "USA"
-    },
-    {
-      "name": "DataBank",
-      "purpose": "Infrastructure Provider providing hosting services and storage.",
-      "region": "North America"
-    },
-    {
-      "name": "Lumen",
-      "purpose": "Infrastructure Provider providing hosting services and storage.",
-      "region": "North America"
-    },
-    {
-      "name": "Digital Realty",
-      "purpose": "Infrastructure Provider providing hosting services and storage.",
-      "region": "North America, EU"
-    },
-    {
-      "name": "Twilio Inc.",
-      "purpose": "Provision of the Twilio Services",
-      "region": "USA*"
     }
   ]
 }

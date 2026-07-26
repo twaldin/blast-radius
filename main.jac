@@ -25,10 +25,17 @@ Run:   jac clean --all && jac start main.jac --port 8000
 Envelope: data.reports[0] is the payload.
 """
 
-import json;
 import from pathlib { Path }
 import from datetime { datetime }
 import from hashlib { sha256 }
+import from atlas_seed {
+    canonical_domain_for_name,
+    load_seed_directory
+}
+import from contracts {
+    AtlasSeedRecord,
+    ProviderEvidence
+}
 import from extract {
     resolve_url, fetch_page, extract_and_resolve,
     canonicalize, clean_provider_name, PROVIDER_ALIASES
@@ -37,6 +44,7 @@ import from demo_data {
     detect_all, provider_profile,
     draft_status_update, explain_fallout, explain_change
 }
+import from provider_evidence { provider_evidence_for }
 import from registry { VENDOR_REGISTRY }
 
 # ------------------------------------------------------------------ graph model
@@ -357,10 +365,10 @@ def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bo
         }
     }
     prof = provider_profile(label);
-    made = (root ++> Company(
+    made: Company = root ++> Company(
         domain=dom, name=label, slug=prof.slug or _slugify(label) or _slugify(dom),
         category=prof.category, is_sink=prof.is_sink
-    ))[0];
+    );
     idx[key] = made;
     return made;
 }
@@ -415,20 +423,40 @@ def _view(start: Company, max_hops: int) -> GraphView {
 }
 
 def _node_payload(c: Company, tier: str, indeg: int) -> dict {
-    cited = c.risk_source_url != "";
+    evidence: ProviderEvidence | None = provider_evidence_for(
+        c.domain,
+        c.name
+    );
+    soc2_cited: bool = (
+        evidence is not None
+        and evidence.soc2_status != ""
+        and evidence.soc2_source_url != ""
+    );
+    risk_source_url: str = (
+        evidence.soc2_source_url
+        if soc2_cited and evidence is not None
+        else c.risk_source_url
+    );
     return {
         "id": c.slug,
         "label": c.name or c.domain,
         "tier": tier,
         "inbound_degree": indeg,
-        "soc2": c.soc2 if cited else True,
-        "supply_chain_risk": c.supply_chain_risk if cited else "",
-        "downtime_hours_ytd": c.downtime_hours_ytd if cited else 0.0,
+        "soc2": True if soc2_cited else c.soc2,
+        "soc2_status": (
+            evidence.soc2_status
+            if soc2_cited and evidence is not None
+            else ""
+        ),
+        "supply_chain_risk": (
+            c.supply_chain_risk if c.risk_source_url else ""
+        ),
+        "downtime_hours_ytd": 0.0,
         "domain": c.domain,
         "category": c.category,
         "crawl_status": c.crawl_status,
         "source_url": c.subprocessor_url,
-        "risk_source_url": c.risk_source_url
+        "risk_source_url": risk_source_url
     };
 }
 
@@ -656,7 +684,7 @@ async def _crawl_company(c: Company, ttl_days: int, force: bool) -> str {
     if c.crawl_status == "ok" and not _is_stale(c.last_crawled, ttl_days) and not force {
         return "cached";
     }
-    url = await resolve_url(c.domain, prefer_demo_cache=c.discovery_method != "manual");
+    url = await resolve_url(c.domain);
     if not url { c.crawl_status = "notfound"; c.last_crawled = _now(); return "notfound"; }
     text = await fetch_page(url);
     if not text { c.crawl_status = "unreadable"; c.last_crawled = _now(); return "unreadable"; }
@@ -675,7 +703,10 @@ async def _crawl_company(c: Company, ttl_days: int, force: bool) -> str {
     for e in [edge c ->:Subprocesses:->] { del e; }
     known = [k.name for k in _all_companies()];
     for rec in extract_and_resolve(text, known) {
-        target = _get_or_create_company("", rec.canonical_name);
+        target = _get_or_create_company(
+            rec.canonical_domain,
+            rec.canonical_name
+        );
         seen_at = prior[target.slug] if target.slug in prior else _now();
         c +>:Subprocesses(
             purpose=rec.purpose, region=rec.region, confidence=rec.confidence,
@@ -688,67 +719,107 @@ async def _crawl_company(c: Company, ttl_days: int, force: bool) -> str {
 # ------------------------------------------------------------------ seeding
 # SPEC-V2 §11. `.jac/` is gitignored and a redeploy starts empty, so the atlas has to
 # come from committed files or the deployed instance has nothing in it.
-def _seed_one(raw: dict, idx: dict[str, Company], use_llm: bool) -> dict {
-    dom = (raw["domain"] as str) if "domain" in raw else "";
-    if not dom { return {"domain": "", "status": "skipped", "edges": 0}; }
-    nm = (raw["name"] as str) if "name" in raw else "";
-    status = (raw["crawl_status"] as str) if "crawl_status" in raw else "ok";
-    c = _upsert_company(dom, nm, idx, use_llm);
+def _seed_one(seed: AtlasSeedRecord, idx: dict[str, Company]) -> dict {
+    c: Company = _upsert_company(seed.domain, seed.name, idx, False);
     c.discovery_method = "seed";
-    c.featured = True;
-    c.crawl_status = status;
-    if "subprocessor_url" in raw { c.subprocessor_url = raw["subprocessor_url"] as str; }
-    if "fetched_at" in raw { c.last_crawled = raw["fetched_at"] as str; }
-    subs = (raw["subprocessors"] as list) if "subprocessors" in raw else [];
-    if status != "ok" { return {"domain": dom, "status": status, "edges": 0}; }
+    c.featured = seed.crawl_status == "ok";
+    c.crawl_status = seed.crawl_status;
+    c.subprocessor_url = seed.subprocessor_url;
+    c.last_crawled = seed.fetched_at;
+    c.content_hash = seed.raw_text_sha;
+
     prior: dict[str, str] = {};
-    for t in [c ->:Subprocesses:->] {
-        for e in [edge c ->:Subprocesses:-> t] { prior[t.slug] = e.first_seen; }
+    for target in [c ->:Subprocesses:->] {
+        for edge_value in [edge c ->:Subprocesses:-> target] {
+            prior[target.slug] = edge_value.first_seen;
+        }
     }
-    for e in [edge c ->:Subprocesses:->] { del e; }
-    made = 0;
-    for s in subs {
-        sname = (s["name"] as str) if "name" in s else "";
-        if not sname { continue; }
-        purpose = (s["purpose"] as str) if "purpose" in s else "";
-        region = (s["region"] as str) if "region" in s else "";
-        target = _upsert_company("", sname, idx, use_llm);
-        seen_at = prior[target.slug] if target.slug in prior else _now();
+    for edge_value in [edge c ->:Subprocesses:->] {
+        del edge_value;
+    }
+    if seed.crawl_status != "ok" {
+        return {
+            "domain": seed.domain,
+            "status": seed.crawl_status,
+            "edges": 0
+        };
+    }
+
+    made: int = 0;
+    seen_targets: set[str] = set();
+    for subprocessor in seed.subprocessors {
+        target_domain: str = canonical_domain_for_name(subprocessor.name);
+        target: Company = _upsert_company(
+            target_domain,
+            subprocessor.name,
+            idx,
+            False
+        );
+        if target.slug in seen_targets {
+            continue;
+        }
+        seen_targets.add(target.slug);
+        seen_at: str = (
+            prior[target.slug]
+            if target.slug in prior
+            else seed.fetched_at
+        );
         c +>:Subprocesses(
-            purpose=purpose, region=region, handles_pii=_handles_pii(purpose),
-            first_seen=seen_at, last_seen=_now()
+            purpose=subprocessor.purpose,
+            region=subprocessor.region,
+            handles_pii=_handles_pii(subprocessor.purpose),
+            first_seen=seen_at,
+            last_seen=seed.fetched_at
         ):+> target;
         made += 1;
     }
-    return {"domain": dom, "status": status, "edges": made};
+    return {
+        "domain": seed.domain,
+        "status": seed.crawl_status,
+        "edges": made
+    };
 }
 
 # ------------------------------------------------------------------ walkers = endpoints
 # POST /walker/seed_atlas {}  -> import committed seed/atlas/*.json. Idempotent.
 walker:pub seed_atlas {
     has directory: str = "seed/atlas";
-    has use_llm: bool = False;      # deterministic by default: the stage path stays offline
     can run with Root entry {
-        base = Path(self.directory);
+        (seeds, validation_errors) = load_seed_directory(
+            Path(self.directory)
+        );
+        if validation_errors {
+            report {
+                "seeded": 0,
+                "ok": 0,
+                "edges": 0,
+                "companies": len(_all_companies()),
+                "detail": [],
+                "errors": validation_errors
+            };
+            disengage;
+        }
         rows: list[dict] = [];
-        idx = _index();
-        if base.exists() {
-            for f in sorted(base.glob("*.json")) {
-                try {
-                    rows.append(_seed_one(json.loads(f.read_text()) as dict, idx, self.use_llm));
-                } except ValueError {
-                    rows.append({"domain": f.name, "status": "badjson", "edges": 0});
-                }
+        idx: dict[str, Company] = _index();
+        for seed in seeds {
+            rows.append(_seed_one(seed, idx));
+        }
+        ok: int = 0;
+        edges: int = 0;
+        for row in rows {
+            if row["status"] == "ok" {
+                ok += 1;
             }
+            edges += row["edges"] as int;
         }
-        ok = 0;
-        edges = 0;
-        for r in rows {
-            if r["status"] == "ok" { ok += 1; }
-            edges += (r["edges"] as int);
-        }
-        report {"seeded": len(rows), "ok": ok, "edges": edges,
-                "companies": len(_all_companies()), "detail": rows};
+        report {
+            "seeded": len(rows),
+            "ok": ok,
+            "edges": edges,
+            "companies": len(_all_companies()),
+            "detail": rows,
+            "errors": []
+        };
     }
 }
 

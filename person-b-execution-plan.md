@@ -1,699 +1,558 @@
-# Person B Execution Plan — Data & Extraction Pipeline
+# Person B Execution Plan — Atlas Seed, Extraction, and Search
 
-This plan executes Person B's role from `blast-radius-build-spec.md`: turn a domain into clean, canonical, typed records without ever mutating the graph.
+This plan implements Person B's lane from `SPEC-V2.md` at fresh-main commit
+`b2de4d9`. It replaces the earlier single-organization, live-discovery-first plan.
+`SPEC-V2.md` is authoritative wherever older documents disagree.
 
-## 1. Mission and non-negotiable boundary
+## Implementation snapshot — July 26, 2026
 
-Person B owns:
+- The registry contains 152 generated entries: the original 150 plus the
+  explicitly required OpenRouter and Lindy records.
+- The committed MVP atlas contains 20 seed records, 20 raw replay fixtures,
+  19 readable filings, 1 honest unreadable filing, and 394 canonical
+  subprocessor records.
+- A real project-environment byLLM replay completed all 19 readable fixtures
+  with zero call errors. Twelve fixtures were exact identity matches; the
+  checked-in report records every missing and unexpected identity for review.
+- `scripts/precompute_atlas.jac` is a resumable, failure-isolated, bounded
+  concurrency runner for the complete registry.
+- Fifteen top-provider SOC claims have first-party citations. Downtime remains
+  absent because no equally reproducible incident-period calculation has been
+  curated.
+- The A-owned `main.jac` integration has an explicit review handoff in
+  `docs/person-a-review.md`; human approval remains a merge gate.
+- Browser Harness is an offline acquisition tool, not the runtime registry-miss
+  fallback. Any future arbitrary-company ReAct path is Firecrawl-only and
+  returns `notfound` when authoritative evidence cannot be extracted.
 
-```text
-domain
-  -> visible-vendor detection
-  -> subprocessor-page resolution
-  -> browser search when the company is absent from the registry
-  -> page fetching and cleanup
-  -> typed subprocessor extraction
-  -> provider canonicalization
-  -> ResolvedSubprocessor records
-```
+## 1. Mission
 
-Person B does **not** create, query, or mutate Jac nodes or edges. Person A is the only graph writer. Person B also does not edit `jac.toml`; dependency and capability changes go through Person C.
-
-The minimum successful outcome is:
-
-1. One real vendor URL resolves.
-2. Its page is fetched and reduced to usable text.
-3. `by llm()` produces typed records.
-4. aliases such as `AWS` and `Amazon Web Services, Inc.` converge on `Amazon Web Services`;
-5. Person A receives plain `ResolvedSubprocessor` objects and creates a visible chokepoint.
-
-Everything else is secondary until this path works end to end.
-
-## 2. Current repository state
-
-As of July 26, 2026:
-
-- Jac is installed and the API service compiles.
-- `registry.jac` contains 150 generated company entries sourced from six
-  non-overlapping research batches.
-- `extract.jac` is the single production extraction/resolution module.
-- `demo_data.jac` owns the explicit offline eight-vendor JacHammer fixture.
-- `browser_discovery.jac` and `browser_worker.py` are the bounded Browser Harness
-  adapter and escalation worker.
-- `main.jac` builds the real typed demo graph. Its E2E test proves 14 visible
-  nodes / 19 visible edges and 19 domain nodes / 27 typed domain edges when
-  deduplicated feature nodes and `Powers` edges are included.
-- The default imported Jac run currently passes 17 tests.
-
-Immediate priority is the deployed/rehearsed demo graph. Firecrawl integration
-and arbitrary-company search remain intentionally deferred until that path is
-stable.
-
-## 3. Freeze the cross-person contract first
-
-### 3.1 Types frozen in `contracts.jac`
-
-Agree on these fields before any real implementation:
-
-```jac
-obj DetectedVendor {
-    has domain: str;
-    has name: str;
-    has method: str;       # dns | headers | scripts | disclosure
-}
-
-obj SubprocessorRecord {
-    has name: str;
-    has purpose: str = "";
-    has hosting_region: str = "";
-}
-
-obj ResolvedSubprocessor {
-    has canonical_name: str;
-    has purpose: str = "";
-    has region: str = "";
-    has confidence: float = 1.0;
-}
-
-obj BrowserDiscoveryResult {
-    has status: str = "notfound";        # found | notfound
-    has company_name: str = "";
-    has company_domain: str = "";
-    has primary_source_url: str = "";
-    has source_urls: list[str] = [];
-    has subprocessors: list[ResolvedSubprocessor] = [];
-}
-```
-
-Do not add or rename fields after the +15 minute freeze without telling A and C. In particular, retain `canonical_name`, `region`, and `method`; those names connect B's layer to A's graph and C's payloads.
-
-### 3.2 Exported functions
-
-Use deterministic stubs first, but freeze the production sync/async shape before A imports them:
-
-```jac
-async def resolve_url(
-    domain: str,
-    prefer_demo_cache: bool = False
-) -> str;
-async def fetch_page(url: str) -> str;
-def detect_all(domain: str) -> list[DetectedVendor];
-async def discover_with_browser(
-    company_keyword: str,
-    domain: str,
-    known: list[str]
-) -> BrowserDiscoveryResult;
-
-def extract_and_resolve(
-    page_text: str,
-    known: list[str]
-) -> list[ResolvedSubprocessor];
-```
-
-`detect_all` is currently the deterministic demo detector; production DNS/HTTP
-detection may make it async later, but that is not allowed to destabilize the
-rehearsed path. Jac's type checker catches an un-awaited async `resolve_url` or
-`fetch_page` call.
-
-Return/error rules:
-
-- `resolve_url`: check only the curated and learned registries and return `""`
-  on a miss. `prefer_demo_cache=True` is reserved for the pre-warmed JacHammer
-  fixture.
-- `fetch_page`: return `""` when a page exists but cannot produce useful text. A maps that to `crawl_status = "unreadable"`.
-- `detect_all`: return a deduplicated list; one vendor should appear once even if several signals identify it.
-- `discover_with_browser`: interim Browser Harness implementation. The deferred
-  registry-miss orchestrator will call Firecrawl search/scrape first and invoke
-  this layer only for a bounded candidate-URL escalation.
-- `extract_and_resolve`: return plain typed objects, never graph objects, and return `[]` for empty/unusable text.
-- Expected network failures are contained and logged; they do not crash the entire expansion.
-
-### 3.3 Minute-15 handoff
-
-Before real logic, give A hardcoded implementations returning:
-
-- one known subprocessor URL;
-- one sample page body;
-- five detected vendors;
-- three canonicalized provider records, including two raw AWS variants that resolve to the same canonical name.
-- one fixed `BrowserDiscoveryResult` containing the new company and three unique subprocessors.
-
-Acceptance: A can import B's module, call every export, and create graph records without waiting for B again.
-
-## 4. Recommended file layout
-
-Person B owns:
+Person B turns authoritative public legal disclosures into reviewable, typed,
+canonical seed records and deterministic company search results:
 
 ```text
-extract.jac                    # fetch, cleanup, LLM extraction, resolution
-registry.jac                   # curated + learned registry, aliases, anchors
-demo_data.jac                  # offline JacHammer fixture and deterministic narrative
-browser_discovery.jac          # bounded Browser Harness validation/escalation
-browser_worker.py              # fixed Browser Harness/CDP boundary
-extract.test.jac               # extraction annex tests
-registry.test.jac              # registry annex tests
-browser_discovery.test.jac     # browser adapter annex tests
+registry company
+  -> authoritative subprocessor URL
+  -> rendered filing text
+  -> typed extraction
+  -> canonical subprocessors
+  -> committed seed/atlas/<domain>.json + raw fixture
+  -> A's idempotent seed_atlas importer
+  -> persistent Company/Subprocesses graph
+  -> C's Atlas UI
 ```
 
-Keep pure helpers separate inside the two owned modules:
+Person B owns data acquisition, extraction, canonicalization, seed generation,
+and matching/ranking. Person B does not create or query graph nodes, implement
+walkers, build the UI, or deploy the app.
 
-- domain and URL normalization;
-- header-to-vendor mapping;
-- script-host-to-vendor mapping;
-- DNS-answer-to-vendor mapping;
-- legal-suffix cleanup and alias lookup;
-- record deduplication.
+The MVP objective is no longer “crawl one demo organization deeply.” It is:
 
-Pure helpers make most behavior testable without network calls or LLM cost.
+> Import at least 20 real, source-backed company graphs into the deployed atlas,
+> prove they survive a redeploy, and keep the rehearsed path independent of the
+> network and an LLM.
 
-`browser_discovery.jac` is also B-owned. It may call the Browser Harness worker
-and return typed data, but it must not import graph types or create nodes.
+## 2. Fresh-main reality
+
+Observed after pulling `origin/main` to `b2de4d9` on July 26, 2026:
+
+- `jac --version` is `0.34.7`, matching the project pin.
+- `jac check extract.jac` passes. The `extract.jac:261` and byLLM import compile
+  blockers described in §6/B1 do not reproduce in this environment.
+- A real model-backed extraction in the deployment-equivalent environment is
+  still unproven. Compile success is not a live byLLM smoke test.
+- `jac check main.jac` still reports five A-owned graph connection typing errors
+  on fresh main. Do not absorb those into B's lane; full-app green remains an
+  external integration gate.
+- `registry.jac` contains 150 generated entries. `openrouter.ai` and `lindy.ai`
+  are absent.
+- There is no committed `seed/atlas/` corpus, no atlas precompute runner, no
+  search-ranking backend, and no cited provider-facts dataset.
+- The bounded ReAct/browser fallback exists, but it must stay off the rehearsed
+  path.
+
+The revised spec resolves the old persistence gap: local `.jac/data` is not a
+handoff artifact. B must commit seed data; A imports it into Jac's graph database.
+
+## 3. Scope and ownership
+
+### Person B owns
+
+- `extract.jac`: fetching, typed extraction, canonicalization, deduplication.
+- `browser_discovery.jac` and `browser_worker.py`: bounded rendered-page access.
+- `research/registry-*.json`: verified registry source records.
+- `scripts/build_registry.jac`: registry generation and validation behavior.
+- `registry.jac`: generated output only; never hand-edit it.
+- `seed/atlas/*.json`: committed, reviewable atlas seed records.
+- `seed/raw/*.txt`: raw rendered filing text used as replay fixtures.
+- B-owned Jac validation/precompute helpers and their annex tests.
+- Pure company-query normalization and ranking behind A's `search {q}` walker.
+- Cited provider facts, only after the real seed corpus is working.
+
+### Shared contracts requiring A's agreement
+
+- `contracts.jac` changes.
+- The exact seed schema consumed by `seed_atlas`.
+- How a disclosed company name resolves to `Company.domain`.
+- The plain-value input/output shape for B's search-ranking helper.
+
+### Person B does not own
+
+- `Company` nodes, `Subprocesses` edges, graph persistence, or graph migrations.
+- `seed_atlas`, `graph`, `expand`, `atlas`, `search`, or `industry_map` walkers.
+- Swiss-editorial UI, force layout, Map view, or deployment.
+- `jac.toml` deployment topology. C owns the required one-replica MVP setting.
+- Fabricated `demo_data.jac` records. They are not seed input.
+- Live vendor detection, the defense adapter, or registry breadth past 150 before
+  the MVP seed corpus lands.
+
+## 4. Contracts to freeze before the data run
+
+### 4.1 Committed seed record
+
+One JSON file per company:
+
+```text
+seed/atlas/<normalized-domain>.json
+seed/atlas/<normalized-domain>.txt
+```
+
+The JSON contract is:
+
+```json
+{
+  "domain": "stripe.com",
+  "name": "Stripe",
+  "subprocessor_url": "https://stripe.com/legal/service-providers",
+  "fetched_at": "2026-07-26T00:00:00Z",
+  "raw_text_sha": "<sha256 of the adjacent .txt fixture>",
+  "crawl_status": "ok",
+  "subprocessors": [
+    {
+      "name": "Amazon Web Services",
+      "purpose": "cloud hosting",
+      "region": "United States"
+    }
+  ]
+}
+```
+
+Rules:
+
+- `domain` is lowercase, has no scheme, path, port, trailing dot, or `www.`.
+- `subprocessor_url` is the authoritative public filing actually read.
+- `fetched_at` records observation time; it is not an invented publication date.
+- `raw_text_sha` is SHA-256 over the exact committed UTF-8 fixture bytes.
+- `crawl_status` is `ok`, `unreadable`, or `notfound`.
+- `ok` requires a readable authoritative source and a reviewed parsed result.
+- `unreadable` and `notfound` ship honestly with an empty `subprocessors` list.
+- Missing purpose or region is `""`; never infer it.
+- Records and fields are emitted in deterministic order for reviewable diffs.
+- A re-run for unchanged text must produce byte-stable parsed content apart from
+  `fetched_at`.
+
+The adjacent `.txt` file is required for every readable source. It provides an
+offline replay fixture and makes the JSON auditable. Do not commit an empty or
+invented fixture for an unreadable source.
+
+### 4.2 Company identity seam
+
+`SPEC-V2.md` makes normalized domain the canonical `Company` key, while the
+current `ResolvedSubprocessor` contract returns only a canonical name. Before the
+first seed is finalized, A and B must freeze one of these approaches:
+
+1. B adds a verified optional `domain` to each subprocessor row; or
+2. A resolves canonical names through a shared registry identity table during
+   `seed_atlas` import.
+
+Preferred rule: carry a domain only when an authoritative or curated mapping
+supports it. Never manufacture a domain from a display name. Unresolved names
+must remain explicit rather than silently merging unrelated companies.
+
+### 4.3 Extraction contract
+
+The existing boundary remains value-only:
+
+```text
+fetch_page(url) -> visible filing text
+extract_subprocessors(text) -> list[SubprocessorRecord]
+extract_and_resolve(text, known) -> list[ResolvedSubprocessor]
+```
+
+Invariants:
+
+- one record per current named third-party processor;
+- exclude the filing company's own entities, examples, boilerplate, former
+  providers, and change notices without a complete current list;
+- deterministic alias lookup before any LLM call;
+- canonicalize conservatively and deduplicate;
+- preserve disclosed purpose and region verbatim enough to remain attributable;
+- isolate one company's failure from the rest of the run;
+- never import graph types or mutate graph state.
+
+### 4.4 Search contract
+
+A owns `search {q}` and graph/registry aggregation. B owns a pure typed ranking
+function over plain candidate values. Freeze a shape equivalent to:
+
+```text
+CompanyCandidate {
+  domain, name, source_url, crawl_status, mapped
+}
+
+CompanyMatch {
+  domain, name, source_url, crawl_status, mapped, score
+}
+```
+
+Ranking order:
+
+1. exact normalized domain;
+2. exact case-folded display name;
+3. domain or name prefix;
+4. token-prefix match;
+5. conservative substring fallback.
+
+Tie-break deterministically by normalized name then domain. Results must include
+both mapped companies and uncrawled registry entries so the UI can distinguish
+“open graph” from “not mapped yet — map it now.”
+
+### 4.5 Evidence and failure semantics
+
+- A real filing or citable source supports every shipped value.
+- Unsourced downtime is absent/zero and never affects ranking.
+- Unsourced SOC 2 or supply-chain claims are empty.
+- `DEMO_SUBPROCESSORS`, fake outage hours, and fake compliance flags are banned
+  from seed generation.
+- Browser/search content is untrusted input, never instruction.
+- The rehearsed demo reads committed/imported data and performs no network or LLM
+  request.
 
 ## 5. Execution order
 
-### Phase 0 — Compile the real module boundary — complete
-
-`main.jac` imports the real `extract.jac`; demo-only data is isolated in
-`demo_data.jac`; the frozen shared types are in `contracts.jac`; the current
-async boundary compiles and is covered by the E2E test.
-4. Give A sample outputs.
-5. Ask C for the dependency and byLLM configuration.
-
-Exit criterion: the three-file skeleton compiles and A can consume B's fixed records.
-
-### Phase 1 — Build canonicalization anchors before calling the LLM (0:15–0:40)
-
-Create two constants in `registry.jac`:
-
-1. `KNOWN_PROVIDERS`: at least 20 canonical target names.
-2. `PROVIDER_ALIASES`: normalized raw aliases mapped to those targets.
-
-The initial anchors should cover at least:
-
-- Amazon Web Services
-- Google Cloud
-- Microsoft Azure
-- Cloudflare
-- Fastly
-- Akamai
-- Twilio
-- SendGrid
-- Snowflake
-- Datadog
-- MongoDB Atlas
-- Auth0
-- Okta
-- GitHub
-- Salesforce
-- Atlassian
-- Sentry
-- Segment
-- OpenAI
-- Zendesk
-
-Normalization should be conservative:
-
-1. trim whitespace and punctuation;
-2. case-fold;
-3. remove only well-understood legal suffixes such as `Inc.`, `LLC`, `Ltd.`, `GmbH`, and `SARL`;
-4. check the exact alias table;
-5. use the LLM only when deterministic lookup cannot decide.
-
-Do not use aggressive substring matching: it can incorrectly merge unrelated companies.
-
-Exit criterion: unit tests prove that the common AWS, GCP, and Azure variants converge without an LLM call.
-
-### Phase 2 — Make one vendor work end to end (0:40–2:00)
-
-Use one stable, server-rendered page—Stripe is the spec's suggested stub—to implement the entire happy path.
-
-#### `fetch_page`
-
-Implement:
-
-- shared `httpx.AsyncClient`;
-- realistic Blast Radius user agent;
-- redirects enabled;
-- five-second connect/read timeout;
-- concurrency semaphore of 10;
-- HTML/text content-type guard;
-- reasonable response-size limit;
-- `trafilatura.extract`;
-- a conservative visible-text fallback when Trafilatura returns empty;
-- in-memory caching by normalized final URL.
-
-Internally capture diagnostic status such as HTTP code, final URL, elapsed time, and failure class. Keep the public return type as `str` to preserve A's contract.
-
-#### `extract_subprocessors`
-
-Define the typed object and attach semantics at the function, parameter, return, object, and field levels. The semantics must say:
-
-- emit one record per named third-party subprocessor;
-- ignore the vendor's own legal entities;
-- ignore examples and boilerplate;
-- preserve stated purpose and region;
-- use empty strings rather than inventing missing values.
-
-Limit the submitted text to the relevant page content and a bounded size so navigation text and very large DPAs do not dominate token use.
-
-#### `canonicalize`
-
-Implement the load-bearing meaning-typed call with these stages:
-
-1. normalized exact canonical-name match;
-2. deterministic alias match;
-3. cached prior LLM resolution;
-4. LLM match against `known + KNOWN_PROVIDERS`;
-5. cleaned new canonical name if no known target fits.
-
-Use confidence consistently:
-
-- `1.0`: deterministic canonical or alias match;
-- `0.9`: LLM result exactly matches a known anchor;
-- `0.65`: cleaned new provider not present in the known list.
-
-#### `extract_and_resolve`
-
-This orchestration function:
-
-1. rejects empty text;
-2. calls typed extraction;
-3. canonicalizes each raw name;
-4. deduplicates by `canonical_name`;
-5. merges non-empty purpose/region values;
-6. returns a stable, deterministic order;
-7. never imports or references graph types.
-
-Cache raw-name resolutions so repeated names across vendors do not trigger repeated LLM calls. If latency is still too high, batch only the unresolved raw names behind an internal typed LLM call while preserving the exported contract.
-
-Exit criterion at +2 hours: one real page produces canonical typed records that A renders in the UI. At least one expected major provider must appear.
-
-### Phase 3 — Build the registry in value order (2:00–3:30)
-
-Do not start by generating 150 unverified rows. Build three tiers:
-
-1. **Demo tier:** the exact 12–15 vendors used in the scripted demo.
-2. **Room tier:** the 40–50 most likely startup vendors.
-3. **Coverage tier:** expand to approximately 150.
-
-Each registry entry should include:
-
-- normalized vendor domain;
-- display name;
-- exact subprocessor URL;
-- optional aliases for acquired or alternate domains.
-
-Validation script/test:
-
-- domains are unique after normalization;
-- URLs are HTTPS unless there is a documented exception;
-- no placeholder or empty URLs;
-- each demo-tier URL returns a successful response;
-- extracted text is non-trivial and contains subprocessor/DPA language;
-- redirects are updated to the stable final URL where practical.
-
-Manually spot-check all demo-tier entries and a sample of every generated batch. A 40-entry verified registry is more valuable for the demo than 150 plausible but broken URLs.
-
-Exit criterion: every scripted vendor resolves from the local registry with zero discovery requests.
-
-### Phase 4 — Implement the Firecrawl-first registry-miss fallback (after demo deploy)
-
-Do not start this phase until the pre-warmed JacHammer graph is deployed and
-rehearsed. This is the long-tail product path, not a dependency of the demo.
-
-#### Trigger
-
-1. Normalize the company keyword and domain.
-2. Check the curated registry.
-3. Check the learned registry/cache.
-4. Only on a complete miss, call the registry-miss ReAct resolver.
-
-The fallback receives both the user-entered company keyword and the detected domain when available. A name alone is acceptable, but a domain is stronger identity evidence.
-
-#### Tool layering
-
-Give the Jac ReAct agent two primary sponsor-backed tools:
-
-- `firecrawl_search(query)` to locate candidate official-company and
-  verified-GitHub sources;
-- `firecrawl_scrape(url)` to extract a known candidate as markdown or
-  structured content.
-
-Expose a third, narrower `browser_harness_render(url, flow_type)` escalation only
-for a required trust-center click-through or a page Firecrawl cannot extract.
-The ReAct agent must not receive generic CDP commands. The escalation worker is
-read-only: it may search and navigate but may not log in, submit forms, download
-files, or perform writes.
-
-Keep the Jac-facing contract independent of either provider. Do not use
-Firecrawl Agent in the first version; nesting its autonomous agent inside our
-Jac ReAct loop weakens observability and the Jac judging story while adding an
-extra asynchronous cost/latency layer.
-
-Run a bounded query set:
-
-1. `"<company>" subprocessors`
-2. `"<company>" "sub-processors" OR "data processing addendum"`
-3. `site:<company-domain> subprocessors OR sub-processors OR DPA`
-4. `site:github.com "<company>" subprocessors OR sub-processors OR DPA`
-
-Inspect at most five search results per query and at most eight candidate pages
-overall. Scrape candidates with Firecrawl first and escalate only the specific
-failed URL to Browser Harness. Stop early once authoritative sources have been
-exhausted. Give the whole fallback a fixed time/page budget so a difficult
-company cannot hold the crawl open indefinitely.
-
-#### Authoritative-source rules
-
-Accept:
-
-- the company's official legal, privacy, trust, security, or DPA page;
-- an official GitHub organization/repository containing a subprocessor list or DPA;
-- a rendered trust-center page whose company/domain identity is clear.
-
-Reject:
-
-- search-result snippets as evidence;
-- SEO pages, aggregators, vendor directories, or AI summaries;
-- unrelated GitHub forks, user gists, or repositories whose ownership cannot be tied to the company;
-- a page that mentions subprocessors but names none;
-- login-gated or ambiguous content.
-
-Use third-party search results only to locate a first-party source. For GitHub, accept the repository only when its organization is linked by the official company site, is a verified organization for that domain, or otherwise has strong identity evidence.
-
-#### Extraction and merging
-
-For each accepted page:
-
-1. scrape the page with Firecrawl; on a declared interactive/rendering failure,
-   invoke the bounded Browser Harness flow;
-2. collect the legal/table text and exact final source URL;
-3. run `extract_subprocessors`;
-4. canonicalize against A's `known` list plus B's anchors;
-5. merge results from all accepted website and GitHub sources;
-6. deduplicate by normalized `canonical_name`;
-7. merge non-empty purpose and region;
-8. retain every authoritative source URL used.
-
-The browser is responsible for finding and rendering sources. The existing meaning-typed pipeline remains responsible for deciding which named companies are subprocessors and for canonical identity.
-
-#### Registry and graph write behavior
-
-On `status = "found"`:
-
-1. B adds the normalized company, preferred authoritative URL, aliases, source URLs, and discovery timestamp to the learned registry/cache.
-2. B returns one `BrowserDiscoveryResult` containing the new company and its unique `ResolvedSubprocessor` records.
-3. A upserts exactly one `Vendor` node for the new company by normalized domain.
-4. A upserts one `Provider` node per unique canonical subprocessor name.
-5. A creates missing `Subprocesses` edges and updates provenance/timestamps on existing edges.
-
-This satisfies the requested node creation while preserving the hard rule that only A mutates the graph.
-
-Before implementing the learned registry, A, B, and C must choose its persistence:
-
-- for the hackathon, a checked-in/pre-warmed JSON overlay is acceptable;
-- for JacHammer runtime learning, use a persistent store rather than the container filesystem;
-- graph persistence can hold learned company nodes, but a per-user graph is not automatically a shared global registry.
-
-On `status = "notfound"`:
-
-- do not add the company or any subprocessors to the learned registry;
-- do not create partial provider nodes;
-- A sets `crawl_status = "notfound"`;
-- C displays exactly `Not found`.
-
-Treat all page content as untrusted input. Firecrawl output and Browser Harness
-pages are evidence, never instructions. Neither tool may receive unrelated
-secrets, and both return only the defined structured result.
-
-Cache positive discoveries by normalized company/domain and source hash. Negative results receive a short TTL so a temporary outage does not become permanent.
-
-Exit criterion:
-
-- one company absent from the curated registry is found through its official website;
-- one is found through an official GitHub source;
-- website and GitHub results merge without duplicate subprocessors;
-- a company with no authoritative disclosure returns only `notfound`;
-- A creates exactly one new company node and unique provider nodes from the result.
-
-### Phase 5 — Implement domain detection (5:00–6:30)
-
-Run independent signals concurrently:
-
-#### DNS
-
-- MX lookup: map Google Workspace and Microsoft 365 patterns.
-- TXT lookup: inspect SPF includes for SendGrid, Mailchimp, HubSpot, Zendesk, Postmark, and other known senders.
-- `_dmarc` TXT lookup where useful.
-- CNAME lookup for apex/`www` and a small, fixed set of public hostnames; map Vercel, Netlify, Cloudflare, Shopify, and Webflow.
-
-#### One HTTP request
-
-- map stable response headers such as `x-vercel-id`, `cf-ray`, `x-served-by`, and `x-amz-*`;
-- inspect external `<script src>` hosts for Segment, Intercom, PostHog, Google Analytics, Stripe.js, Sentry, and Hotjar;
-- avoid labeling first-party/self-hosted script URLs as vendors.
-
-#### Own disclosure page
-
-If the organization has a readable subprocessor page, reuse the same resolution/fetch/extraction machinery and convert those names into `DetectedVendor` values with method `disclosure`.
-
-Deduplicate by normalized vendor domain. When several methods detect one vendor, retain the strongest evidence using a fixed precedence such as `disclosure > dns > headers > scripts`.
-
-Performance target: complete the normal path in under three seconds by using short per-signal timeouts and concurrent I/O. Never let one DNS failure or slow site cancel successful signals.
-
-Exit criterion: fixture tests cover every signal map, and manual tests against several known domains return credible, deduplicated vendors.
-
-### Phase 6 — Quality pass on 15 real pages (6:30–7:30)
-
-Create a review table for the demo-tier vendor pages:
-
-| Field | Record |
-|---|---|
-| vendor | name/domain |
-| source | exact URL |
-| crawl result | ok/unreadable/notfound |
-| extracted count | integer |
-| expected anchors | e.g. AWS, GCP, Cloudflare |
-| bad inclusions | vendor subsidiaries/examples |
-| aliases resolved | count |
-| elapsed time | fetch + LLM |
-| cached replay | pass/fail |
-
-For each page:
-
-1. compare extracted names with the visible legal disclosure;
-2. identify missing major providers;
-3. identify false positives;
-4. inspect canonical convergence;
-5. refine `sem` declarations or deterministic aliases;
-6. re-run the whole set after every prompt change.
+### Phase 0 — Runtime proof and contract freeze
+
+1. Re-run `jac check extract.jac` on the exact team/deploy toolchain.
+2. Execute one real, bounded byLLM extraction against a saved filing fixture.
+3. Have C record model/provider configuration and required secret handling in the
+   deployment environment; do not rely on one developer's global Python install.
+4. Freeze the seed JSON schema with A's `seed_atlas` importer.
+5. Resolve the name-to-domain identity seam in §4.2.
+6. Freeze the plain-value search helper contract.
+7. Confirm A's graph fix and `Company` migration are available on the integration
+   branch, without editing A's graph code.
+
+Exit criterion: one raw fixture produces deterministic typed records, and A can
+parse the agreed seed shape without B touching the graph.
+
+### Phase 1 — Registry additions and exact 20-company manifest
+
+1. Add verified `openrouter.ai` and `lindy.ai` rows to the appropriate
+   `research/registry-*.json` batches.
+2. Include authoritative URL, source type, verification date, notes, flow type,
+   and recommended rendering flow.
+3. Regenerate `registry.jac`; do not hand-edit generated output.
+4. Update registry count assertions to the resulting count.
+5. Freeze an exact 20-company dispatch manifest before starting parallel work.
+
+Mandatory first nine:
+
+```text
+openai.com
+anthropic.com
+openrouter.ai
+github.com
+stripe.com
+datadoghq.com
+vercel.com
+sentry.io
+lindy.ai
+```
+
+Candidate pool from §12:
+
+```text
+notion.so
+slack.com
+figma.com
+linear.app
+twilio.com
+snowflake.com
+cloudflare.com
+auth0.com or okta.com
+hubspot.com
+intercom.com
+segment.com
+zoom.com
+```
+
+The prose list in §12 overfills a 20-company manifest and some named candidates
+are not currently registry entries. Resolve this before dispatch: select exactly
+11 additional companies, preferring recognizable names with verified readable
+sources. A candidate absent from the registry must either receive a verified row
+first or be replaced; never improvise a URL inside a seed file.
+
+Exit criterion: exactly 20 domains, each with an authoritative input URL or an
+explicitly approved `notfound` investigation target.
+
+### Phase 2 — Twenty-company real-data run
+
+This is the highest-value Person B task and the first data milestone. It replaces
+“automatically crawl all 150” as the MVP gate.
+
+Run one independent worker per company in parallel:
+
+1. Read the domain and authoritative URL from the frozen manifest/registry.
+2. Render with Browser Harness or another bounded headless flow appropriate to
+   the registry entry. Plain GET is insufficient for Vanta/SafeBase-style trust
+   centers.
+3. Capture only the visible complete current filing text.
+4. Write the raw text fixture.
+5. Produce a draft seed JSON record in the agreed schema.
+6. On failure, emit `unreadable` or `notfound`; do not invent subprocessors.
+7. Do not touch the graph or shared Jac persistence.
+
+Workers must skip project-wide checks; validation happens once after all results
+land. Each company is isolated so one failed trust center cannot block the other
+19.
+
+Exit criterion: 20 JSON records exist, every readable record has a matching raw
+fixture, and every failure is explicit.
+
+### Phase 3 — Run our extractor and finalize the seed corpus
+
+For every readable fixture:
+
+1. Run `extract_and_resolve` against the committed raw text.
+2. Compare its result with the worker's independently extracted list.
+3. Review disagreements against the visible filing, not against intuition.
+4. Fix deterministic aliases or `sem` declarations at the source when the same
+   error class appears across companies.
+5. Canonicalize and deduplicate the final result.
+6. Preserve only source-backed purpose and region values.
+7. Recompute and verify `raw_text_sha`.
+8. Sort output deterministically and validate the complete directory.
+
+The final JSON should come from the reviewed pipeline output, not from a worker's
+unchecked transcription.
 
 Quality gate:
 
-- all readable demo pages return at least one plausible record;
-- no obvious vendor-owned legal entities remain;
-- every AWS/GCP/Azure variant in the set converges;
-- extraction failures are isolated per vendor;
-- the team can point from every result to its source URL.
+- every `ok` company has at least one plausible current subprocessor;
+- no obvious company-owned legal entities or former providers remain;
+- common AWS/GCP/Azure variants converge;
+- every JSON source URL points to the filing represented by its fixture;
+- every hash matches;
+- no fabricated demo value appears anywhere in the corpus.
 
-### Phase 7 — Pre-warm and prove offline replay (before feature freeze)
+### Phase 4 — Seed importer handoff and deployed proof
 
-The scripted demo must not depend on live crawling or live extraction.
+1. Give A the complete seed directory and schema validator.
+2. A implements `seed_atlas` as an idempotent domain-keyed import.
+3. Run the importer twice; the second run must create no duplicate companies or
+   edges.
+4. C deploys with one replica for the MVP unless shared Mongo/Redis is configured.
+5. Invoke `seed_atlas` after deployment or through the agreed boot hook.
+6. Confirm the public deployment contains at least 20 real companies.
+7. Redeploy and confirm the atlas is restored from committed seed data.
+8. Disable network/model access and exercise the featured graphs.
 
-Build a persistent cache manifest keyed by:
+Exit criterion: the public app has a non-empty real atlas after a redeploy, and
+the rehearsed path is fully offline.
 
-- normalized final URL;
-- a cache/schema version;
-- content hash;
-- extraction-semantic version;
-- canonicalization-anchor version.
+### Phase 5 — Search matching and ranking
 
-Store:
+1. Implement query normalization as a pure Jac helper.
+2. Rank mapped graph candidates and uncrawled registry candidates using §4.4.
+3. Preserve a stable limit and deterministic tie-breaking.
+4. Return enough status for “open graph” versus “map it now.”
+5. Hand the helper to A's `search {q}` walker without importing graph types.
+6. Validate exact domain, exact name, prefix, ambiguous, empty, and no-match
+   queries.
 
-- cleaned page text, or an approved bounded fixture;
-- resolved records;
-- source URL;
-- learned registry entries and their evidence/source hashes;
-- fetched timestamp;
-- crawl status.
+Exit criterion: a query can find both a seeded company and an unseeded registry
+company, with mapped state and order stable across runs.
 
-Pre-warm every scripted vendor. Then deliberately disable or break network access and run the rehearsed path from a clean process. It passes only if the same graph data appears without making an HTTP or LLM request.
+### Phase 6 — Scale the proven pipeline toward all registry companies
 
-Do not claim that an in-memory cache is pre-warming; it disappears on restart and is insufficient for a stage demo.
+Only begin after the 20-company corpus is imported into a green deployment.
 
-Exit criterion: a cold app process can replay the complete scripted dataset from persistent cache.
+1. Reuse the same seed schema and validation path.
+2. Crawl registry companies with approximately ten concurrent fetches.
+3. Keep per-company failures isolated and resumable.
+4. Skip fresh, hash-identical fixtures.
+5. Commit reviewed batches rather than one opaque 150-file dump.
+6. Import each batch idempotently.
 
-## 6. Test plan
+The 150-company crawl remains the full lane target, but it is not allowed to delay
+the first 20-company deployed MVP. Do not expand the registry past its current
+breadth until the existing corpus is actually crawled.
 
-Run `jac check` continuously and `jac test -d tests/` at every checkpoint.
+### Phase 7 — Cited provider facts
 
-### Deterministic unit tests
+After real graph degree data exists:
 
-- normalize domains, URLs, legal suffixes, and provider names;
-- validate registry uniqueness and required fields;
-- resolve known vendor from registry without HTTP;
-- trigger the ReAct search only for a complete curated/learned registry miss;
-- use Firecrawl search/scrape before any Browser Harness escalation;
-- invoke Browser Harness only for the specific failed candidate URL;
-- accept official-company and verified-GitHub sources;
-- reject snippets, aggregators, unrelated GitHub repositories, and login-gated pages;
-- merge website and GitHub records without duplicate companies;
-- return only `notfound` when no authoritative source names a subprocessor;
-- reject wrong content type, empty shell, error response, timeout, and oversized response;
-- parse every supported header, script host, MX, SPF, and CNAME signal;
-- deduplicate multi-signal vendor detections;
-- merge duplicate resolved subprocessors;
-- confirm B's modules contain no graph node/edge creation.
+1. Identify roughly the top 15 providers by global inbound degree.
+2. Curate SOC 2/attestation status only from a citable primary source.
+3. Calculate outage hours only from public status-page incident history with a
+   defined period and source URL.
+4. Store a source URL and observation period per claim.
+5. Leave unsupported fields empty.
+6. Tell C to cut the compliance panel if supported facts do not land by freeze.
 
-### LLM tests
+Do not preserve the fabricated AWS `9.2h` or Fastly SOC 2/watchlist story.
 
-Use Jac's `MockLLM` support so tests are deterministic and cost-free:
+### Phase 8 — Explicitly deferred work
 
-- valid structured extraction;
-- malformed structured output followed by typed-output retry;
-- vendor-owned legal entity exclusion;
-- known alias resolution;
-- unknown cleaned provider;
-- empty input;
-- duplicate records.
+These do not block Person B's MVP:
 
-### Live integration tests
+- live Firecrawl ReAct discovery during the rehearsed run;
+- registry expansion past 150;
+- the industry Map;
+- `root.shared` migration and auth;
+- DNS/header/script vendor detection;
+- the defense/DoD adapter;
+- compliance UI when no cited facts exist.
 
-Keep live-network tests separate from the default fast suite. Run them manually for the 15-page quality pass and cache warm. Record failures rather than letting a transient 403 obscure deterministic regressions.
+Browser Harness remains available to the offline acquisition runner. It is not a
+registry-miss fallback. A future live, non-rehearsed miss path may use bounded
+Firecrawl search/scrape and must return `notfound` when it cannot verify a
+complete authoritative disclosure.
 
-### Cross-layer contract test
-
-With A:
-
-1. `await resolve_url`;
-2. on a registry miss, await the Firecrawl-first ReAct resolver;
-3. if found, upsert the new company and its unique providers;
-4. otherwise display `Not found` and stop;
-5. for a registry hit, `await fetch_page` and call `extract_and_resolve`;
-6. create provider nodes from returned strings;
-7. run chokepoints;
-8. verify a canonical provider has the expected inbound vendor edges.
-
-This is the +2 hour alarm and the most important test in the project.
-
-## 7. Handoffs and communication
+## 6. Handoffs
 
 ### To Person A
 
 Provide:
 
-- exact import paths and async signatures;
-- frozen type definitions;
-- return/error semantics;
-- three sample payloads;
-- demo cache lookup behavior;
-- known status mapping: no URL = `notfound`, no text = `unreadable`;
-- a warning before any semantic or field change.
+- frozen seed schema and exact sample files;
+- identity-resolution decision for disclosed company domains;
+- status semantics: `ok`, `unreadable`, `notfound`;
+- deterministic seed validator;
+- the 20-company committed corpus;
+- pure search candidate/match types and ranking helper;
+- notice before any field or semantic change.
 
-Person A must pass the graph's existing provider names into `extract_and_resolve`; B combines them with the seed anchors.
+Require from A:
+
+- idempotent `seed_atlas` import keyed by normalized domain;
+- no duplicate nodes or edges on re-import;
+- `Company`/`Subprocesses` model compatible with the frozen seed fields;
+- A-owned `search {q}` walker around B's plain-value matcher.
 
 ### To Person C
 
 Request:
 
-- dependencies in `jac.toml`;
-- byLLM model/capability setup;
-- safe environment-variable handling for the model key;
-- a decision on whether the warmed cache is checked in or attached at deploy time.
+- deployment-equivalent byLLM provider/key configuration;
+- a one-replica MVP deployment unless Mongo+Redis is intentionally configured;
+- a post-deploy or boot invocation of `seed_atlas`;
+- no demo-script claim unsupported by committed source evidence.
 
-Provide C with:
+Provide:
 
-- detection and crawl progress labels;
-- coverage status definitions;
-- source URL and timestamp for display;
-- `Searching official website and GitHub…` and `Not found` states;
-- expected demo latency for cached and live paths.
+- featured company domains and crawl statuses;
+- source URLs and observation timestamps for display;
+- mapped/unmapped search semantics;
+- expected offline behavior of all rehearsed featured graphs.
 
-### Commit discipline
+## 7. Validation
 
-- Commit approximately every 20 minutes.
-- Touch only B-owned implementation/tests/fixtures.
-- Pull with rebase before pushing.
-- Do not run a repository-wide formatter.
-- Announce contract changes before committing them.
+Run targeted validation at each behavior boundary:
+
+- registry generation rejects duplicate normalized domains, missing URLs, and
+  non-authoritative source types;
+- seed validation rejects malformed domains, unsupported statuses, missing
+  readable fixtures, hash mismatches, duplicate subprocessors, and invented
+  non-empty fields without a source;
+- extraction tests cover typed output, alias convergence, deduplication, empty
+  input, malformed model output, and exclusion of company-owned entities;
+- search tests cover exact domain/name, prefix ordering, deterministic ties,
+  mapped/unmapped status, empty query, and no result;
+- A's importer integration proves idempotence and graph shape;
+- deployed smoke proves at least 20 companies survive a redeploy with network and
+  LLM access unavailable.
+
+`jac check` and `jac test` validate B-owned Jac changes. A full `jac start` smoke is
+the final cross-lane proof, not a substitute for seed and extraction checks.
 
 ## 8. Time-pressure cuts
 
 Cut in this order:
 
-1. defense/DOD adapter;
-2. registry entries beyond the verified room tier;
-3. own-disclosure detection;
-4. lower-value DNS/script signatures;
-5. searching both official web and GitHub sources—retain official-site
-   Firecrawl search/scrape and drop Browser Harness escalation first if time is
-   too short to deploy it safely.
+1. live ReAct/browser-discovery polish;
+2. registry breadth past 150;
+3. cited provider facts and therefore the compliance panel;
+4. completing all 150 after the first 20 are deployed.
 
 Never cut:
 
-- anchor providers and alias mapping;
-- one real extraction path;
-- typed extraction and canonicalization;
-- the demo-tier registry;
-- persistent cache pre-warm;
-- the 15-page quality pass;
-- the +2 hour end-to-end integration;
-- rehearsals.
-
-If only a few hours remain, ship 12–15 verified vendors with perfect cached convergence instead of 150 questionable registry entries.
+- the exact 20-company seed run;
+- raw filing fixtures and matching hashes;
+- real typed extraction and conservative canonicalization;
+- committed seed data;
+- A's idempotent seed import;
+- source provenance and honest failure states;
+- offline deployed replay;
+- rehearsals on the deployed URL.
 
 ## 9. Definition of done
 
-Person B is done when:
+### Person B's MVP lane is done when
 
-- [ ] The real multi-file project compiles.
-- [x] `contracts.jac` and the current async exports are frozen and consumed by A.
-- [ ] B's files contain no graph mutation.
-- [ ] The demo-tier registry is hand-verified.
-- [ ] The registry resolves scripted vendors without network access.
-- [ ] A registry miss invokes the bounded ReAct resolver exactly once per uncached company.
-- [ ] Firecrawl search/scrape is the primary web layer.
-- [ ] Browser Harness is used only for bounded per-URL escalation.
-- [ ] The resolver accepts only authoritative company-site or verified-GitHub evidence.
-- [ ] Website and GitHub findings merge into unique canonical subprocessors.
-- [ ] A upserts one new Vendor and unique Provider nodes from a found result.
-- [ ] No authoritative result produces only `Not found` and no partial nodes.
-- [ ] Fetching uses a real user agent, five-second timeout, redirects, a global concurrency limit of 10, and caching.
-- [ ] Typed extraction uses explicit `sem` declarations and handles malformed output.
-- [ ] anchors and aliases converge AWS/GCP/Azure variants.
-- [ ] `extract_and_resolve` returns deduplicated `ResolvedSubprocessor` values.
-- [ ] Domain detection covers DNS, HTTP headers, and script tags.
-- [ ] Fifteen real pages have recorded quality results.
-- [ ] The persistent demo cache replays from a clean process with network/LLM disabled.
-- [ ] A's real walker produces at least one visible chokepoint from B's records.
-- [ ] Expected failures surface as `ok`, `unreadable`, or `notfound` rather than crashing.
-- [ ] Person B can answer the meaning-typed/data Q&A without notes.
+- [x] A real byLLM extraction is proven in the project-pinned environment.
+- [x] `openrouter.ai` and `lindy.ai` are verified registry entries generated from
+      research data.
+- [x] An exact 20-company manifest is frozen.
+- [x] Twenty seed JSON records are committed.
+- [x] Every readable record has a committed raw fixture and matching SHA-256.
+- [x] Every record is `ok`, `unreadable`, or `notfound` without fabricated data.
+- [x] `extract_and_resolve` has been cross-checked against every readable fixture.
+- [x] Common provider aliases converge and final records are deduplicated.
+- [ ] A imports the corpus idempotently through `seed_atlas`.
+- [ ] The public deployment contains at least 20 real companies after a redeploy.
+- [x] Featured seed parsing and graph construction work with network and LLM
+      access disabled.
+- [x] Search ranks both mapped and unmapped companies deterministically.
+- [x] No uncited downtime/compliance value is shipped.
 
-## 10. Person B's Q&A brief
+### The extended B lane is done when
 
-Prepare these four answers:
+- [x] The same reviewed pipeline has a complete-registry runner with
+      approximately ten-way concurrency.
+- [x] Per-company failures are resumable and visible.
+- [x] The top provider facts are cited per claim or deliberately absent.
+- [ ] Registry breadth grows only after existing entries are mapped.
 
-1. **Why `by llm()` instead of a parser?** The legal pages use incompatible table and prose layouts. The typed return signature makes layout variance an extraction problem while preserving a strict application contract.
-2. **Why is canonicalization load-bearing?** Without it, AWS legal entities and aliases become separate low-degree providers, so the concentration signal disappears.
-3. **Where does the data come from?** The vendor's own public legal disclosure. Every result retains source URL and observation time, and unreadable coverage is reported honestly.
-4. **How is this different from BuiltWith?** BuiltWith detects first-layer technology on the target site. This pipeline then follows legal disclosures into the second layer and resolves shared providers across vendors.
-5. **What happens for a company outside the registry?** A bounded Jac ReAct agent
-   searches and scrapes with Firecrawl, escalates only difficult interactive
-   pages to Browser Harness, extracts typed subprocessor records, merges
-   canonical duplicates, and teaches the learned registry. With no
-   authoritative result, it returns only `Not found`.
+## 10. Q&A brief
+
+1. **Why committed seed data if Jac already persists the graph?**
+   Local `.jac/data` does not travel with the repo or populate a deployment, and a
+   destroyed deployment loses its volume. Committed seeds make the atlas
+   reproducible; Jac remains the runtime graph database.
+2. **Why 20 before 150?**
+   Twenty verified, reviewable companies produce a real deployed atlas quickly.
+   The exact same pipeline can then scale without betting the MVP on 150 hostile
+   page layouts succeeding at once.
+3. **Why keep raw text fixtures?**
+   They make every parsed row auditable, allow offline extractor replay, and let
+   us detect disagreements between independent collection and our byLLM pipeline.
+4. **Why `by llm()` instead of one parser?**
+   Legal disclosures use incompatible tables, prose, PDFs, and client-rendered
+   trust centers. The typed return contract absorbs layout variance without
+   weakening the application boundary.
+5. **Why is canonicalization load-bearing?**
+   If AWS legal aliases become separate companies, inbound degree fragments and
+   the chokepoint signal disappears.
+6. **What happens when a page cannot be read?**
+   It ships as `unreadable` with its attempted authoritative URL and no invented
+   subprocessors. Coverage gaps are honest product data.
+7. **Why is live discovery off the demo path?**
+   The demo must be deterministic. Live discovery remains a bounded product path
+   on top of the committed seed-backed atlas.
 
 Pitch sentence:
 
-> "The extractor returns a typed legal record, and the resolver maps legal aliases onto one provider identity; without that meaning-typed step, the graph never converges and there is no chokepoint to find."
-
-## References checked
-
-- [Jac byLLM reference](https://docs.jaseci.org/reference/plugins/byllm/)
-- [Jac concurrency reference](https://docs.jaseci.org/reference/language/concurrency/)
-- [Jac testing reference](https://docs.jaseci.org/reference/testing/)
-- [Jac CLI and package-management reference](https://docs.jaseci.org/reference/cli/)
-- [Jac import reference](https://docs.jaseci.org/quick-guide/import-anything/)
-- [Firecrawl Search](https://docs.firecrawl.dev/features/search)
-- [Firecrawl Scrape](https://docs.firecrawl.dev/features/scrape)
-- [Browser Use harness](https://github.com/browser-use/browser-harness)
+> “We turn each company's public Article 28 filing into a typed, canonical,
+> source-backed seed record; Jac imports those records into one persistent graph,
+> so shared providers emerge without fabricated data or a live crawl on stage.”

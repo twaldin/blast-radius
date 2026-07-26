@@ -2,40 +2,139 @@
   "domain": "notion.so",
   "name": "Notion",
   "subprocessor_url": "https://www.notion.so/Notion-s-List-of-Subprocessors-268fa5bcfa0f46b6bc29436b21676734?pvs=24",
+  "fetched_at": "2026-07-26T14:22:00-07:00",
+  "raw_text_sha": "b50e3f1066e91964c904fc474820fc26f2686ed546ce562add39c1a7e4d95018",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:22:00",
   "subprocessors": [
-    {"name": "AWS", "purpose": "Hosting and storage systems provider", "region": "USA, European Union, Korea, Japan"},
-    {"name": "Anthropic", "purpose": "Service provider for AI agents, hosting large language models and embeddings", "region": "Global"},
-    {"name": "Confluent", "purpose": "Kafka managed streaming storage platform used for in-product audit log data and analytics", "region": "USA, Germany, Korea, Japan"},
-    {"name": "Cloudflare", "purpose": "Content distribution and processing, security, abuse prevention and DNS services", "region": "Global"},
-    {"name": "DeepL", "purpose": "Translation services", "region": "USA"},
-    {"name": "Fireworks", "purpose": "Service provider for hosting large language models and embeddings", "region": "Global"},
-    {"name": "OpenAI", "purpose": "Service provider for hosting large language models and embeddings and for abuse prevention", "region": "Global"},
-    {"name": "Splunk", "purpose": "Security and application logging", "region": "USA"},
-    {"name": "Turbopuffer", "purpose": "Vector database for storing embeddings", "region": "USA, Germany, Korea, Japan"},
-    {"name": "Twilio", "purpose": "Multi-factor Authentication", "region": "USA"},
-    {"name": "Exa", "purpose": "Service provider for providing web search results.", "region": "USA"},
-    {"name": "Google LLC", "purpose": "Service provider for hosting large language models and embeddings.", "region": "Global"},
-    {"name": "Cerebras Systems Inc.", "purpose": "Service provider for hosting large language models and embeddings.", "region": "USA"},
-    {"name": "StarTree, Inc.", "purpose": "Storage platform used for in-product analytics", "region": "USA, Germany, Korea, Japan"},
-    {"name": "Baseten Labs, Inc.", "purpose": "Service provider for hosting large language models and embeddings", "region": "Global"},
-    {"name": "Parallel Web Systems", "purpose": "Service provider for providing web search results and for hosting large language models and embeddings", "region": "USA"},
-    {"name": "Mathpix, Inc.", "purpose": "PDF file conversion", "region": "USA, Germany, Singapore"},
-    {"name": "Vercel Inc.", "purpose": "Compute services that enable code execution and AI agent actions.", "region": "USA"},
-    {"name": "Anysource Inc., dba Runlayer", "purpose": "Security for MCP connections", "region": "USA"},
-    {"name": "X.AI LLC", "purpose": "Service provider for hosting large language models and embeddings", "region": "USA, UK"},
-    {"name": "Teleperformance", "purpose": "Support services", "region": "Greece"},
-    {"name": "Amplitude", "purpose": "Event logging for analytics", "region": "USA"},
-    {"name": "Customer.io", "purpose": "Transactional, broadcast, and marketing messaging", "region": "USA"},
-    {"name": "Fivetran", "purpose": "Data pipeline for connecting systems to our data warehouse", "region": "USA, Germany, Korea, Japan"},
-    {"name": "Mailgun Technologies, Inc.", "purpose": "Transactional, broadcast, and marketing messaging", "region": "USA"},
-    {"name": "Notion Labs, Ireland Limited", "purpose": "Support services", "region": "Ireland"},
-    {"name": "Brain Capital Labs PVT Ltd.", "purpose": "Support services", "region": "India"},
-    {"name": "Notion Labs Japan, G.K.", "purpose": "Support services", "region": "Japan"},
-    {"name": "Notion International Inc.", "purpose": "Support services", "region": "USA"},
-    {"name": "Notion Labs Australia Pty Ltd", "purpose": "Support services", "region": "Australia"},
-    {"name": "Notion Labs United Kingdom, Private Limited", "purpose": "Support services", "region": "UK"},
-    {"name": "Notion Labs Korea Ltd", "purpose": "Support services", "region": "South Korea"}
+    {
+      "name": "Amplitude",
+      "purpose": "Event logging for analytics",
+      "region": "USA"
+    },
+    {
+      "name": "Anthropic",
+      "purpose": "Service provider for AI agents, hosting large language models and embeddings",
+      "region": "Global"
+    },
+    {
+      "name": "Anysource Inc., dba Runlayer",
+      "purpose": "Security for MCP connections",
+      "region": "USA"
+    },
+    {
+      "name": "AWS",
+      "purpose": "Hosting and storage systems provider",
+      "region": "USA, European Union, Korea, Japan"
+    },
+    {
+      "name": "Baseten Labs, Inc.",
+      "purpose": "Service provider for hosting large language models and embeddings",
+      "region": "Global"
+    },
+    {
+      "name": "Brain Capital Labs PVT Ltd.",
+      "purpose": "Support services",
+      "region": "India"
+    },
+    {
+      "name": "Cerebras Systems Inc.",
+      "purpose": "Service provider for hosting large language models and embeddings.",
+      "region": "USA"
+    },
+    {
+      "name": "Cloudflare",
+      "purpose": "Content distribution and processing, security, abuse prevention and DNS services",
+      "region": "Global"
+    },
+    {
+      "name": "Confluent",
+      "purpose": "Kafka managed streaming storage platform used for in-product audit log data and analytics",
+      "region": "USA, Germany, Korea, Japan"
+    },
+    {
+      "name": "Customer.io",
+      "purpose": "Transactional, broadcast, and marketing messaging",
+      "region": "USA"
+    },
+    {
+      "name": "DeepL",
+      "purpose": "Translation services",
+      "region": "USA"
+    },
+    {
+      "name": "Exa",
+      "purpose": "Service provider for providing web search results.",
+      "region": "USA"
+    },
+    {
+      "name": "Fireworks",
+      "purpose": "Service provider for hosting large language models and embeddings",
+      "region": "Global"
+    },
+    {
+      "name": "Fivetran",
+      "purpose": "Data pipeline for connecting systems to our data warehouse",
+      "region": "USA, Germany, Korea, Japan"
+    },
+    {
+      "name": "Google LLC",
+      "purpose": "Service provider for hosting large language models and embeddings.",
+      "region": "Global"
+    },
+    {
+      "name": "Mailgun Technologies, Inc.",
+      "purpose": "Transactional, broadcast, and marketing messaging",
+      "region": "USA"
+    },
+    {
+      "name": "Mathpix, Inc.",
+      "purpose": "PDF file conversion",
+      "region": "USA, Germany, Singapore"
+    },
+    {
+      "name": "OpenAI",
+      "purpose": "Service provider for hosting large language models and embeddings and for abuse prevention",
+      "region": "Global"
+    },
+    {
+      "name": "Parallel Web Systems",
+      "purpose": "Service provider for providing web search results and for hosting large language models and embeddings",
+      "region": "USA"
+    },
+    {
+      "name": "Splunk",
+      "purpose": "Security and application logging",
+      "region": "USA"
+    },
+    {
+      "name": "StarTree, Inc.",
+      "purpose": "Storage platform used for in-product analytics",
+      "region": "USA, Germany, Korea, Japan"
+    },
+    {
+      "name": "Teleperformance",
+      "purpose": "Support services",
+      "region": "Greece"
+    },
+    {
+      "name": "Turbopuffer",
+      "purpose": "Vector database for storing embeddings",
+      "region": "USA, Germany, Korea, Japan"
+    },
+    {
+      "name": "Twilio",
+      "purpose": "Multi-factor Authentication",
+      "region": "USA"
+    },
+    {
+      "name": "Vercel Inc.",
+      "purpose": "Compute services that enable code execution and AI agent actions.",
+      "region": "USA"
+    },
+    {
+      "name": "X.AI LLC",
+      "purpose": "Service provider for hosting large language models and embeddings",
+      "region": "USA, UK"
+    }
   ]
 }

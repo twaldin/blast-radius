@@ -2,21 +2,74 @@
   "domain": "datadoghq.com",
   "name": "Datadog",
   "subprocessor_url": "https://www.datadoghq.com/legal/subprocessors/",
+  "fetched_at": "2026-07-26T15:05:00-07:00",
+  "raw_text_sha": "c9bd686054347a48ebfbcc298887d1734644f414ab395bc3d4bf3ca4c3ec2225",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T15:05:00",
   "subprocessors": [
-    {"name": "Amazon Web Services, Inc.", "purpose": "Infrastructure services", "region": "United States, Australia, Italy, Japan, United Kingdom"},
-    {"name": "Anthropic, PBC", "purpose": "AI services", "region": "United States"},
-    {"name": "Google LLC", "purpose": "Infrastructure services; Email and office applications", "region": "United States, Germany"},
-    {"name": "Hyperdoc Inc.", "purpose": "Meeting transcription and recording services", "region": "United States"},
-    {"name": "Mailgun Technologies, Inc.", "purpose": "Email and office applications", "region": "United States"},
-    {"name": "Microsoft Corporation (Azure)", "purpose": "Infrastructure services", "region": "United States"},
-    {"name": "OpenAI, LLC", "purpose": "AI services", "region": "United States"},
-    {"name": "Reversing Labs International GmbH", "purpose": "Threat intelligence services", "region": "Switzerland"},
-    {"name": "Salesforce, Inc.", "purpose": "Customer support platform", "region": "United States"},
-    {"name": "Snowflake, Inc.", "purpose": "Data warehouse services", "region": "United States"},
-    {"name": "Twilio, Inc.", "purpose": "Communication services", "region": "United States"},
-    {"name": "Vonage Business, Inc.", "purpose": "Communication services", "region": "United States"},
-    {"name": "Zendesk, Inc.", "purpose": "Customer support platform", "region": "United States"}
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Infrastructure services",
+      "region": "United States, Australia, Italy, Japan, United Kingdom"
+    },
+    {
+      "name": "Anthropic, PBC",
+      "purpose": "AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Google LLC",
+      "purpose": "Infrastructure services; Email and office applications",
+      "region": "United States, Germany"
+    },
+    {
+      "name": "Hyperdoc Inc.",
+      "purpose": "Meeting transcription and recording services",
+      "region": "United States"
+    },
+    {
+      "name": "Mailgun Technologies, Inc.",
+      "purpose": "Email and office applications",
+      "region": "United States"
+    },
+    {
+      "name": "Microsoft Corporation (Azure)",
+      "purpose": "Infrastructure services",
+      "region": "United States"
+    },
+    {
+      "name": "OpenAI, LLC",
+      "purpose": "AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Reversing Labs International GmbH",
+      "purpose": "Threat intelligence services",
+      "region": "Switzerland"
+    },
+    {
+      "name": "Salesforce, Inc.",
+      "purpose": "Customer support platform",
+      "region": "United States"
+    },
+    {
+      "name": "Snowflake, Inc.",
+      "purpose": "Data warehouse services",
+      "region": "United States"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "Communication services",
+      "region": "United States"
+    },
+    {
+      "name": "Vonage Business, Inc.",
+      "purpose": "Communication services",
+      "region": "United States"
+    },
+    {
+      "name": "Zendesk, Inc.",
+      "purpose": "Customer support platform",
+      "region": "United States"
+    }
   ]
 }

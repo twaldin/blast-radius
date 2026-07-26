@@ -2,22 +2,38 @@
   "domain": "vercel.com",
   "name": "Vercel",
   "subprocessor_url": "https://security.vercel.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57&source=title",
+  "fetched_at": "2026-07-26T14:23:10-07:00",
+  "raw_text_sha": "04fb17b8008c458f8593a6de6ee0843c67ba86f88c68fc550ec6fa6e1769d7ee",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:23:10",
   "subprocessors": [
+    {
+      "name": "Algolia",
+      "purpose": "Real-time site search services",
+      "region": "United States"
+    },
     {
       "name": "Amazon Web Services (AWS)",
       "purpose": "Hosting, storage and generative AI services",
       "region": "United States"
     },
     {
-      "name": "Google",
-      "purpose": "Cloud computing, storage and generative AI services",
+      "name": "Anthropic",
+      "purpose": "Generative AI services",
       "region": "United States"
     },
     {
-      "name": "Microsoft",
-      "purpose": "Hosting, storage and generative AI services",
+      "name": "Baseten Labs Inc",
+      "purpose": "AI model inference services",
+      "region": "United States"
+    },
+    {
+      "name": "Cerebras Systems Inc",
+      "purpose": "AI model inference services",
+      "region": "United States"
+    },
+    {
+      "name": "ClickHouse",
+      "purpose": "Analytics services",
       "region": "United States"
     },
     {
@@ -26,28 +42,73 @@
       "region": "United States"
     },
     {
+      "name": "Discourse",
+      "purpose": "Community support and communication services",
+      "region": "United States"
+    },
+    {
+      "name": "Exa.ai",
+      "purpose": "AI search services",
+      "region": "United States"
+    },
+    {
+      "name": "Fireworks AI",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Google",
+      "purpose": "Cloud computing, storage and generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Groq",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
       "name": "Honeycomb",
       "purpose": "Real-time monitoring and debugging service",
       "region": "United States"
     },
     {
-      "name": "Redis",
-      "purpose": "Real-time logging and security services",
+      "name": "Invisible Tools Inc (dba Raindrop.ai)",
+      "purpose": "AI monitoring and analytics services",
       "region": "United States"
     },
     {
-      "name": "WorkOS",
-      "purpose": "Audit log services",
-      "region": "United States"
-    },
-    {
-      "name": "Algolia",
-      "purpose": "Real-time site search services",
+      "name": "Kasada",
+      "purpose": "Fraud prevention services",
       "region": "United States"
     },
     {
       "name": "Knock Labs",
       "purpose": "Customer notification services",
+      "region": "United States"
+    },
+    {
+      "name": "Microsoft",
+      "purpose": "Hosting, storage and generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Neon",
+      "purpose": "Serverless storage services",
+      "region": "United States"
+    },
+    {
+      "name": "OpenAI",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Plain",
+      "purpose": "Customer support services",
+      "region": "United Kingdom"
+    },
+    {
+      "name": "Redis",
+      "purpose": "Real-time logging and security services",
       "region": "United States"
     },
     {
@@ -81,68 +142,8 @@
       "region": "United States"
     },
     {
-      "name": "Neon",
-      "purpose": "Serverless storage services",
-      "region": "United States"
-    },
-    {
-      "name": "Kasada",
-      "purpose": "Fraud prevention services",
-      "region": "United States"
-    },
-    {
-      "name": "Discourse",
-      "purpose": "Community support and communication services",
-      "region": "United States"
-    },
-    {
-      "name": "ClickHouse",
-      "purpose": "Analytics services",
-      "region": "United States"
-    },
-    {
-      "name": "OpenAI",
-      "purpose": "Generative AI services",
-      "region": "United States"
-    },
-    {
-      "name": "Fireworks AI",
-      "purpose": "Generative AI services",
-      "region": "United States"
-    },
-    {
-      "name": "Anthropic",
-      "purpose": "Generative AI services",
-      "region": "United States"
-    },
-    {
-      "name": "Exa.ai",
-      "purpose": "AI search services",
-      "region": "United States"
-    },
-    {
-      "name": "Plain",
-      "purpose": "Customer support services",
-      "region": "United Kingdom"
-    },
-    {
-      "name": "Groq",
-      "purpose": "Generative AI services",
-      "region": "United States"
-    },
-    {
-      "name": "Cerebras Systems Inc",
-      "purpose": "AI model inference services",
-      "region": "United States"
-    },
-    {
-      "name": "Baseten Labs Inc",
-      "purpose": "AI model inference services",
-      "region": "United States"
-    },
-    {
-      "name": "Invisible Tools Inc (dba Raindrop.ai)",
-      "purpose": "AI monitoring and analytics services",
+      "name": "WorkOS",
+      "purpose": "Audit log services",
       "region": "United States"
     }
   ]

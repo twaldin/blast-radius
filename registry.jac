@@ -812,6 +812,16 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         flow_type="rendered_html",
         recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
+    "lindy.ai": RegistryEntry(
+        name="Lindy",
+        domain="lindy.ai",
+        subprocessor_url="https://app.drata.com/trust/9cb791f0-0c38-11ee-865f-029d78a187d9",
+        source_type="official_website",
+        verified_on="2026-07-26",
+        notes="Lindy's official public Drata Trust Center has a Subprocessors section with a complete named list, stated purposes, and data locations.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official Drata Trust Center in Browser Harness, click View all in the Subprocessors section, capture the complete modal text, then canonicalize and deduplicate; return notfound if the named section is absent."
+    ),
     "linear.app": RegistryEntry(
         name="Linear",
         domain="linear.app",
@@ -971,6 +981,16 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         notes="Official OpenAI Sub-processor List, last updated July 9, 2026, names third parties and affiliates with product scope, location, and purpose.",
         flow_type="rendered_html",
         recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
+    ),
+    "openrouter.ai": RegistryEntry(
+        name="OpenRouter",
+        domain="openrouter.ai",
+        subprocessor_url="https://trust.openrouter.ai/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57",
+        source_type="official_website",
+        verified_on="2026-07-26",
+        notes="OpenRouter's official SafeBase Trust Center exposes a Legal > Subprocessors document, but the named list requires an approved work-email access request; the public view proves the disclosure exists without revealing its contents.",
+        flow_type="rendered_html_guarded",
+        recommended_flow="Open the exact SafeBase item URL in Browser Harness and inspect the rendered document; emit unreadable with no fixture when the work-email access gate remains, and return notfound if the official disclosure is removed."
     ),
     "optimizely.com": RegistryEntry(
         name="Optimizely",
