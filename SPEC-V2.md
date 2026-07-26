@@ -3,9 +3,17 @@
 Supersedes the lane tables in `PLAN.md`. Written against the **actual merged tree** at
 `ffcf6bc`, after B's `data` push and C's `pages/` + `risk/` push.
 
-**The pivot:** stop building one deep demo graph. Build an **atlas** — many real company
-graphs, precomputed from real legal filings, browsable from a landing page. Demo value
-moves from *depth* to *wideness*.
+**The pivot, in three parts:**
+1. **Wideness, not depth** — stop building one deep demo graph. Build an **atlas** of many
+   real company graphs, precomputed from real legal filings (§3).
+2. **A whole-industry Map** — every crawled company and every disclosed dependency on one
+   canvas, as a third view (§10).
+3. **Swiss-editorial frontend, generalised** — take the full design system from
+   `drafts/02-swiss-editorial`, strip its single-company copy, and replace the tier-pinned
+   three-column graph with a free-form force layout (§9).
+
+Reading order: **§0 unblocks the build, §1 gets us deployed.** Do those before anything
+below them. A owns §4–5, B owns the data/search lane, C owns §9–10.
 
 ---
 
@@ -167,6 +175,8 @@ existing five calls keep working unchanged while it migrates.
 | `one_look` | `{domain}` | Headline for that company. |
 | `crawl_progress` | `{domain}` | Unchanged. |
 | `expand_one` | `{domain}` | Crawl exactly one company. |
+| `industry_map` | `{min_degree?}` | **NEW.** Every company, every edge, one payload — powers the Map view (§10). |
+| `search` | `{q}` | **NEW.** Type-ahead over crawled companies **and** uncrawled registry entries. |
 
 **Dropped:** `expansion_candidates` (the depth-cap justifier — obsolete once depth is
 uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vendors[]}`.
@@ -186,27 +196,33 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
 8. Degrade gracefully: unsourced downtime/compliance → zero/empty, never fabricated.
 9. *(if time)* Vendor/Provider subgraph onto `root.shared` — `DECISIONS-A.md` §4.
 
-### B — data, extraction, breadth
+### B — data, fetching, search *(that is the whole lane now)*
 1. **Fix `extract.jac:261` + the byLLM import/install.** Blocking. *(25 min)*
 2. **Batch precompute the atlas:** crawl all 150 registry companies, extract, canonicalize,
    persist. Concurrency ~10. This is the single highest-value task left — it's what turns
    the pivot into a demo.
-3. Add `openrouter.ai` and `lindy.ai` to the registry.
-4. **Curate provider facts *with a source URL per claim*** (SOC 2 status, real outage hours
+3. **Search backend.** Resolve a typed string → company, over crawled companies *and*
+   uncrawled registry entries, so search can offer "not mapped yet — map it now". A exposes
+   the `search` walker; B owns the matching/ranking behind it.
+4. Add `openrouter.ai` and `lindy.ai` to the registry.
+5. **Curate provider facts *with a source URL per claim*** (SOC 2 status, real outage hours
    from public status-page history) for the top ~15 providers. **If it isn't cited by
    freeze, we ship the field empty** — see §2.
-5. Keep the ReAct/browser discovery path off the rehearsed run.
-6. *(subagent play)* Expand the registry well past 150 — see §8.
+6. Keep the ReAct/browser discovery path off the rehearsed run.
+7. *(subagent play)* Expand the registry well past 150 — see §8.
 
-### C — interface, deploy, pitch
-1. **Deploy the moment A's fix lands.** Before atlas, before polish. Non-negotiable.
+### C — frontend → deploy *(that is the whole lane now)*
+1. **Deploy the moment A's fix lands.** Before the restyle, before the atlas. Non-negotiable.
 2. Verify `jac.toml`: `jac-version = "==0.34.7"` but the installed toolchain is **0.16.7**.
    Confirm this pin doesn't break `jac start`/`--scale`.
-3. Atlas landing page: featured graphs, rotating headline with swapping bold slots.
-4. Pass `domain` through to the five walkers; add the company selector.
-5. **Update `docs/demo-script.md`:** remove the 9.2h AWS claim and the Fastly SOC 2 /
+3. **Restyle everything to the Swiss-editorial design system — §9.**
+4. **Replace the tier-pinned graph with the free-form render — §9.3.**
+5. Atlas landing: featured graphs, rotating headline, company selector, search box.
+6. **Build the Map view — §10.**
+7. Pass `domain` through every walker call.
+8. **Update `docs/demo-script.md`:** remove the 9.2h AWS claim and the Fastly SOC 2 /
    watchlist claim unless B lands cited replacements. Re-point the script at the atlas.
-6. `min_replicas = 1` is already set — good, no cold start on stage.
+9. `min_replicas = 1` is already set — good, no cold start on stage.
 
 ---
 
@@ -243,3 +259,101 @@ rehearsals.**
 4. **Compliance panel** — if B can't source cited SOC 2 / watchlist facts by freeze, do we
    ship the panel empty, or cut it from the UI entirely? I'd cut it from the UI; an empty
    panel reads as broken.
+
+---
+
+## 9. Frontend direction — Swiss editorial, generalised
+
+**The visual target is `drafts/02-swiss-editorial`.** Take its full design system.
+Nothing else in `drafts/` is a style reference any more. The current dark-blue palette in
+`risk/DependencyGraph.jac` is replaced wholesale.
+
+### 9.1 Design system — lift verbatim
+
+| Token | Value | Use |
+|---|---|---|
+| `--paper` | `#F4F1E9` | page background — **light**, not dark |
+| `--ink` | `#191813` | type, rules, node strokes, edges |
+| `--red` | `#E30613` | **blast radius only.** Never for warnings, errors, or badges. |
+| Display | `Archivo Black` | headline, section heads |
+| Body | `Archivo` | prose |
+| Data/label | `IBM Plex Mono` | figure captions, table data, node labels, all numerics |
+
+Keep the editorial furniture — it is the whole personality: hairline rules, `FIG. N —`
+captions, small-caps mono kickers, clause numbering, generous margins, the masthead, and
+the end-mark. Keep the memorandum framing.
+
+### 9.2 De-overfit the copy — this is the actual work
+
+The draft hardcodes one company everywhere. **Every string below must become
+data-driven or generic.** Static copy names no company, no count, no percentage.
+
+| Draft string | Problem | Fix |
+|---|---|---|
+| `One of them is carrying 62% of your stack.` | hardcoded stat | bind to selected company; rotate across featured companies on the landing |
+| `JACHAMMER.AI` (masthead slug) | one company | selected company, or the product name on the landing |
+| `BLAST RADIUS — <X> DOWN → k/8 VENDORS` | hardcoded `8` | `k/{vendor_count}` from the payload |
+| `SOC 2 GAP INHERITED (PII VIA FASTLY)` | hardcoded vendor | from `compliance_fallout`, and only if cited (§2) |
+| `Move error monitoring and one CDN path off AWS-bound vendors:` | hardcoded remediation | `one_look.biggest_suggestion` |
+| `TECHNICAL MEMORANDUM Nº BR-01` | single memo | derive per company, or drop the number |
+| `JACKHACKS · JUL 2026`, `PRINTED AT 1440 × 900` | hackathon/demo artifact | drop, or demote to a colophon |
+| `FIG. 1 — ORG / VENDORS / PROVIDERS` | already generic | **keep** |
+| `Your vendors have vendors.` | already generic | **keep — it is the product line** |
+
+**Rule of thumb:** if a judge selects a different company and a sentence is still true,
+it belongs in the markup. If it becomes false, it belongs in the payload.
+
+### 9.3 Graph render — free-form, not columns
+
+`risk/DependencyGraph.jac` currently pins `x` per tier (`TIER_X = {org:0.13, vendor:0.47,
+provider:0.85}`) and only solves `y`. That produces the three-column look, and it
+structurally cannot render the atlas or the Map — both have no single org and unbounded
+depth.
+
+**Replace with a real force layout**, closer to `drafts/12-contagion`:
+
+- **Drop `fx`/tier pinning entirely.** Let charge + link distance resolve both axes.
+- **No max depth and no max node count in the renderer.** Depth is a data question now
+  (§4), not a layout constraint.
+- Node radius `∝ sqrt(inbound_degree)` — shared dependencies read as visibly bigger.
+- Curved//bent edges and a slow organic drift (contagion uses a small sinusoidal offset
+  per node with a per-node seed). Keeps it alive without animating layout.
+- Prune by **degree**, not by tier: fold `inbound_degree < 2` leaves into an `other (N)`
+  aggregate. `store.jac` already does this with `PRUNE_ABOVE`; keep it, make the
+  threshold a prop.
+- Ink-on-paper: `--ink` nodes and hairline edges on `--paper`; **`--red` only during a
+  blast**. Everything else desaturates to ~15% opacity when a blast is running.
+- `tier` still arrives on every node (§4) — use it for *labelling*, never for position.
+
+### 9.4 Multigraph
+
+One canvas component, three consumers: a single company (Atlas selection), the whole
+dataset (Map, §10), and the memo figure (Brief). Same `DependencyGraph`, different
+payload and palette prop — the component already accepts `palette`, so keep that seam.
+
+---
+
+## 10. The Map — third view, the industry map
+
+*(New — this had not come up with me before now.)*
+
+**Every company and every disclosed dependency in one canvas.** Not one org's graph — the
+whole crawled corpus. This is the payoff of the wideness pivot and it is the single most
+arresting thing we can put on a projector: hundreds of real companies, sourced from real
+legal filings, visibly collapsing onto a handful of providers.
+
+- Endpoint: `industry_map {min_degree?}` → `{nodes, edges, stats}` over all crawled
+  companies. No org root, so `tier` is degree-derived: sinks/hubs vs leaves.
+- Sizing by global `inbound_degree`; the hyperscalers become unmissable hubs.
+- `min_degree` lets C trade density for legibility at render time.
+- Hover a node → its name, dependents count, `source_url`. Click → open that company's
+  Atlas view.
+- Search (§B3) targets this view: type a company, fly to its node.
+
+**Nav becomes:** `/` **Atlas** (landing + company view) · `/map` **Map** · `/brief`
+**Brief**. The current `/console` outage controls fold into the Atlas company view — that
+keeps three tabs, which is what `pages/layout.jac` already renders.
+
+**Honesty guard:** the Map shows only what we actually crawled. Put the real count in the
+furniture — *"N companies · M disclosed dependencies · sourced from public Article 28
+filings"* — and it reads as rigor rather than decoration.
