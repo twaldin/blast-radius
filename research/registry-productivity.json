@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Slack",
+    "domain": "slack.com",
+    "subprocessor_url": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf?bc=OTH",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Current Salesforce Infrastructure and Sub-processors document; the Slack section explicitly applies to Slack, Slack AI, and GovSlack and names the applicable providers."
+  },
+  {
+    "name": "Notion",
+    "domain": "notion.so",
+    "subprocessor_url": "https://www.notion.so/Notion-s-List-of-Subprocessors-268fa5bcfa0f46b6bc29436b21676734?pvs=24",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Notion page titled Notion's List of Subprocessors, with a named third-party subprocessor table."
+  },
+  {
+    "name": "Linear",
+    "domain": "linear.app",
+    "subprocessor_url": "https://linear.app/dpa",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official DPA; Exhibit B contains the current List of Authorized Sub-Processors with company, description, and location."
+  },
+  {
+    "name": "Figma",
+    "domain": "figma.com",
+    "subprocessor_url": "https://www.figma.com/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official list updated June 22, 2026, naming infrastructure, AI, support, and affiliate subprocessors."
+  },
+  {
+    "name": "Zoom",
+    "domain": "zoom.com",
+    "subprocessor_url": "https://www.zoom.com/en/trust/subprocessors/?page=1",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Zoom Trust page effective April 29, 2026, with named authorized subprocessors, purposes, data shared, and locations."
+  },
+  {
+    "name": "Miro",
+    "domain": "miro.com",
+    "subprocessor_url": "https://miro.com/static/legal/Miro-Current-Subprocessors-List.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official current PDF linked from Miro's DPA; it lists Miro subprocessors and third-party AI model providers and was updated July 8, 2026."
+  },
+  {
+    "name": "Airtable",
+    "domain": "airtable.com",
+    "subprocessor_url": "https://www.airtable.com/company/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official list updated July 6, 2026, with named core-infrastructure, AI, support, and affiliate subprocessors."
+  },
+  {
+    "name": "Asana",
+    "domain": "asana.com",
+    "subprocessor_url": "https://asana.com/terms/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Asana legal page updated June 22, 2026, naming infrastructure, analytics, support, feature-specific, and affiliate subprocessors."
+  },
+  {
+    "name": "monday.com",
+    "domain": "monday.com",
+    "subprocessor_url": "https://monday.com/l/privacy/sub-processors-subsidiaries-support/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official legal portal updated June 24, 2026, with named subprocessors, applicable services, data shared, regions, and conditions."
+  },
+  {
+    "name": "ClickUp",
+    "domain": "clickup.com",
+    "subprocessor_url": "https://clickup.com/terms/dpa/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official list updated July 10, 2026, naming infrastructure, platform, AI, support, and professional-services subprocessors."
+  },
+  {
+    "name": "Box",
+    "domain": "box.com",
+    "subprocessor_url": "https://www.box.com/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Box legal page containing named core and customer-enabled AI subprocessors, service categories, and processing locations."
+  },
+  {
+    "name": "Jotform",
+    "domain": "jotform.com",
+    "subprocessor_url": "https://www.jotform.com/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Jotform page naming subprocessors, applicable services, service types, and the categories of data shared."
+  },
+  {
+    "name": "Calendly",
+    "domain": "calendly.com",
+    "subprocessor_url": "https://calendly.com/help/calendly-sub-processors-gdpr-ccpa",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official help-center list updated July 10, 2026, naming each subprocessor with activity, privacy contact, and data-center locations."
+  },
+  {
+    "name": "Loom",
+    "domain": "loom.com",
+    "subprocessor_url": "https://www.atlassian.com/legal/loom/privacy",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Atlassian legal page for Loom; its subprocessor section names providers and explains what each processes. Atlassian is Loom's parent company."
+  },
+  {
+    "name": "DocuSign",
+    "domain": "docusign.com",
+    "subprocessor_url": "https://assets.ctfassets.net/3fcisxc3a6xz/4wY1tp0jisFLerBClIRcll/407e05ef8358df558f898519a79e5b8a/Docusign_Services_Subprocessor_List.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Current official PDF linked from Docusign's Trust page, updated July 2, 2026, with service-specific names, locations, and processing descriptions."
+  },
+  {
+    "name": "1Password",
+    "domain": "1password.com",
+    "subprocessor_url": "https://1password.com/files/legal/1password-subprocessor-list.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official subprocessor PDF effective January 13, 2026, naming affiliates, infrastructure providers, and third-party subprocessors."
+  },
+  {
+    "name": "LastPass",
+    "domain": "lastpass.com",
+    "subprocessor_url": "https://www.lastpass.com/-/media/50dd502f16c34e99ad3ba7ea031d55ab.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official LastPass Sub-Processors disclosure linked from its Trust Center, with hosting and third-party provider tables."
+  },
+  {
+    "name": "Dashlane",
+    "domain": "dashlane.com",
+    "subprocessor_url": "https://www.dashlane.com/privacy/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official list updated May 15, 2026, grouped by secured, registration, billing, usage, support, marketing, and administrative data."
+  },
+  {
+    "name": "Canva",
+    "domain": "canva.com",
+    "subprocessor_url": "https://content-management-files.canva.com/assets/en/f6022a49-58d4-40d8-88d3-803529880cc0",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Most recent official PDF linked from Canva's subprocessor policy page, updated April 17, 2026, with third-party and Canva Group subprocessors."
+  },
+  {
+    "name": "Webflow",
+    "domain": "webflow.com",
+    "subprocessor_url": "https://webflow.com/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official list updated July 9, 2026, naming each subprocessor, service provided, and location."
+  },
+  {
+    "name": "Egnyte",
+    "domain": "egnyte.com",
+    "subprocessor_url": "https://www.egnyte.com/subcontractors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official subcontractor/subprocessor disclosure naming cloud, CRM, billing, notification, training, and support providers and locations."
+  },
+  {
+    "name": "Front",
+    "domain": "front.com",
+    "subprocessor_url": "https://front.com/legal/list-of-subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official list effective July 13, 2026, naming third-party and Front Group subprocessors with processing activities and countries."
+  },
+  {
+    "name": "Slite",
+    "domain": "slite.com",
+    "subprocessor_url": "https://slite.com/help/1n_zqy6ByfWGTV/List-of-Sub-Processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Slite help-center disclosure with a named provider table covering data type, processing purpose, region, and safeguards."
+  },
+  {
+    "name": "Pitch",
+    "domain": "pitch.com",
+    "subprocessor_url": "https://pitch.com/dpa",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official DPA; Annex 7.2 names the further processors and describes each processing function."
+  },
+  {
+    "name": "Make",
+    "domain": "make.com",
+    "subprocessor_url": "https://assets.ctfassets.net/un655fb9wln6/78xuveidrchD9EWZLrrCUM/a8333d0c19d7de7910d81d8edd68df71/Make_Sub-Processors_November_2025.docx.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Current official Make subprocessor PDF linked from Make's terms page, effective December 12, 2025, with named providers and processing descriptions."
+  }
+]

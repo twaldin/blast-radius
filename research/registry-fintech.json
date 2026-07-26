@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Stripe",
+    "domain": "stripe.com",
+    "subprocessor_url": "https://stripe.com/legal/service-providers",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names AWS, Sprinklr, Salesforce, Twilio, and product-specific subprocessors; page last updated December 20, 2025."
+  },
+  {
+    "name": "Adyen",
+    "domain": "adyen.com",
+    "subprocessor_url": "https://www.adyen.com/en_GB/legal/list-of-adyen-subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names AWS, Google, Microsoft, and Oracle; last updated July 1, 2026."
+  },
+  {
+    "name": "BlackLine",
+    "domain": "blackline.com",
+    "subprocessor_url": "https://www.blackline.com/legal/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened BlackLine's official public list, effective July 1, 2026, and confirmed named hosting, processing, and affiliate subprocessors across Financial Close, Invoice-to-Cash, Intercompany, and Verity Accruals."
+  },
+  {
+    "name": "Allvue Systems",
+    "domain": "allvuesystems.com",
+    "subprocessor_url": "https://www.allvuesystems.com/legal-terms/data-privacy/subprocessor-list.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Allvue's official Subprocessor List PDF, versioned June 16, 2026, and confirmed named infrastructure, platform, customer-success, AI, integration, and affiliate subprocessors with use cases and locations."
+  },
+  {
+    "name": "Tilled",
+    "domain": "tilled.com",
+    "subprocessor_url": "https://www.tilled.com/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Tilled's official public Subprocessors page and confirmed a complete named list for its embedded-payments service, with provider locations and purposes spanning hosting, payment processing, bank verification, analytics, support, and card infrastructure."
+  },
+  {
+    "name": "Carta",
+    "domain": "carta.com",
+    "subprocessor_url": "https://carta.com/legal/privacy/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal table lists current Carta and Carta Europe subprocessors; last updated March 9, 2026."
+  },
+  {
+    "name": "Modern Treasury",
+    "domain": "moderntreasury.com",
+    "subprocessor_url": "https://www.moderntreasury.com/legal/subprocessor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names AWS, Anthropic, Hightouch, Datadog, and others; last updated May 27, 2026."
+  },
+  {
+    "name": "Coupa",
+    "domain": "coupa.com",
+    "subprocessor_url": "https://compass.coupa.com/en-us/trust/data-privacy/quick-guide-subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public Trust guide names default, additional, and legacy subprocessors; revised January 5, 2026."
+  },
+  {
+    "name": "Chargebee",
+    "domain": "chargebee.com",
+    "subprocessor_url": "https://www.chargebee.com/privacy/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Chargebee's general official list, effective February 15, 2026, and confirmed named affiliate and third-party subprocessors across Billing, Retention/Growth, RevRec, Receivables, and Reveal, with purposes and data-center locations."
+  },
+  {
+    "name": "Recurly",
+    "domain": "recurly.com",
+    "subprocessor_url": "https://recurly.com/legal/privacy/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names service-specific and infrastructure subprocessors including Appcues, Avalara, AWS, and Google."
+  },
+  {
+    "name": "Zuora",
+    "domain": "zuora.com",
+    "subprocessor_url": "https://www.zuora.com/wp-content/uploads/2026/01/0102726-Subprocessor-Update-Subprocessors-and-Affiliates.docx.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official legal PDF names hosting, third-party, and affiliate subprocessors; last updated January 27, 2026."
+  },
+  {
+    "name": "Maxio",
+    "domain": "maxio.com",
+    "subprocessor_url": "https://www.maxio.com/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public service-provider and subprocessor page names vendors by function and core, optional, add-on, or service scope."
+  },
+  {
+    "name": "Xero",
+    "domain": "xero.com",
+    "subprocessor_url": "https://www.xero.com/au/legal/xero-subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names third-party and affiliate subprocessors, including AWS, Anthropic, Google Cloud, and Stripe."
+  },
+  {
+    "name": "Sage",
+    "domain": "sage.com",
+    "subprocessor_url": "https://www.sage.com/en-us/trust-security/privacy/customer-due-diligence/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public due-diligence page lists subprocessors by Sage product, processing location, and activity."
+  },
+  {
+    "name": "Persona",
+    "domain": "withpersona.com",
+    "subprocessor_url": "https://withpersona.com/legal/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names required and conditional subprocessors; last updated June 17, 2026."
+  },
+  {
+    "name": "Circle",
+    "domain": "circle.com",
+    "subprocessor_url": "https://www.circle.com/legal/sub-processor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names affiliate and third-party subprocessors; last updated December 22, 2025."
+  },
+  {
+    "name": "Flywire",
+    "domain": "flywire.com",
+    "subprocessor_url": "https://www.flywire.com/es/legal/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names client- and user-data subprocessors; last modified March 16, 2026."
+  },
+  {
+    "name": "Expensify",
+    "domain": "expensify.com",
+    "subprocessor_url": "https://use.expensify.com/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public subprocessor page names data centers and providers and states the data shared with each."
+  },
+  {
+    "name": "Spendesk",
+    "domain": "spendesk.com",
+    "subprocessor_url": "https://www.spendesk.com/legals/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal list names group and third-party subprocessors; version applicable March 31, 2025."
+  },
+  {
+    "name": "Pennylane",
+    "domain": "pennylane.com",
+    "subprocessor_url": "https://www.pennylane.com/fr/legal/subcontractors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "French public legal list names GDPR subprocessors and services; last modified December 16, 2025."
+  },
+  {
+    "name": "Numeric",
+    "domain": "numeric.io",
+    "subprocessor_url": "https://help.numeric.io/articles/8337651077-subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official knowledge-base list names hosting, email, payments, AI, authentication, and data-movement subprocessors."
+  },
+  {
+    "name": "FreshBooks",
+    "domain": "freshbooks.com",
+    "subprocessor_url": "https://www.freshbooks.com/third-party-sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public first-party list names AWS, Google Cloud, Google, Zendesk, and Salesforce as third-party subprocessors."
+  },
+  {
+    "name": "Billtrust",
+    "domain": "billtrust.com",
+    "subprocessor_url": "https://www.billtrust.com/legal/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal page names subprocessors by Billtrust product; revised July 22, 2025."
+  },
+  {
+    "name": "Uphold",
+    "domain": "uphold.com",
+    "subprocessor_url": "https://uphold.com/legal/uphold-subprocessor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public legal processor list names banking, KYC, payment, infrastructure, and support providers; last updated July 20, 2026."
+  },
+  {
+    "name": "Bastion",
+    "domain": "bastion.com",
+    "subprocessor_url": "https://bastion.com/subprocessor-list",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Public subprocessor list names infrastructure, banking, compliance, blockchain, and operations providers; effective April 7, 2026."
+  }
+]

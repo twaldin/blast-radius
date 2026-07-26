@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Amazon Web Services",
+    "domain": "amazon.com",
+    "subprocessor_url": "https://aws.amazon.com/compliance/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official AWS compliance page with named AWS service and affiliate subprocessors, locations, and processing activities; last updated April 13, 2026."
+  },
+  {
+    "name": "Google Cloud",
+    "domain": "google.com",
+    "subprocessor_url": "https://cloud.google.com/terms/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Google Cloud terms page with named third-party and affiliate subprocessors, service scope, locations, and activities; modified July 16, 2026."
+  },
+  {
+    "name": "Temporal Technologies",
+    "domain": "temporal.io",
+    "subprocessor_url": "https://trust.temporal.io/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Opened Temporal's official public Trust Center and confirmed its complete named Subprocessors section, including Auth0, AWS, Elastic, Google Cloud, IBM, Microsoft Azure, and WorkOS with locations and usage details; last updated May 29, 2026."
+  },
+  {
+    "name": "Cloudflare",
+    "domain": "cloudflare.com",
+    "subprocessor_url": "https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Cloudflare GDPR disclosure with named service and affiliate subprocessors, purposes, and processing locations; updated October 1, 2025."
+  },
+  {
+    "name": "Vercel",
+    "domain": "vercel.com",
+    "subprocessor_url": "https://security.vercel.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57&source=title",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Vercel Trust Center Subprocessors item. Its current named list is client-rendered and the static response leaves the result area blank, so Browser Use is required to render and extract the complete list; published change notices alone are not a complete source."
+  },
+  {
+    "name": "GitHub",
+    "domain": "github.com",
+    "subprocessor_url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official GitHub policy page listing named infrastructure, support, analytics, AI, and affiliate subprocessors with processing descriptions and locations."
+  },
+  {
+    "name": "GitLab",
+    "domain": "gitlab.com",
+    "subprocessor_url": "https://about.gitlab.com/privacy/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official GitLab privacy page with named infrastructure, platform, AI, support, and affiliate subprocessors, purposes, and locations."
+  },
+  {
+    "name": "Atlassian",
+    "domain": "atlassian.com",
+    "subprocessor_url": "https://www.atlassian.com/legal/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Atlassian legal page with named subprocessors by product, purpose, and processing location; effective May 15, 2026."
+  },
+  {
+    "name": "Sentry",
+    "domain": "sentry.io",
+    "subprocessor_url": "https://sentry.io/legal/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Sentry legal page with named infrastructure, support, communications, analytics, AI, and affiliate subprocessors; updated June 1, 2026."
+  },
+  {
+    "name": "Datadog",
+    "domain": "datadoghq.com",
+    "subprocessor_url": "https://www.datadoghq.com/legal/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Datadog legal page listing named infrastructure, product, support, AI, and affiliate subprocessors with service descriptions and locations; updated April 22, 2026."
+  },
+  {
+    "name": "New Relic",
+    "domain": "newrelic.com",
+    "subprocessor_url": "https://newrelic.com/sub-processors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official New Relic disclosure with named subprocessors, processing purposes, applicable products, and locations."
+  },
+  {
+    "name": "PagerDuty",
+    "domain": "pagerduty.com",
+    "subprocessor_url": "https://www.pagerduty.com/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official PagerDuty page listing named platform, communications, analytics, support, AI, and affiliate subprocessors with service details."
+  },
+  {
+    "name": "MongoDB",
+    "domain": "mongodb.com",
+    "subprocessor_url": "https://www.mongodb.com/products/platform/trust/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official MongoDB Trust Center page with named cloud, support, security, communications, AI, and affiliate subprocessors and processing locations."
+  },
+  {
+    "name": "Snowflake",
+    "domain": "snowflake.com",
+    "subprocessor_url": "https://www.snowflake.com/en/legal/privacy/snowflake-sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Snowflake legal page with named infrastructure, support, security, AI, and affiliate subprocessors, purposes, and locations; updated March 6, 2026."
+  },
+  {
+    "name": "Confluent",
+    "domain": "confluent.io",
+    "subprocessor_url": "https://assets.confluent.io/m/227f69dc22168130/original/20250321-Confluent_Cloud_Subprocessors-March-2025.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Confluent Cloud Subprocessors PDF linked from Confluent's legal site, with named providers, services, and processing locations; dated March 2025."
+  },
+  {
+    "name": "Elastic",
+    "domain": "elastic.co",
+    "subprocessor_url": "https://www.elastic.co/agreements/external_subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Elastic agreements page listing named cloud, support, security, AI, and other external subprocessors with service scope and locations."
+  },
+  {
+    "name": "Buildkite",
+    "domain": "buildkite.com",
+    "subprocessor_url": "https://buildkite.com/about/legal/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Buildkite legal page with named subprocessors, service descriptions, and processing locations; updated April 6, 2026."
+  },
+  {
+    "name": "Render",
+    "domain": "render.com",
+    "subprocessor_url": "https://render.com/security",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Render security page containing a named Subprocessors table with provider functions and processing locations."
+  },
+  {
+    "name": "Fly.io",
+    "domain": "fly.io",
+    "subprocessor_url": "https://fly.io/legal/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Fly.io legal page listing named hosting, support, observability, communications, and affiliate subprocessors with purposes and locations."
+  },
+  {
+    "name": "DigitalOcean",
+    "domain": "digitalocean.com",
+    "subprocessor_url": "https://www.digitalocean.com/trust/subprocessors",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official DigitalOcean Trust page with named service and affiliate subprocessors, service descriptions, and processing locations; updated June 10, 2026."
+  },
+  {
+    "name": "Supabase",
+    "domain": "supabase.com",
+    "subprocessor_url": "https://supabase.com/downloads/docs/Supabase%2BDPA%2B250805.pdf",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Supabase DPA dated August 5, 2025; Schedule 3 names authorized subprocessors and describes each processing function."
+  },
+  {
+    "name": "Grafana Labs",
+    "domain": "grafana.com",
+    "subprocessor_url": "https://grafana.com/legal/list-of-subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Grafana Labs legal page with named infrastructure, AI, alerting, and federal-cloud subprocessors, countries, and processing purposes."
+  },
+  {
+    "name": "Docker",
+    "domain": "docker.com",
+    "subprocessor_url": "https://www.docker.com/trust/privacy/sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Docker Trust page with named core, optional AI, and affiliate subprocessors, purposes, hosting locations, and compliance links."
+  },
+  {
+    "name": "LaunchDarkly",
+    "domain": "launchdarkly.com",
+    "subprocessor_url": "https://launchdarkly.com/policies/subprocessors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official LaunchDarkly policy page with named infrastructure, CDN, analytics, billing, support, AI, and affiliate subprocessors; effective May 15, 2026."
+  },
+  {
+    "name": "Cockroach Labs",
+    "domain": "cockroachlabs.com",
+    "subprocessor_url": "https://www.cockroachlabs.com/cloud-terms-and-conditions/data-processing-addendum/cockroach-labs-sub-processors/",
+    "source_type": "official_website",
+    "verified_on": "2026-07-26",
+    "notes": "Official Cockroach Labs subprocessor page with named cloud providers, payment processor, affiliates, processing purposes, data categories, and duration."
+  }
+]
