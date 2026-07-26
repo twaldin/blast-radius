@@ -56,7 +56,10 @@ suppress_health_check_logs = true
 app_name = "blast-radius"
 namespace = "blast-radius"
 min_replicas = 1
-max_replicas = 4
+# One pod, one database. Persistence is SQLite in .jac/data and no
+# [scale.database] is configured, so a second replica would serve its own
+# separate graph -- a judge clicking twice could land on an unseeded pod.
+max_replicas = 1
 cpu_request = "250m"
 cpu_utilization_target = 70
 memory_limit = "1Gi"
