@@ -561,7 +561,7 @@ So get a trivial three-file version compiling first — `main.jac` importing a s
 
 | File | Owner | Rule |
 |---|---|---|
-| `types.jac` | written once by whoever's fastest, then **frozen** | `ResolvedSubprocessor`, `SubprocessorRecord`, `DetectedVendor`. Field changes are a conversation, not a commit |
+| `contracts.jac` (**NOT** `types.jac` — collides with Python's stdlib `types` module and silently imports the wrong one) | written once, then **frozen** | `ResolvedSubprocessor`, `SubprocessorRecord`, `DetectedVendor`, `RiskHeadline`. Field changes are a conversation, not a commit |
 | import lines | whoever's file it is | trivial to resolve, but the classic conflict zone |
 | `jac.toml` | **C only** | B needs `httpx`/`trafilatura`, C needs `[scale.*]`. B requests additions verbally |
 
@@ -664,7 +664,7 @@ Set actual alarms. Three people converging on one `main.jac` will conflict, and 
 | When | Checkpoint |
 | --- | --- |
 | +10 min | Three-file skeleton compiles (§11.2 step zero). If not, collapse to one file now |
-| +15 min | Contracts stubbed and `types.jac` frozen. A, B, C all have something running against fake data |
+| +15 min | Contracts stubbed and `contracts.jac` frozen. A, B, C all have something running against fake data |
 | +2 hr | **First real end-to-end:** one hardcoded vendor → real crawl → real extraction → chokepoint in the UI. One vendor is enough. Primarily a test of B's layer — if extraction and canonicalization don't converge, nothing downstream matters |
 | mid-afternoon | JacHammer deploy live on the stub. Non-negotiable |
 | −3 hr | Feature freeze on Tier 1 and 2. Everything after this is Tier 3 or polish |
