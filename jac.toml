@@ -6,11 +6,9 @@ entry-point = "main.jac"
 kind = "web-app"
 jac-version = "==0.34.7"
 
-# The deploy builds its own .jac/venv from this table, so anything the server
-# imports has to be declared here -- an empty table is why the builder logged
-# "No dependencies to install" and then failed on `import from byllm.lib`.
+# The deploy builds its own .jac/venv from this table.
+#
 [dependencies]
-byllm = "~=0.6.5"
 # jac-scale reaches for requests at deploy time and does not vendor it
 requests = ">=2.28"
 litellm = ">=1.70.0,<=1.82.6"

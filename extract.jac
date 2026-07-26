@@ -4,7 +4,7 @@ import asyncio;
 import os;
 import re;
 import from datetime { datetime, timezone }
-import from byllm.lib { ByLLMError, Model }
+import from jaclang.byllm.lib { ByLLMError, Model }
 import from browser_discovery {
     BrowserPageResult,
     browser_read,
@@ -196,7 +196,7 @@ def resolve_canonical_match(
             raw,
             list(dict.fromkeys(known + KNOWN_PROVIDERS))
         ).strip();
-    } except ByLLMError {
+    } except Exception {
         candidate = "";
     }
     if candidate {
@@ -360,7 +360,7 @@ def extract_and_resolve(
             page_text[:80000]
         );
         return resolve_records(records, known);
-    } except ByLLMError {
+    } except Exception {
         return [];
     }
 }
@@ -535,7 +535,7 @@ async def discover_with_browser(
             )
         ];
         source_urls = source_urls[:8];
-    } except ByLLMError {
+    } except Exception {
         source_urls = [];
     }
     if not source_urls {
