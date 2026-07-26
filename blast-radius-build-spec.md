@@ -111,7 +111,12 @@ This covers roughly 90% of what any startup in that room actually uses, and it m
 
 It is not a shortcut — a real company would maintain exactly this asset, and it is most of the defensible value.
 ### 4.3 Discovery fallback — the agentic long-tail hunter
-**This is the Agentic AI hero.** For anything not in the registry, do not hardcode a waterfall — hand the tools to a ReAct agent and let it plan its own hunt. The tools are the same either way; the only change is that `by llm(tools=[...])` orchestrates them, which is exactly the "planning + tool use" the Agentic AI rubric rewards and a deterministic `if/elif` chain is not.
+**This is the Agentic AI hero, but it comes after the deterministic demo is
+deployed.** For anything not in the registry, let the Jac ReAct agent plan a
+bounded hunt using narrow discovery tools. Firecrawl is the primary web layer:
+`search` locates candidates and `scrape` extracts a known URL. Browser Harness is
+a separate escalation for trust-center click-throughs and other interactions
+that search/scrape cannot complete; the agent does not receive unrestricted CDP.
 
 Resolution order, cheapest first:
 
@@ -124,21 +129,31 @@ Resolution order, cheapest first:
 
 ```jac
 def find_dpa_url(domain: str) -> str by llm(
-    tools=[list_sitemap, check_trust_subdomain, guess_paths, fetch_page, web_search],
+    tools=[firecrawl_search, firecrawl_scrape, browser_harness_render],
     max_react_iterations=6
 );
 sem find_dpa_url =
-    "Find the URL of this company's subprocessor or DPA page. Try the sitemap "
-    "and the trust subdomain first, then guess common legal paths, then web "
-    "search as a last resort. Return the single best URL, or empty if none.";
+    "Find this company's complete current named subprocessor list. Search for "
+    "official-company or verified-GitHub candidates, scrape likely URLs, and "
+    "use the browser escalation only for a required click-through or failed "
+    "render. Return one authoritative URL, or empty if none.";
 sem find_dpa_url.domain = "The vendor's root domain, e.g. 'linear.app'.";
 ```
 
-Each tool is one narrow Jac `def` with its own `sem`; the agent chooses what to call and when. `tools=[...]` alone activates the ReAct loop — `method="ReAct"` is dead in byllm 0.6.19, do not write it. The demo beat: _"watch it try the sitemap, get nothing, check the trust center, then reason its way to the DPA."_ That visible planning loop is the Agentic-AI track's hero criterion, and it is the difference between this and a crawler.
+Each tool is one narrow Jac `def` with its own `sem`; the agent chooses what to
+call and when. Deterministic code still validates domain ownership, completeness,
+page limits, timeouts, and the final evidence before learning the result.
+`tools=[...]` activates the ReAct loop. Do not nest Firecrawl Agent inside the
+first version of our ReAct agent: that obscures the Jac planning story and adds
+another asynchronous cost/latency layer.
 
 Keep the agent off the rehearsed path: registry + fuzzy resolve the scripted vendors instantly and offline. The agent fires live only on the judge's own unindexed vendor — which is also the most impressive thing on screen.
 
-**Known limitation, worth saying out loud:** Vanta and SafeBase trust centers are client-rendered and return an empty shell to a plain GET. Rendering them needs a headless browser you don't have time for. Registry entries should point at underlying HTML where it exists; unknown JS-rendered domains mark `crawl_status = "unreadable"` and surface as such. A tool that reports its own coverage gaps reads as competent, not incomplete.
+**Known limitation, worth saying out loud:** Some trust centers require client
+rendering or click-throughs. Firecrawl handles the ordinary rendered/search case;
+the bounded Browser Harness escalation handles supported interactive cases.
+Anything still incomplete surfaces as `notfound`—never as a guessed or partial
+company graph.
 ### 4.4 Fetch mechanics
 ```jac
 import httpx;

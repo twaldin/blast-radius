@@ -16,7 +16,10 @@ Envelope: data.reports[0] is the payload.
 
 import from datetime { datetime }
 import from extract {
-    detect_all, resolve_url, fetch_page, extract_and_resolve,
+    resolve_url, fetch_page, extract_and_resolve
+}
+import from demo_data {
+    detect_all,
     provider_profile, vendor_feature,
     draft_status_update, explain_fallout, explain_change, compose_one_look
 }
@@ -92,7 +95,7 @@ def _get_or_create_org(dom: str, nm: str) -> Org {
         if nm { found.name = nm; }
         return found;
     }
-    return (root ++> Org(domain=dom, name=nm or _name_from_domain(dom)))[0];
+    return root ++> Org(domain=dom, name=nm or _name_from_domain(dom));
 }
 
 def _org_or_default(dom: str) -> Org {
@@ -103,7 +106,7 @@ def _org_or_default(dom: str) -> Org {
 def _get_or_create_feature(fname: str) -> Feature {
     existing = [root -->[?:Feature, name == fname]];
     if existing { return existing[0]; }
-    return (root ++> Feature(name=fname))[0];
+    return root ++> Feature(name=fname);
 }
 
 # Node creation from B's returned canonical strings. Seeds curated risk data (B's asset).
@@ -111,12 +114,12 @@ def find_or_create_provider(name: str) -> Provider {
     existing = [root -->[?:Provider, canonical_name == name]];
     if existing { return existing[0]; }
     prof = provider_profile(name);
-    return (root ++> Provider(
+    return root ++> Provider(
         canonical_name=name, slug=prof.slug or _slugify(name), category=prof.category,
         downtime_hours_ytd=prof.downtime_hours_ytd,
         soc2=prof.soc2, hipaa=prof.hipaa,
         supply_chain_risk=prof.supply_chain_risk
-    ))[0];
+    );
 }
 
 # Accepts either the UI slug ("aws", "gcp") or the canonical name ("Google Cloud").
@@ -260,9 +263,9 @@ walker:pub detect_vendors {
         for d in found {
             rows.append({"id": _slugify(d.name), "domain": d.domain, "name": d.name, "method": d.method});
             if [org ->:Uses:->[?:Vendor, domain == d.domain]] { continue; }
-            v = (org +>:Uses(added_at=_now()):+> Vendor(
+            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
                 domain=d.domain, name=d.name, slug=_slugify(d.name),
-                discovery_method=d.method))[0];
+                discovery_method=d.method);
             feat = vendor_feature(d.domain);
             if feat { v +>:Powers:+> _get_or_create_feature(feat); }
         }
@@ -279,8 +282,8 @@ walker:pub add_vendors {
         for dom in self.domains {
             if [org ->:Uses:->[?:Vendor, domain == dom]] { continue; }
             nm = _name_from_domain(dom);
-            v = (org +>:Uses(added_at=_now()):+> Vendor(
-                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual"))[0];
+            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
+                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual");
             feat = vendor_feature(dom);
             if feat { v +>:Powers:+> _get_or_create_feature(feat); }
             added.append({"id": v.slug, "domain": dom, "name": nm, "method": "manual"});
@@ -302,7 +305,10 @@ async walker:pub expand {
         cached = here.crawl_status == "ok" and not _is_stale(here.last_crawled, self.ttl_days);
         if (cached and not self.force) or jid(here) in self.seen { skip; }
         self.seen.append(jid(here));
-        url = resolve_url(here.domain);
+        url = await resolve_url(
+            here.domain,
+            prefer_demo_cache=here.discovery_method != "manual"
+        );
         if not url { here.crawl_status = "notfound"; here.last_crawled = _now(); skip; }
         text = await fetch_page(url);
         if not text { here.crawl_status = "unreadable"; here.last_crawled = _now(); skip; }

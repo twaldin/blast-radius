@@ -8,6 +8,8 @@ test "registry resolves a known company" {
     assert stripe is not None;
     assert stripe.name == "Stripe";
     assert stripe.subprocessor_url.startswith("https://");
+    assert stripe.flow_type == "rendered_html";
+    assert "Browser Harness" in stripe.recommended_flow;
 }
 
 
@@ -31,5 +33,14 @@ test "every registry key matches its entry domain" {
             "official_website",
             "official_github"
         };
+        assert entry.flow_type in {
+            "github_raw",
+            "pdf_text",
+            "rendered_html",
+            "rendered_html_guarded",
+            "rendered_trust_center",
+            "trust_center_clickthrough"
+        };
+        assert "return notfound" in entry.recommended_flow.lower();
     }
 }
