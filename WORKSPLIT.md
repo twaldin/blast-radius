@@ -1,7 +1,7 @@
 # Blast Radius — final work split
 
 **Written 16:00 PT. Demo 19:15 PT. 3h15m left.**
-**A = Tim (backend/graph) · B = David (extraction/agent) · C = Snehil (frontend)**
+**Tim → frontend · Snehil → deploy · David → search + discovery agent**
 
 This supersedes `PLAN.md`, `SPEC-V2.md`, `blast-radius-build-spec.md`, and `REVIEW.md`
 wherever they disagree. Those docs describe a product we did not build. Everything below
@@ -133,8 +133,9 @@ database → four pods, four different graphs.
 
 ## 4. Frozen API contract — read this, then never block on each other
 
-These payloads are **verified from the passing test run**. They will not change. C builds
-against them without waiting for A; A builds against B's signature without waiting for B.
+These payloads are **verified from the passing test run**. They will not change. Tim builds
+the pages against them without waiting for anyone; David owns both sides of the discovery
+path, so there is no cross-lane contract left to honor.
 
 ```jsonc
 // POST /walker/atlas  {}                      -> the landing page's company list
@@ -157,7 +158,7 @@ against them without waiting for A; A builds against B's signature without waiti
  "resolved": {"id","domain","name","state","filing_count","dependent_count",
               "crawl_status","source_url","match"},
  "results": [ ...same shape... ],
- "discovered": false}                          // <- NEW, added by A in §5
+ "discovered": false}                          // <- NEW, added by David in §5
 
 // POST /walker/chokepoints {}
 [{"provider","provider_id","vendors_affected","share","downtime_hours_ytd",
@@ -174,17 +175,15 @@ against them without waiting for A; A builds against B's signature without waiti
 
 Envelope for all of them: `{"data": {"reports": [ <payload> ]}}`.
 
-**The one contract that does not exist yet — A and B agree to this now and build in parallel:**
+**The one piece that does not exist yet — David owns both sides of it, so it cannot desync:**
 
 ```jac
-# B owns the body. A owns the caller. Signature is frozen as of 16:00.
+# extract.jac:570-593 -- already exists, needs hardening
 def discover_and_resolve(domain: str, keyword: str) -> BrowserDiscoveryResult;
-# B guarantees: never raises; status in {"ok","notfound","unreadable"}; returns in <=45s.
-# A guarantees: persists results through _upsert_company; response shape unchanged.
+# never raises; status in {"ok","notfound","unreadable"}; returns in <=45s
 ```
 
-`discover_and_resolve` already exists at `extract.jac:570-593`. B hardens it, A calls it.
-Neither waits.
+The `search` walker calls it. Both sides live in David's lane now.
 
 ---
 
@@ -193,48 +192,61 @@ Neither waits.
 Each lane owns disjoint files. **Do not edit outside your lane** — cross-lane edits are
 what produced §3.1.
 
-### A — Tim · owns `main.jac`, `jac.toml`, deploy
+Assignment changed at 16:10. Tim moves to frontend because it is now the only thing between
+us and a demo and it is the riskiest lane. Snehil takes deploy: bounded, binary, needs no
+context in a 1185-line file. David takes the entire search→discovery vertical so one person
+owns both sides of it and there is nothing to hand off.
+
+### SNEHIL · deploy + config — owns `jac.toml`, hosting
+
+**Do this first. Nothing else in this document matters without a URL.** You do not need to
+read `main.jac`.
 
 | # | Task | Done when |
 |---|---|---|
-| A1 | **Deploy now, on what exists.** `max_replicas = 1` (`jac.toml:42`). Commit the `jac.toml` byLLM fix that is still sitting uncommitted. | A URL exists and answers `POST /walker/atlas` with 19 companies |
-| A2 | Cold-start seeding: make `seed_atlas` resolve `seed/atlas` **relative to the module file, not CWD**, and auto-run when the graph is empty | Fresh container serves 293 companies with no manual curl |
-| A3 | `search` gains `allow_discovery: bool = False` and a `"discovered"` field. On graph+registry miss with the flag set, call `discover_and_resolve` (§4), persist via `_upsert_company`, return the same envelope | `search{q:"vercel", allow_discovery:true}` returns a resolved company that was not in the graph before |
-| A4 | Keep `main.test.jac` at 9/9 | green before every push |
+| S1 | Set `max_replicas = 1` (`jac.toml:42`). Four replicas with no shared database means four different graphs depending on which pod a judge hits | one replica |
+| S2 | **Deploy on what exists right now.** Do not wait for anyone's feature | a URL answers `POST /walker/atlas` with 19 companies |
+| S3 | Check `jac-version = "==0.34.7"` (`jac.toml:7`) against the installed 0.16.7 toolchain. If the builder honors that pin, install fails | build log clean |
+| S4 | Cold-start seeding. `seed_atlas` resolves `Path("seed/atlas")` relative to **process CWD**, so in a container it reports `seeded: 0` and succeeds silently. Make it module-relative and auto-run when the graph is empty | fresh container serves 293 companies, no manual curl |
+| S5 | Once a URL exists, own redeploys. Everyone else pushes `main`; you keep the URL current | — |
 
-A1 is first and is not negotiable. Everything else in this document is worthless without a URL.
+S4 is the only item that touches `main.jac`. It is ~10 lines, localized to the `seed_atlas`
+walker — tell David before you push, he is in the same file.
 
-### B — David · owns `extract.jac`, `browser_discovery.jac`, `registry.jac`
+### DAVID · search + discovery — owns `extract.jac`, `browser_discovery.jac`, `registry.jac`, and the `search` walker in `main.jac`
 
-**Your lane was blocked by a dead LLM binding until 15:50. It works now. Start by re-running
-whatever you gave up on.**
-
-| # | Task | Done when |
-|---|---|---|
-| B1 | Verify the ReAct agent end to end: call `find_dpa_sources("Vercel", "vercel.com")` directly and watch it plan | It returns real candidate URLs for a company not in the 150-entry registry |
-| B2 | Harden `discover_and_resolve` to the §4 guarantee: never raises, always returns a status, hard 45s ceiling | Fuzzed with 5 junk inputs, never throws |
-| B3 | Make it work without a local browser, or make the fallback honest. `browser_discovery.jac` shells out to a `browser-harness` binary + Chrome CDP that **will not exist in the deployed container** | Either it degrades cleanly to `unreadable`, or discovery runs LLM-only via `search_web_tool` |
-| B4 | Confirm `extract_subprocessors` produces typed records off one real page now that the model is bound | One live extraction, eyeballed |
-
-B3 is the one that will bite on stage. Decide early: if the deployed box has no browser,
-say so in the UI rather than hanging for 45 seconds.
-
-### C — Snehil · owns `pages/`, `risk/`
-
-This is the biggest lane. **Do not merge the swiss checkout** (§3.4 note); it will cost you
-more than it saves.
+**Your lane was blocked by a dead LLM binding until 15:50 (§3.2). It works now. Start by
+re-running whatever you gave up on.** You own both sides of the discovery boundary, so there
+is no contract to negotiate with anyone.
 
 | # | Task | Done when |
 |---|---|---|
-| C1 | **Rename the four exports** — `Landing`→`page`, `Atlas`→`page`, `Brief`→`page`, `Shell`→`layout` | `/` renders literally anything. ~2 minutes. Do it first |
-| C2 | Fix the 6 `jac check` failures (§3.1) | `jac check pages/*.jac risk/*.jac` clean |
-| C3 | **Landing = real data.** Delete the 8 hardcoded literals at `pages/index.jac:8-17`; drive the picker from `atlas {}` (19 real companies with counts and chokepoints). Add the project/problem copy | Landing lists Okta/Figma/Stripe with real subprocessor counts |
-| C4 | **Kill the fixture path.** `risk/store.jac:123-134` calls `expand {}` with no domain and falls back to `detect_vendors` → the fabricated 8-vendor stack. Replace with `atlas {}` on load, `graph {domain}` on select | `detect_vendors` and `DEMO_VENDORS` have no frontend callers. Delete the apology line at `pages/atlas.jac:160` |
-| C5 | **Atlas search box** — the page's whole reason to exist. Input → `search {q}` → hit list → select → `graph {domain}`. On empty result, show a "map it now" button that re-calls with `allow_discovery: true` and a spinner | Typing "okta" draws Okta's 89-dependency graph |
-| C6 | Keep the SVG radial renderer in `risk/DependencyGraph.jac`. It works and has no npm dependency | — |
+| D1 | Verify the ReAct agent end to end: call `find_dpa_sources("Vercel", "vercel.com")` and watch it plan | returns real candidate URLs for a company outside the 150-entry registry |
+| D2 | Harden `discover_and_resolve` (`extract.jac:570-593`): never raises, always returns a status, hard 45s ceiling | fuzzed with 5 junk inputs, never throws |
+| D3 | **Wire it up.** `search` gains `allow_discovery: bool = False` and a `"discovered"` field. On graph+registry miss with the flag set, call `discover_and_resolve`, persist via `_upsert_company`, return the same envelope (§4) | `search{q:"vercel", allow_discovery:true}` resolves a company that was not in the graph before |
+| D4 | Decide the no-browser story. `browser_discovery.jac` shells out to a `browser-harness` binary + Chrome CDP that **will not exist in the deployed container** | either it degrades cleanly to `unreadable`, or discovery runs LLM-only via `search_web_tool` |
+| D5 | Keep `main.test.jac` at 9/9 — you are the only one changing backend logic | green before every push |
 
-C5 depends on A3 only for the *discovery* branch. Build the search box against plain
-`search {q}` immediately — that already works today and covers every seeded company.
+D3 is the Agentic-AI track centrepiece and the Atlas page's entire promise. D4 is what bites
+on stage: if the deployed box has no browser, say so in the UI rather than hanging 45 seconds.
+
+### TIM · frontend — owns `pages/`, `risk/`
+
+Biggest lane and the critical path. **Do not merge the swiss checkout** (§3.4 note) — it is
+5 commits behind and drags in an npm dependency we already removed. Read it for the
+search-input pattern only.
+
+| # | Task | Done when |
+|---|---|---|
+| T1 | **Rename the four exports** — `Landing`→`page`, `Atlas`→`page`, `Brief`→`page`, `Shell`→`layout` | `/` renders literally anything. ~2 minutes. Do it first |
+| T2 | Fix the 6 `jac check` failures (§3.1) | `jac check pages/*.jac risk/*.jac` clean |
+| T3 | **Landing = real data.** Delete the 8 hardcoded literals at `pages/index.jac:8-17`; drive the picker from `atlas {}` (19 real companies, real counts, real chokepoints). Add the project/problem copy | landing lists Okta/Figma/Stripe with real subprocessor counts |
+| T4 | **Kill the fixture path.** `risk/store.jac:123-134` calls `expand {}` with no domain and falls back to `detect_vendors` → the fabricated 8-vendor stack. Replace with `atlas {}` on load, `graph {domain}` on select | `detect_vendors`/`DEMO_VENDORS` have no frontend callers; the apology line at `pages/atlas.jac:160` is gone |
+| T5 | **Atlas search box** — the page's reason to exist. Input → `search {q}` → hit list → select → `graph {domain}`. On an empty result, a "map it now" button that re-calls with `allow_discovery: true`, plus a spinner | typing "okta" draws Okta's 89-dependency graph |
+| T6 | Keep the SVG radial renderer in `risk/DependencyGraph.jac` — it works and has no npm dependency | — |
+
+T5 depends on David's D3 only for the *discovery* branch. Build the search box against plain
+`search {q}` immediately — that works today and covers every seeded company.
 
 ---
 
@@ -242,8 +254,8 @@ C5 depends on A3 only for the *discovery* branch. Build the search box against p
 
 | Time | Gate |
 |---|---|
-| **16:20** | A: URL is live. C: `/` renders something. B: agent confirmed running. **If A1 has not landed by 16:20, everyone stops and helps.** |
-| **17:30** | C: landing + atlas on real data, search box works for seeded companies. A: A2+A3 done. B: B1–B3 done. |
+| **16:20** | Snehil: URL is live. Tim: `/` renders something. David: agent confirmed running. **If S2 has not landed by 16:20, everyone stops and helps.** |
+| **17:30** | Tim: landing + atlas on real data, search box works for seeded companies. Snehil: S4 done. David: D1–D4 done. |
 | **18:00** | Integration on the deployed URL. Discovery branch wired or explicitly cut. |
 | **18:15** | **Feature freeze.** Nothing merges after this. |
 | **18:15–19:00** | Rehearse twice, on the deployed URL, not localhost. |
@@ -264,7 +276,7 @@ C5 depends on A3 only for the *discovery* branch. Build the search box against p
 The root cause of §3.1 was work living somewhere nobody merged from.
 
 - Everyone works on `main`. Small commits. Push every 20 minutes even if unfinished.
-- `jac check` your own files before pushing. `jac test main.test.jac` is A's gate.
+- `jac check` your own files before pushing. `jac test main.test.jac` is David's gate.
 - If tests report `readonly database`, kill your `jac start` processes — that is a lock, not a bug.
 - Say it in the group chat when you touch a file outside your lane. Do not do it silently.
 
@@ -282,7 +294,7 @@ Best Jac line:
 > milliseconds — because in Jac the graph *is* the database. We put the budget on crawling,
 > which costs money, not on depth, which doesn't."
 
-Then the agent, if B lands it: *"this isn't a scraper with an if/elif chain — the agent
+Then the agent, if David lands D3: *"this isn't a scraper with an if/elif chain — the agent
 decides where to look."*
 
 Do not narrate any number that is not in §2.
