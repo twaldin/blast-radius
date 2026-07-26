@@ -469,17 +469,45 @@ Rehearse twice. Pre-warm the cache for your scripted vendor set so the rehearsed
 
 ## 11. Three-way split
 
-### 11.0 First 15 minutes — stub the contracts, then never block again
+### 11.0 The split principle — one layer each, separate files
+
+The boundary is **pipeline stage**, not "hard stuff vs. easy stuff":
+
+| Person | Owns | File |
+|---|---|---|
+| **A** | records → graph → insight | `main.jac` |
+| **B** | raw web → clean typed records | `extract.jac`, `registry.jac` |
+| **C** | insight → screen → judge | `app.jac` (the `cl def` section) |
+
+Two benefits beyond even workload. Each person has exactly one responsibility, and **each works in their own file**, so three people don't spend the evening resolving merge conflicts in one `main.jac`.
+
+One hard rule: **only A writes to the graph.** B returns pure typed values and never creates a node or edge. That keeps graph mutation in one head and one file.
+
+### 11.1 First 15 minutes — stub the contracts, then never block again
 
 Do this before anyone writes real logic. The whole point of the split is that nobody waits on anybody, and that only holds if the interfaces exist as stubs from minute one.
 
-**B hands A three function signatures, stubbed with hardcoded returns:**
+**B hands A four signatures, stubbed with hardcoded returns:**
 
 ```jac
+obj ResolvedSubprocessor {
+    has canonical_name: str;
+    has purpose: str = "";
+    has region: str = "";
+    has confidence: float = 1.0;
+}
+
 def resolve_url(domain: str) -> str { return "https://stripe.com/legal/subprocessors"; }
-def detect_all(domain: str) -> list[DetectedVendor] { return [ /* 5 fixed vendors */ ]; }
 async def fetch_page(url: str) -> str { return SAMPLE_PAGE_TEXT; }
+def detect_all(domain: str) -> list[DetectedVendor] { return [ /* 5 fixed */ ]; }
+
+# B's headline export: raw page text in, canonical records out.
+# Extraction AND entity resolution both happen behind this one call.
+def extract_and_resolve(page_text: str, known: list[str])
+    -> list[ResolvedSubprocessor] { return [ /* 3 fixed */ ]; }
 ```
+
+`extract_and_resolve` returns **strings, not nodes.** A does all node creation from the returned records.
 
 **A hands C the walker names and exact JSON shapes, stubbed with sample reports:**
 
@@ -487,77 +515,121 @@ async def fetch_page(url: str) -> str { return SAMPLE_PAGE_TEXT; }
 POST /walker/detect_vendors   -> {"found": 9, "vendors": [...]}
 POST /walker/expand           -> {"nodes": [...], "edges": [...]}
 POST /walker/chokepoints      -> [{"provider","vendors_affected","share","names"}]
-POST /walker/blast_radius     -> {"provider","vendors_down","features_down","status_post"}
+POST /walker/blast_radius     -> {"provider","vendors_down","features_down"}
 ```
 
 C builds the entire frontend against those fixed shapes. When A's real walkers land, the UI already works. If you skip this step, C sits idle for four hours and you lose the demo.
 
-Agree the JSON shapes in writing. Renaming a field at hour eight is how three-person teams lose.
+Agree the JSON field names in writing. Renaming a field at hour eight is how three-person teams lose.
+
+### 11.2 Working simultaneously without collisions
+
+Separate files reduce conflicts. They don't eliminate them, and the worst failure here isn't a merge conflict at all.
+
+**Step zero: verify multi-file actually compiles.** Do this before anyone writes real logic.
+
+Jac's entire marketing pitch is "a complete full-stack AI app in one file," and the flagship example puts nodes, walkers, and the `cl def` frontend together. Splitting across files should work via imports, but the frontend-in-a-separate-file path is less well-trodden than the documented happy path.
+
+So get a trivial three-file version compiling first — `main.jac` importing a stub from `extract.jac`, with the `cl def` living in `app.jac`. Two minutes of work. If it fights you, fall back to **one file with strict section ownership** and commit more often. You want to discover that at minute 10, not hour six.
+
+**Shared touchpoints that still collide:**
+
+| File | Owner | Rule |
+|---|---|---|
+| `types.jac` | written once by whoever's fastest, then **frozen** | `ResolvedSubprocessor`, `SubprocessorRecord`, `DetectedVendor`. Field changes are a conversation, not a commit |
+| import lines | whoever's file it is | trivial to resolve, but the classic conflict zone |
+| `jac.toml` | **C only** | B needs `httpx`/`trafilatura`, C needs `[scale.*]`. B requests additions verbally |
+
+**The risk that's worse than a merge conflict.**
+
+B renames `canonical_name` to `name`, or makes `region` optional. A's code breaks **silently** — no textual conflict, so git says nothing. You find out during integration when the graph is inexplicably empty and three people start debugging the wrong layer.
+
+This is why the contract freeze matters more than the file split does. After minute 15, a field rename is something you say out loud.
+
+**Git hygiene — boring, works:**
+
+- Commit every ~20 minutes. Small commits are cheap to untangle; one giant commit at hour seven is not.
+- `git pull --rebase` before every push.
+- **Nobody touches a file they don't own.** No drive-by fixes, no "while I was in there."
+- **No formatters.** One person running a formatter across the repo at hour seven generates a conflict in every file simultaneously, and you will spend your rehearsal time on it.
 
 ---
 
-### Person A — Graph & Intelligence
-**Owns: best use of Jac. This prize is yours to lose.**
+### Person A — Graph & Traversal (`main.jac`)
+**Owns the object-spatial half of "best use of Jac."**
 
-The Jaseci judges are evaluating your code specifically. Everything else is packaging.
+You own every line that touches the graph. Nobody else creates a node or an edge.
 
 | Priority | Task |
 |---|---|
-| 1 | Graph model in `main.jac` — nodes, edges, **typed edge endpoints** (`edge Uses: Org --> Vendor`) |
-| 1 | `Expand` walker, depth 2, with the `seen` guard for cycles |
-| 1 | `extract_subprocessors` and `canonicalize` as `by llm()` with `sem` annotations |
+| 1 | Graph model — nodes, edges, **typed edge endpoints** (`edge Uses: Org --> Vendor`) |
+| 1 | `Expand` walker — depth cap, `seen` guard for cycles, BFS orchestration, calls into B's `extract_and_resolve` |
+| 1 | `find_or_create_provider` — node creation from B's returned canonical strings |
 | 1 | `Chokepoints` walker — `[prov <-:Subprocesses:<-]`, the core algorithm |
-| 2 | `BlastRadius` walker + `draft_status_update` |
-| 3 | `risk_memo` export (Action 1) |
-| 3 | `DiffMonitor` on `@schedule` (Action 2) |
+| 2 | `BlastRadius` walker — backward traversal, affected vendors → affected features |
+| 2 | `DetectVendors` and `AddVendors` walkers (graph writes from B's detection output) |
+| 2 | `walker:priv` auth wiring + per-user root isolation |
+| 3 | `DiffMonitor` on `@schedule` + `Snapshot` nodes (Action 2) |
+| 3 | Second-user isolation demo data |
 
-**Before anything else:** seed the known-providers list with the obvious 20 (AWS, GCP, Azure, Cloudflare, Fastly, Twilio, SendGrid, Snowflake, Datadog, MongoDB Atlas…). Canonicalization needs anchors. Without them "AWS" and "Amazon Web Services, Inc." stay separate single-edge nodes and **the chokepoint silently never appears** — the failure mode that looks like the whole idea doesn't work.
-
-**In Q&A you field every Jac question.** Be ready to explain, without notes: why BFS is the language default (`visit [-->]` appends to the queue), why the `seen` guard is required rather than defensive, why typed endpoints let traversals infer concrete types, and why `by llm()` entity resolution is load-bearing rather than decorative.
+**In Q&A you field the object-spatial questions.** Be ready without notes: why BFS is the language default (`visit [-->]` appends to the queue), why the `seen` guard is required rather than defensive, why typed endpoints let traversals infer concrete node types, why persistence-by-reachability means the monitor needs no database.
 
 ---
 
-### Person B — Data & Discovery
-**Owns: the judge-types-their-own-domain moment. That's the wow.**
+### Person B — Data & Extraction Pipeline (`extract.jac`, `registry.jac`)
+**Owns the meaning-typed half of "best use of Jac," and the judge-types-their-own-domain moment.**
+
+You own everything from "a domain name" to "clean canonical records." Both `by llm()` calls are yours — they're the second Jac pillar, and you speak to them in Q&A.
 
 | Priority | Task |
 |---|---|
 | 1 | Registry: ~150 vendors → subprocessor URLs. Generate the bulk with Claude, spot-check by hand |
 | 1 | `resolve_url` — registry first, then discovery fallback |
 | 1 | `fetch_page` — real UA, 5s timeout, concurrency cap ~10, cache by domain |
+| 1 | **Seed the known-providers anchor list** — the obvious 20 (AWS, GCP, Azure, Cloudflare, Fastly, Twilio, SendGrid, Snowflake, Datadog, MongoDB Atlas…) |
+| 1 | `extract_subprocessors` — `by llm()` with `sem`, returns `list[SubprocessorRecord]` |
+| 1 | `canonicalize` — `by llm()` entity resolution, the load-bearing call |
+| 1 | `extract_and_resolve` — the single export A calls. Returns records, **never touches the graph** |
 | 2 | Detection module: DNS (MX, SPF/DMARC TXT, CNAME), HTTP headers, `<script>` tags |
 | 2 | **Pre-warm the demo cache** for the scripted vendor set |
+| 2 | Extraction quality pass — run it against 15 real vendor pages and eyeball the output |
 | 3 | Discovery fallback: `/sitemap.xml` grep, `trust.<domain>`, path guessing |
 | 3 | Defense tab data adapter — public DoD prime → sub → tier-3 subaward records |
 
-The registry is Tier 1 and it is the difference between a product and a scraper. Judge's vendors resolving instantly off cache is what makes it feel real.
+**The anchor list comes before the LLM calls.** Canonicalization needs something to resolve *toward*. Without anchors, "AWS" and "Amazon Web Services, Inc." stay separate single-edge nodes and **the chokepoint silently never appears** — the failure mode that looks like the whole idea doesn't work. You own that risk.
 
-**Pre-warming the cache is not optional.** Your rehearsed path must never touch the network. Live crawling exists only for the judge's own input.
+**You're now on the critical path**, which you weren't before. Extraction quality determines whether a chokepoint exists at all, so the +2hr end-to-end checkpoint is primarily a test of your layer. Get one vendor extracting correctly before you touch detection.
 
-**In Q&A you field the data questions:** where the data comes from (the vendors' own legal disclosures, which beats inference for provenance), what coverage looks like, why some pages are unreadable, and how this differs from BuiltWith.
+**Pre-warming the cache is not optional.** The rehearsed path must never touch the network. Live crawling exists only for the judge's own input.
+
+**In Q&A you field meaning-typed and data questions:** why entity resolution is a type signature rather than a prompt, why a hand-written parser for 150 page layouts is a week of work, where the data comes from (the vendors' own legal disclosures — better provenance than inference), what coverage looks like, and how this differs from BuiltWith.
 
 ---
 
-### Person C — Frontend, Deploy & Pitch
-**Owns: best use of JacHammer, and the pitch. Two of the three prizes route through you.**
+### Person C — Interface, Deploy & Pitch (`app.jac`)
+**Owns: best use of JacHammer, the scale-invariance story, and the pitch. Two prizes route through you.**
 
 | Priority | Task |
 |---|---|
 | 1 | **Deploy a two-node stub to JacHammer by mid-afternoon.** Before any real logic exists |
 | 1 | `cl def:pub app` skeleton wired to A's stubbed JSON shapes |
 | 2 | Graph canvas per **§6.1** — tier-pinned x, force-solved y, sqrt sizing, 2+ dependent pruning |
-| 2 | Outage simulation with **backward propagation animation** (§6.2). This is the money shot |
+| 2 | Outage simulation with **backward propagation animation** (§6.2). The money shot |
 | 2 | WebSocket streaming, batched at 200ms so it doesn't jank on the projector |
 | 2 | **The 3-minute script, written down.** Then rehearse it twice |
+| 2 | `draft_status_update` — `by llm()`, renders into the outage panel |
+| 3 | `risk_memo` — `by llm()`, plus the export UI (Action 1) |
+| 3 | Diff feed UI (Action 2) |
 | 3 | Coverage strip (`ok / unreadable / notfound`) |
-| 3 | Export UI for the questionnaire answer (Action 1) and the diff feed (Action 2) |
-| 3 | Second-user login demo for root isolation |
+| 3 | `jac.toml` `[scale.*]` config + verify `jac start --scale` actually comes up |
 
-Deploy first, on a stub. Deploy problems discovered at hour nine have killed better projects than yours. Get the JacHammer URL working while it costs you twenty minutes instead of two hours.
+The two narrative `by llm()` calls are yours because you own the surfaces they render into — no cross-file handoff for a string.
+
+Deploy first, on a stub. Deploy problems discovered at hour nine have killed better projects than yours. Get the JacHammer URL working while it costs twenty minutes instead of two hours.
 
 `jac clean --all` before every rehearsal or you'll hit `NodeAnchor` errors on stage.
 
-**In Q&A you field the product questions:** who pays, what the wedge is, why the monitor drives retention, how it differs from Vanta.
+**In Q&A you field scale and product questions:** why the same file runs `jac run` → `jac start` → `jac start --scale` with an empty diff, what scale-to-zero means on JacHammer, who pays, what the wedge is, why the monitor drives retention, how it differs from Vanta.
 
 ---
 
@@ -567,8 +639,9 @@ Set actual alarms. Three people converging on one `main.jac` will conflict, and 
 
 | When | Checkpoint |
 |---|---|
-| +15 min | Contracts stubbed. A, B, C all have something running against fake data |
-| +2 hr | **First real end-to-end:** one hardcoded vendor → real crawl → real extraction → chokepoint in the UI. One vendor is enough. This is the moment you learn whether the idea works |
+| +10 min | Three-file skeleton compiles (§11.2 step zero). If not, collapse to one file now |
+| +15 min | Contracts stubbed and `types.jac` frozen. A, B, C all have something running against fake data |
+| +2 hr | **First real end-to-end:** one hardcoded vendor → real crawl → real extraction → chokepoint in the UI. One vendor is enough. Primarily a test of B's layer — if extraction and canonicalization don't converge, nothing downstream matters |
 | mid-afternoon | JacHammer deploy live on the stub. Non-negotiable |
 | −3 hr | Feature freeze on Tier 1 and 2. Everything after this is Tier 3 or polish |
 | −2 hr | Full rehearsal #1 on the deployed URL, not localhost |
@@ -578,7 +651,9 @@ The +2hr end-to-end matters more than it looks. If extraction and canonicalizati
 
 ### Who does what on stage
 
-Snehil pitches — you've won this way before and you know the beats. C drives the laptop, since they built the UI and know where every click lives. A takes Jac questions, B takes data questions. Decide this now, not while walking up.
+Snehil pitches — you've won this way before and you know the beats. C drives the laptop, since they built the UI and know where every click lives.
+
+Jac questions split cleanly now, which is better than one person carrying all of it: **A takes object-spatial** (traversal, walkers, persistence), **B takes meaning-typed** (`by llm()`, entity resolution, why no parser), **C takes scale-invariance** (one file, three deploy modes, JacHammer). If a Jaseci judge goes deep, whoever owns that pillar answers. Decide this now, not while walking up.
 
 ### Cut order under time pressure
 
