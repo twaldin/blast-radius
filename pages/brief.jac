@@ -1,25 +1,10 @@
 """Brief — the written artifact a company owes an auditor. Prose, not a console."""
 
 import "./brief.css";
-import from ..risk.DependencyGraph { DependencyGraph }
 import from ..risk.store { useRisk }
 import from ..risk.ui { LoadState }
 
 glob NL: str = chr(10);
-
-glob BRIEF_PALETTE: dict = {
-    "org": "#c7d0dd",
-    "vendor": "#8fa6c0",
-    "provider": "#b9c4d2",
-    "flag": "#e0a44a",
-    "down": "#e0a44a",
-    "edge": "rgba(147, 163, 184, 0.24)",
-    "edgeHot": "rgba(147, 163, 184, 0.24)",
-    "dim": "rgba(120, 138, 160, 0.16)",
-    "label": "rgba(233, 239, 248, 0.6)",
-    "labelOn": "rgba(233, 239, 248, 0.85)",
-    "font": "Georgia, 'Times New Roman', serif"
-};
 
 def choke_sentence(c: any) -> str {
     pct = str(round((c["share"] as float) * 100));
@@ -56,7 +41,6 @@ def build_report_text(risk: any) -> str {
     if h {
         text = text + (h["biggest_suggestion"] as str) + NL;
     }
-
     return text;
 }
 
@@ -71,7 +55,7 @@ def:pub CopyButton() -> JsxElement {
         setTimeout(lambda { copied = False; }, 1600);
     }
 
-    return <button className="brief-copy" onClick={handle_copy}>
+    return <button className="btn btn-quiet brief-copy" onClick={handle_copy}>
         {"Copied" if copied else "Copy as text"}
     </button>;
 }
@@ -100,11 +84,11 @@ def:pub Brief() -> JsxPage {
             }}
 
             <section className="brief-section">
-                <h2>Findings</h2>
+                <h2 className="brief-h"><span className="brief-n">01</span><span className="brief-t">Findings</span><span className="brief-fill"></span></h2>
                 {for c in st["chokes"] {
                     finding_num = finding_num + 1;
                     <div className="brief-finding" key={c["provider"] as str}>
-                        <span className="brief-finding-num">{str(finding_num)}</span>
+                        <span className="brief-finding-num fig">{str(finding_num)}</span>
                         <div className="brief-finding-body">
                             <h3>{c["provider"] as str}</h3>
                             <p>{choke_sentence(c)}</p>
@@ -114,15 +98,8 @@ def:pub Brief() -> JsxPage {
                 }}
             </section>
 
-            <figure className="brief-figure">
-                <div className="brief-figure-frame">
-                    <DependencyGraph palette={BRIEF_PALETTE} />
-                </div>
-                <figcaption>Figure 1 — second-layer dependency map</figcaption>
-            </figure>
-
             <section className="brief-section">
-                <h2>Compliance exposure</h2>
+                <h2 className="brief-h"><span className="brief-n">02</span><span className="brief-t">Compliance exposure</span><span className="brief-fill"></span></h2>
                 {for f in st["fallout"] {
                     <div className="brief-exposure" key={f["vendor"]}>
                         <p className="brief-exposure-pair">{(f["vendor"] as str) + " → " + (f["provider"] as str)}</p>
@@ -133,7 +110,7 @@ def:pub Brief() -> JsxPage {
             </section>
 
             <section className="brief-section brief-remediation">
-                <h2>Recommended remediation</h2>
+                <h2 className="brief-h"><span className="brief-n">03</span><span className="brief-t">Recommended remediation</span><span className="brief-fill"></span></h2>
                 {if h {
                     <p>{h["biggest_suggestion"]}</p>
                     skip;
