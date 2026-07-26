@@ -15,8 +15,12 @@ Envelope: data.reports[0] is the payload.
 """
 
 import from datetime { datetime }
+import from hashlib { sha256 }
 import from extract {
-    detect_all, resolve_url, fetch_page, extract_and_resolve,
+    resolve_url, fetch_page, extract_and_resolve
+}
+import from demo_data {
+    detect_all,
     provider_profile, vendor_feature,
     draft_status_update, explain_fallout, explain_change, compose_one_look
 }
@@ -31,11 +35,13 @@ node Vendor   { has domain: str; has name: str;
                 has source_url: str = "";                  # the filing we read (provenance)
                 has discovery_method: str = "";            # dns | headers | scripts | manual
                 has crawl_status: str = "pending";         # pending | ok | unreadable | notfound
-                has last_crawled: str = ""; }              # ISO ts -> drives TTL re-crawl
+                has last_crawled: str = "";                # ISO ts -> drives TTL re-crawl
+                has content_hash: str = ""; }              # filing digest -> re-extract only on change
 node Provider { has canonical_name: str; has slug: str = ""; has category: str = "";
                 has downtime_hours_ytd: float = 0.0;       # curated historical outage -> risk weight
                 has soc2: bool = True; has hipaa: bool = False;
-                has supply_chain_risk: str = ""; }         # "" | watchlist | sanctioned | foreign-owned
+                has supply_chain_risk: str = "";           # "" | watchlist | sanctioned | foreign-owned
+                has is_sink: bool = False; }               # hyperscaler: nothing new one layer down
 node Feature  { has name: str; }
 node Snapshot { has taken_at: str; has vendor_count: int = 0;
                 has provider_count: int = 0; has edges: list[str] = []; }
@@ -55,6 +61,8 @@ def _now() -> str { return datetime.now().isoformat(); }
 def _round(x: float, n: int) -> float { return float(f"%.{n}f" % x); }
 
 def _by_exposure(d: dict) -> float { return (d["exposure"] as float); }
+
+def _by_inbound(d: dict) -> int { return (d["inbound_degree"] as int); }
 
 def _name_from_domain(dom: str) -> str { return dom.split(".")[0].capitalize(); }
 
@@ -92,7 +100,7 @@ def _get_or_create_org(dom: str, nm: str) -> Org {
         if nm { found.name = nm; }
         return found;
     }
-    return (root ++> Org(domain=dom, name=nm or _name_from_domain(dom)))[0];
+    return root ++> Org(domain=dom, name=nm or _name_from_domain(dom));
 }
 
 def _org_or_default(dom: str) -> Org {
@@ -103,7 +111,7 @@ def _org_or_default(dom: str) -> Org {
 def _get_or_create_feature(fname: str) -> Feature {
     existing = [root -->[?:Feature, name == fname]];
     if existing { return existing[0]; }
-    return (root ++> Feature(name=fname))[0];
+    return root ++> Feature(name=fname);
 }
 
 # Node creation from B's returned canonical strings. Seeds curated risk data (B's asset).
@@ -111,12 +119,12 @@ def find_or_create_provider(name: str) -> Provider {
     existing = [root -->[?:Provider, canonical_name == name]];
     if existing { return existing[0]; }
     prof = provider_profile(name);
-    return (root ++> Provider(
+    return root ++> Provider(
         canonical_name=name, slug=prof.slug or _slugify(name), category=prof.category,
         downtime_hours_ytd=prof.downtime_hours_ytd,
         soc2=prof.soc2, hipaa=prof.hipaa,
-        supply_chain_risk=prof.supply_chain_risk
-    ))[0];
+        supply_chain_risk=prof.supply_chain_risk, is_sink=prof.is_sink
+    );
 }
 
 # Accepts either the UI slug ("aws", "gcp") or the canonical name ("Google Cloud").
@@ -260,9 +268,9 @@ walker:pub detect_vendors {
         for d in found {
             rows.append({"id": _slugify(d.name), "domain": d.domain, "name": d.name, "method": d.method});
             if [org ->:Uses:->[?:Vendor, domain == d.domain]] { continue; }
-            v = (org +>:Uses(added_at=_now()):+> Vendor(
+            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
                 domain=d.domain, name=d.name, slug=_slugify(d.name),
-                discovery_method=d.method))[0];
+                discovery_method=d.method);
             feat = vendor_feature(d.domain);
             if feat { v +>:Powers:+> _get_or_create_feature(feat); }
         }
@@ -279,8 +287,8 @@ walker:pub add_vendors {
         for dom in self.domains {
             if [org ->:Uses:->[?:Vendor, domain == dom]] { continue; }
             nm = _name_from_domain(dom);
-            v = (org +>:Uses(added_at=_now()):+> Vendor(
-                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual"))[0];
+            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
+                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual");
             feat = vendor_feature(dom);
             if feat { v +>:Powers:+> _get_or_create_feature(feat); }
             added.append({"id": v.slug, "domain": dom, "name": nm, "method": "manual"});
@@ -289,9 +297,51 @@ walker:pub add_vendors {
     }
 }
 
+# One vendor's crawl. Shared by the batch `expand` and the per-vendor `expand_one`.
+# Returns: cached | unchanged | ok | unreadable | notfound.
+#
+# The TTL says WHEN to look again; the content hash says whether looking cost us
+# anything. A refresh of an unchanged filing is one HTTP fetch and zero LLM calls,
+# which is what makes a short TTL affordable on a shared graph.
+async def _crawl_vendor(v: Vendor, ttl_days: int, force: bool) -> str {
+    if v.crawl_status == "ok" and not _is_stale(v.last_crawled, ttl_days) and not force {
+        return "cached";
+    }
+    url = await resolve_url(
+        v.domain,
+        prefer_demo_cache=v.discovery_method != "manual"
+    );
+    if not url { v.crawl_status = "notfound"; v.last_crawled = _now(); return "notfound"; }
+    text = await fetch_page(url);
+    if not text { v.crawl_status = "unreadable"; v.last_crawled = _now(); return "unreadable"; }
+    digest = sha256(text.encode("utf-8")).hexdigest();
+    v.source_url = url;
+    v.last_crawled = _now();
+    if digest == v.content_hash and v.crawl_status == "ok" { return "unchanged"; }
+    v.content_hash = digest;
+    v.crawl_status = "ok";
+    # Re-crawl replaces this vendor's edges, but first_seen survives so the weekly
+    # diff still knows which sub-processors are genuinely new.
+    prior: dict[str, str] = {};
+    for p in [v ->:Subprocesses:->] {
+        for e in [edge v ->:Subprocesses:-> p] { prior[p.canonical_name] = e.first_seen; }
+    }
+    for e in [edge v ->:Subprocesses:->] { del e; }
+    known = [p.canonical_name for p in [root -->[?:Provider]]];
+    for rec in extract_and_resolve(text, known) {
+        prov = find_or_create_provider(rec.canonical_name);
+        seen_at = prior[rec.canonical_name] if rec.canonical_name in prior else _now();
+        v +>:Subprocesses(
+            purpose=rec.purpose, confidence=rec.confidence,
+            handles_pii=_handles_pii(rec.purpose), first_seen=seen_at, last_seen=_now()
+        ):+> prov;
+    }
+    return "ok";
+}
+
 # POST /walker/expand  {}   -> BFS crawl, depth 2, then the full graph for the canvas.
 # BFS is the language default: `visit [-->]` appends to the queue. The `seen` guard is
-# required (the graph has real cycles), not defensive; crawl_status makes re-runs cheap.
+# required (the graph has real cycles), not defensive; the TTL makes re-runs cheap.
 async walker:pub expand {
     has ttl_days: int = 7;               # a cached crawl older than this is refetched
     has force: bool = False;             # ignore the cache entirely
@@ -299,34 +349,72 @@ async walker:pub expand {
     can enter with Root entry { visit [-->[?:Org]]; }
     async can crawl_org with Org entry { visit [->:Uses:->]; }
     async can crawl_vendor with Vendor entry {
-        cached = here.crawl_status == "ok" and not _is_stale(here.last_crawled, self.ttl_days);
-        if (cached and not self.force) or jid(here) in self.seen { skip; }
+        if jid(here) in self.seen { skip; }
         self.seen.append(jid(here));
-        url = resolve_url(here.domain);
-        if not url { here.crawl_status = "notfound"; here.last_crawled = _now(); skip; }
-        text = await fetch_page(url);
-        if not text { here.crawl_status = "unreadable"; here.last_crawled = _now(); skip; }
-        here.source_url = url;
-        here.crawl_status = "ok";
-        here.last_crawled = _now();
-        # Re-crawl replaces this vendor's edges, but first_seen survives so the weekly
-        # diff still knows which sub-processors are genuinely new.
-        prior: dict[str, str] = {};
-        for p in [here ->:Subprocesses:->] {
-            for e in [edge here ->:Subprocesses:-> p] { prior[p.canonical_name] = e.first_seen; }
-        }
-        for e in [edge here ->:Subprocesses:->] { del e; }
-        known = [p.canonical_name for p in [root -->[?:Provider]]];
-        for rec in extract_and_resolve(text, known) {
-            prov = find_or_create_provider(rec.canonical_name);
-            seen_at = prior[rec.canonical_name] if rec.canonical_name in prior else _now();
-            here +>:Subprocesses(
-                purpose=rec.purpose, confidence=rec.confidence,
-                handles_pii=_handles_pii(rec.purpose), first_seen=seen_at, last_seen=_now()
-            ):+> prov;
-        }
+        _ = await _crawl_vendor(here, self.ttl_days, self.force);
     }
     can finish with Root exit { report {"nodes": _nodes(), "edges": _edges()}; }
+}
+
+# POST /walker/expand_one  {"vendor_id": "stripe"}  -> crawl exactly one vendor.
+# Lets the UI drive its own per-vendor spinner + timeout with no streaming infra:
+# read crawl_progress, then call this for each pending vendor.
+async walker:pub expand_one {
+    has vendor_id: str;
+    has ttl_days: int = 7;
+    has force: bool = False;
+    async can run with Root entry {
+        org = _org();
+        vendors = [org ->:Uses:->] if org else [];
+        hit: list[Vendor] = [];
+        for v in vendors {
+            if v.slug == self.vendor_id or v.domain == self.vendor_id { hit.append(v); }
+        }
+        if not hit {
+            report {"id": self.vendor_id, "name": "", "status": "unknown",
+                    "subprocessors": [], "source_url": "", "last_crawled": ""};
+        } else {
+            target = hit[0];
+            status = await _crawl_vendor(target, self.ttl_days, self.force);
+            report {"id": target.slug, "name": target.name, "status": status,
+                    "subprocessors": [p.canonical_name for p in [target ->:Subprocesses:->]],
+                    "source_url": target.source_url, "last_crawled": target.last_crawled};
+        }
+    }
+}
+
+# POST /walker/expansion_candidates  {}  -> should we go deeper than depth 2?
+# Not a guess: a deeper layer can only change the answer if it can create a NEW
+# shared dependency. So a provider is worth expanding iff it is not a terminal
+# hyperscaler AND at least two of your vendors already share it. Same math as the
+# chokepoint algorithm, one layer down.
+walker:pub expansion_candidates {
+    can run with Root entry {
+        org = _org();
+        vendors = [org ->:Uses:->] if org else [];
+        out: list[dict] = [];
+        sinks = 0;
+        for p in [root -->[?:Provider]] {
+            dependents = [v for v in [p <-:Subprocesses:<-] if v in vendors];
+            if not dependents { continue; }
+            if p.is_sink { sinks += 1; }
+            worth = (not p.is_sink) and len(dependents) >= 2;
+            why = "terminal hyperscaler — one layer down is AWS-on-AWS, no new information";
+            if not p.is_sink {
+                why = "only one dependent — a deeper layer cannot create a shared chokepoint";
+                if worth {
+                    why = f"{len(dependents)} of your vendors share it — a deeper layer could surface a new chokepoint";
+                }
+            }
+            out.append({"provider": p.canonical_name, "provider_id": p.slug,
+                        "inbound_degree": len(dependents), "is_sink": p.is_sink,
+                        "worth_expanding": worth, "why": why});
+        }
+        out.sort(key=_by_inbound, reverse=True);
+        rec = [c["provider_id"] for c in out if c["worth_expanding"]];
+        report {"depth_cap": 2, "terminal_providers": sinks,
+                "candidates": out, "recommended": rec};
+    }
 }
 
 # POST /walker/crawl_progress  {}  -> per-vendor crawl state + provenance for the

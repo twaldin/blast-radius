@@ -14,6 +14,8 @@ obj ResearchEntry {
         source_type: str,
         verified_on: str,
         notes: str,
+        flow_type: str,
+        recommended_flow: str,
         location: str;
 }
 
@@ -24,11 +26,21 @@ glob REQUIRED_FIELDS: set[str] = {
     "subprocessor_url",
     "source_type",
     "verified_on",
-    "notes"
+    "notes",
+    "flow_type",
+    "recommended_flow"
 };
 glob ALLOWED_SOURCE_TYPES: set[str] = {
     "official_website",
     "official_github"
+};
+glob ALLOWED_FLOW_TYPES: set[str] = {
+    "github_raw",
+    "pdf_text",
+    "rendered_html",
+    "rendered_html_guarded",
+    "rendered_trust_center",
+    "trust_center_clickthrough"
 };
 glob DOMAIN_PATTERN: re.Pattern[str] = re.compile(
     r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$"
@@ -132,6 +144,8 @@ def load_batches(research_dir: Path) -> tuple[list[ResearchEntry], list[str]] {
                         source_type=values["source_type"].strip(),
                         verified_on=values["verified_on"].strip(),
                         notes=values["notes"].strip(),
+                        flow_type=values["flow_type"].strip(),
+                        recommended_flow=values["recommended_flow"].strip(),
                         location=location
                     )
                 );
@@ -185,6 +199,22 @@ def validate_entries(
             errors.append(
                 f"{entry.location}: source_type must be one of "
                 f"{sorted(ALLOWED_SOURCE_TYPES)}"
+            );
+        }
+        if entry.flow_type not in ALLOWED_FLOW_TYPES {
+            errors.append(
+                f"{entry.location}: flow_type must be one of "
+                f"{sorted(ALLOWED_FLOW_TYPES)}"
+            );
+        }
+        if not entry.recommended_flow {
+            errors.append(
+                f"{entry.location}: recommended_flow cannot be empty"
+            );
+        } elif "return notfound" not in entry.recommended_flow.lower() {
+            errors.append(
+                f"{entry.location}: recommended_flow must include a "
+                "\"return notfound\" guard"
             );
         }
         if (
@@ -259,6 +289,8 @@ def render_jac(entries: list[ResearchEntry]) -> str {
         "    has source_type: str;",
         "    has verified_on: str;",
         "    has notes: str = \"\";",
+        "    has flow_type: str = \"rendered_html_guarded\";",
+        "    has recommended_flow: str = \"\";",
         "}",
         "",
         "glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {"
@@ -274,7 +306,10 @@ def render_jac(entries: list[ResearchEntry]) -> str {
                 f"{jac_string(entry.subprocessor_url)},",
                 f"        source_type={jac_string(entry.source_type)},",
                 f"        verified_on={jac_string(entry.verified_on)},",
-                f"        notes={jac_string(entry.notes)}",
+                f"        notes={jac_string(entry.notes)},",
+                f"        flow_type={jac_string(entry.flow_type)},",
+                "        recommended_flow="
+                f"{jac_string(entry.recommended_flow)}",
                 "    ),"
             ]
         );

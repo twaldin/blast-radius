@@ -5,7 +5,9 @@
     "subprocessor_url": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the general official Salesforce Infrastructure and Sub-processors PDF, published July 8, 2026, and confirmed named providers, infrastructure, processing locations, and product applicability across Salesforce online services and managed packages."
+    "notes": "Opened the general official Salesforce Infrastructure and Sub-processors PDF, published July 8, 2026, and confirmed named providers, infrastructure, processing locations, and product applicability across Salesforce online services and managed packages.",
+    "flow_type": "pdf_text",
+    "recommended_flow": "Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
   },
   {
     "name": "HubSpot",
@@ -13,7 +15,9 @@
     "subprocessor_url": "https://legal.hubspot.com/sub-processors-page",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page and confirmed named infrastructure, feature-specific, and affiliate subprocessors."
+    "notes": "Opened the official legal page and confirmed named infrastructure, feature-specific, and affiliate subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Intercom",
@@ -21,7 +25,9 @@
     "subprocessor_url": "https://www.intercom.com/legal/subprocessors-list",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page and confirmed named subprocessors for US, EU, and Australian hosting plus affiliate subprocessors."
+    "notes": "Opened the official legal page and confirmed named subprocessors for US, EU, and Australian hosting plus affiliate subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Zendesk",
@@ -29,7 +35,9 @@
     "subprocessor_url": "https://support.zendesk.com/hc/en-us/articles/4408883061530-Sub-processor-Policy",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened Zendesk's official policy and confirmed named infrastructure, service-specific, innovation-service, and group subprocessors."
+    "notes": "Opened Zendesk's official policy and confirmed named infrastructure, service-specific, innovation-service, and group subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Freshworks",
@@ -37,7 +45,9 @@
     "subprocessor_url": "https://www.freshworks.com/privacy/sub-processor-july31-2025/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official Freshworks privacy page and confirmed a named list of infrastructure, service, and group subprocessors."
+    "notes": "Opened the official Freshworks privacy page and confirmed a named list of infrastructure, service, and group subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Gainsight",
@@ -45,7 +55,9 @@
     "subprocessor_url": "https://www.gainsight.com/policy/sub-processors/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official policy page, last updated April 2026, and confirmed its named third-party subprocessor table."
+    "notes": "Opened the official policy page, last updated April 2026, and confirmed its named third-party subprocessor table.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Gong",
@@ -53,7 +65,9 @@
     "subprocessor_url": "https://www.gong.io/legal/sub-processors",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page and confirmed named subprocessors with purposes and processing locations."
+    "notes": "Opened the official legal page and confirmed named subprocessors with purposes and processing locations.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Pipedrive",
@@ -61,7 +75,9 @@
     "subprocessor_url": "https://www.pipedrive.com/en/subprocessors",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official repository page, current as of July 13, 2026, and confirmed named hosting, feature, AI, support, and affiliate subprocessors."
+    "notes": "Opened the official repository page, current as of July 13, 2026, and confirmed named hosting, feature, AI, support, and affiliate subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Klaviyo",
@@ -69,7 +85,9 @@
     "subprocessor_url": "https://www.klaviyo.com/legal/subprocessors",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, updated April 10, 2026, and confirmed named third-party and affiliate subprocessors."
+    "notes": "Opened the official legal page, updated April 10, 2026, and confirmed named third-party and affiliate subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Braze",
@@ -77,7 +95,9 @@
     "subprocessor_url": "https://cdn.sanity.io/files/b7pblshe/marketing-prod/56073d92ae50195865f0258019982d5c3263bb0a.pdf",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the current official PDF linked by Braze's legal center; it was revised June 1, 2026 and contains named third-party and Braze-group subprocessors."
+    "notes": "Opened the current official PDF linked by Braze's legal center; it was revised June 1, 2026 and contains named third-party and Braze-group subprocessors.",
+    "flow_type": "pdf_text",
+    "recommended_flow": "Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
   },
   {
     "name": "Customer.io",
@@ -85,7 +105,9 @@
     "subprocessor_url": "https://customer.io/legal/sub-processors",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, revised March 2026, and confirmed named infrastructure, AI-feature, and platform subprocessors."
+    "notes": "Opened the official legal page, revised March 2026, and confirmed named infrastructure, AI-feature, and platform subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Iterable",
@@ -93,7 +115,9 @@
     "subprocessor_url": "https://iterable.com/legal/iterable-sub-processors/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page and confirmed its named subprocessor list with processing activities and locations."
+    "notes": "Opened the official legal page and confirmed its named subprocessor list with processing activities and locations.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "ActiveCampaign",
@@ -101,7 +125,9 @@
     "subprocessor_url": "https://www.activecampaign.com/legal/subprocessors",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, last updated April 2, 2026, and confirmed named infrastructure, network, support, feature-specific, and affiliate subprocessors."
+    "notes": "Opened the official legal page, last updated April 2, 2026, and confirmed named infrastructure, network, support, feature-specific, and affiliate subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Adobe",
@@ -109,7 +135,9 @@
     "subprocessor_url": "https://www.adobe.com/privacy/sub-processors.html",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened Adobe's official privacy page and confirmed named third-party Cloud Services subprocessors and Adobe affiliates."
+    "notes": "Opened Adobe's official privacy page and confirmed named third-party Cloud Services subprocessors and Adobe affiliates.",
+    "flow_type": "rendered_html_guarded",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for JavaScript rendering, locate the complete named subprocessor table/list through the accessibility tree and rendered DOM, then canonicalize and deduplicate; return notfound if no authoritative complete list becomes available."
   },
   {
     "name": "Sprout Social",
@@ -117,7 +145,9 @@
     "subprocessor_url": "https://sproutsocial.com/legal/subprocessors/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, last updated January 21, 2026, and confirmed named subprocessors for the core, advocacy, and influencer platforms."
+    "notes": "Opened the official legal page, last updated January 21, 2026, and confirmed named subprocessors for the core, advocacy, and influencer platforms.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Hootsuite",
@@ -125,7 +155,9 @@
     "subprocessor_url": "https://www.hootsuite.com/legal/subprocessor-list",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, last updated June 24, 2026, and confirmed named core and service-specific subprocessors."
+    "notes": "Opened the official legal page, last updated June 24, 2026, and confirmed named core and service-specific subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Typeform",
@@ -133,7 +165,9 @@
     "subprocessor_url": "https://help.typeform.com/hc/en-us/articles/360029617191-What-other-companies-do-we-share-data-with",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened Typeform's official help-center disclosure and confirmed named subprocessors for response data, optional services, and customer data."
+    "notes": "Opened Typeform's official help-center disclosure and confirmed named subprocessors for response data, optional services, and customer data.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "SurveyMonkey",
@@ -141,7 +175,9 @@
     "subprocessor_url": "https://www.surveymonkey.com/mp/legal/subprocessor-list/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, effective December 27, 2025, and confirmed the named onward-subprocessor table."
+    "notes": "Opened the official legal page, effective December 27, 2025, and confirmed the named onward-subprocessor table.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Qualtrics",
@@ -149,7 +185,9 @@
     "subprocessor_url": "https://www.qualtrics.com/subprocessor-list",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official Qualtrics page and confirmed named mandatory, CDN, optional technical, professional-services, and affiliate subprocessors."
+    "notes": "Opened the official Qualtrics page and confirmed named mandatory, CDN, optional technical, professional-services, and affiliate subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Help Scout",
@@ -157,7 +195,9 @@
     "subprocessor_url": "https://www.helpscout.com/company/legal/sub-processors/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page and confirmed its named subprocessor list with purposes and locations."
+    "notes": "Opened the official legal page and confirmed its named subprocessor list with purposes and locations.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Contentsquare",
@@ -165,7 +205,9 @@
     "subprocessor_url": "https://contentsquare.com/privacy-center/subprocessors/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official privacy-center page, last updated June 2026, and confirmed named affiliate, third-party, and professional-services subprocessors by product."
+    "notes": "Opened the official privacy-center page, last updated June 2026, and confirmed named affiliate, third-party, and professional-services subprocessors by product.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Fullstory",
@@ -173,7 +215,9 @@
     "subprocessor_url": "https://www.fullstory.com/legal/subprocessor-list/",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, last updated June 2, 2026, and confirmed named subprocessors with purposes, processed data, and locations."
+    "notes": "Opened the official legal page, last updated June 2, 2026, and confirmed named subprocessors with purposes, processed data, and locations.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Dixa",
@@ -181,7 +225,9 @@
     "subprocessor_url": "https://www.dixa.com/legal/3rd-party-services-used-by-dixa",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page, last updated December 10, 2025, and confirmed named minimum, group-company, and modular subprocessors."
+    "notes": "Opened the official legal page, last updated December 10, 2025, and confirmed named minimum, group-company, and modular subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "Optimizely",
@@ -189,7 +235,9 @@
     "subprocessor_url": "https://www.optimizely.com/legal/sub-processors/third-party",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official legal page and confirmed its named third-party subprocessors with service, hosting, data, and product applicability details."
+    "notes": "Opened the official legal page and confirmed its named third-party subprocessors with service, hosting, data, and product applicability details.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   },
   {
     "name": "UserTesting",
@@ -197,6 +245,8 @@
     "subprocessor_url": "https://www.usertesting.com/privacy-center/subprocessors",
     "source_type": "official_website",
     "verified_on": "2026-07-26",
-    "notes": "Opened the official privacy-center page, last updated March 20, 2026, and confirmed named affiliates and platform-delivery subprocessors."
+    "notes": "Opened the official privacy-center page, last updated March 20, 2026, and confirmed named affiliates and platform-delivery subprocessors.",
+    "flow_type": "rendered_html",
+    "recommended_flow": "Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
   }
 ]

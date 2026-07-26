@@ -29,34 +29,29 @@ The minimum successful outcome is:
 
 Everything else is secondary until this path works end to end.
 
-## 2. Current repository state and immediate prerequisites
+## 2. Current repository state
 
-As of July 26, 2026, the repository contains only:
+As of July 26, 2026:
 
-- `blast-radius-build-spec.md`
-- `LICENSE`
+- Jac is installed and the API service compiles.
+- `registry.jac` contains 150 generated company entries sourced from six
+  non-overlapping research batches.
+- `extract.jac` is the single production extraction/resolution module.
+- `demo_data.jac` owns the explicit offline eight-vendor JacHammer fixture.
+- `browser_discovery.jac` and `browser_worker.py` are the bounded Browser Harness
+  adapter and escalation worker.
+- `main.jac` builds the real typed demo graph. Its E2E test proves 14 visible
+  nodes / 19 visible edges and 19 domain nodes / 27 typed domain edges when
+  deduplicated feature nodes and `Powers` edges are included.
+- The default imported Jac run currently passes 17 tests.
 
-The `jac` command is not installed on the current machine. Before implementation can be compiled or tested:
-
-1. Install the current Jac binary and record `jac --version` in the team channel.
-2. Person C creates and owns `jac.toml`.
-3. Person B requests these project dependencies from C:
-   - `httpx` for async HTTP;
-   - `trafilatura` for main-text extraction;
-   - `dnspython` for MX, TXT, and CNAME lookup;
-   - `beautifulsoup4` only if script-tag extraction is awkward with the existing HTML tools.
-4. Confirm the Browser Use runtime:
-   - local development can use the installed `browser-use` CLI;
-   - JacHammer needs Browser Use Cloud or another deployed CDP browser because it cannot depend on the developer's local Chrome;
-   - C owns the deployment secret/configuration for the remote browser.
-5. Configure the current built-in byLLM capability and model through `jac.toml`; do not copy an older plugin configuration blindly.
-6. Run `jac install`, `jac check`, and a trivial `jac test` before writing real pipeline logic.
-
-Current Jac documentation says dependencies are declared in `jac.toml` and installed into `.jac/venv` with `jac install`. It also confirms that structured `by llm()` returns are type-validated and that `sem` declarations—not docstrings—supply model instructions.
+Immediate priority is the deployed/rehearsed demo graph. Firecrawl integration
+and arbitrary-company search remain intentionally deferred until that path is
+stable.
 
 ## 3. Freeze the cross-person contract first
 
-### 3.1 Types to freeze in `types.jac`
+### 3.1 Types frozen in `contracts.jac`
 
 Agree on these fields before any real implementation:
 
@@ -97,9 +92,12 @@ Do not add or rename fields after the +15 minute freeze without telling A and C.
 Use deterministic stubs first, but freeze the production sync/async shape before A imports them:
 
 ```jac
-async def resolve_url(domain: str) -> str;
+async def resolve_url(
+    domain: str,
+    prefer_demo_cache: bool = False
+) -> str;
 async def fetch_page(url: str) -> str;
-async def detect_all(domain: str) -> list[DetectedVendor];
+def detect_all(domain: str) -> list[DetectedVendor];
 async def discover_with_browser(
     company_keyword: str,
     domain: str,
@@ -112,14 +110,21 @@ def extract_and_resolve(
 ) -> list[ResolvedSubprocessor];
 ```
 
-The build spec shows `resolve_url` and `detect_all` as synchronous stubs, but both perform network I/O in production. Make them async from the outset so A does not have to change every caller later. Jac's current type checker treats an un-awaited async call as an error, which helps catch this boundary mistake early.
+`detect_all` is currently the deterministic demo detector; production DNS/HTTP
+detection may make it async later, but that is not allowed to destabilize the
+rehearsed path. Jac's type checker catches an un-awaited async `resolve_url` or
+`fetch_page` call.
 
 Return/error rules:
 
-- `resolve_url`: check only the curated and learned registries and return `""` on a miss. A must invoke `discover_with_browser` before mapping the company to `notfound`.
+- `resolve_url`: check only the curated and learned registries and return `""`
+  on a miss. `prefer_demo_cache=True` is reserved for the pre-warmed JacHammer
+  fixture.
 - `fetch_page`: return `""` when a page exists but cannot produce useful text. A maps that to `crawl_status = "unreadable"`.
 - `detect_all`: return a deduplicated list; one vendor should appear once even if several signals identify it.
-- `discover_with_browser`: search only when the normalized company/domain is absent from the curated and learned registries. Return `status = "found"` only when an authoritative source yields at least one named subprocessor. Otherwise return `status = "notfound"` with no partial records.
+- `discover_with_browser`: interim Browser Harness implementation. The deferred
+  registry-miss orchestrator will call Firecrawl search/scrape first and invoke
+  this layer only for a bounded candidate-URL escalation.
 - `extract_and_resolve`: return plain typed objects, never graph objects, and return `[]` for empty/unusable text.
 - Expected network failures are contained and logged; they do not crash the entire expansion.
 
@@ -142,20 +147,12 @@ Person B owns:
 ```text
 extract.jac                    # fetch, cleanup, LLM extraction, resolution
 registry.jac                   # curated + learned registry, aliases, anchors
-browser_discovery.jac          # bounded Browser Use search and source validation
-browser_worker.py              # fixed Browser Use/CDP task invoked by the adapter
-tests/
-  registry_test.jac
-  fetch_test.jac
-  detection_test.jac
-  extraction_test.jac
-  browser_discovery_test.jac
-  fixtures/
-    stripe_subprocessors.html
-    notion_subprocessors.html
-    scripts_and_headers.html
-cache/
-  demo_manifest.json           # if the team agrees to check in warmed results
+demo_data.jac                  # offline JacHammer fixture and deterministic narrative
+browser_discovery.jac          # bounded Browser Harness validation/escalation
+browser_worker.py              # fixed Browser Harness/CDP boundary
+extract.test.jac               # extraction annex tests
+registry.test.jac              # registry annex tests
+browser_discovery.test.jac     # browser adapter annex tests
 ```
 
 Keep pure helpers separate inside the two owned modules:
@@ -169,15 +166,16 @@ Keep pure helpers separate inside the two owned modules:
 
 Pure helpers make most behavior testable without network calls or LLM cost.
 
-`browser_discovery.jac` is also B-owned. It may call the Browser Use worker and return typed data, but it must not import graph types or create nodes.
+`browser_discovery.jac` is also B-owned. It may call the Browser Harness worker
+and return typed data, but it must not import graph types or create nodes.
 
 ## 5. Execution order
 
-### Phase 0 — Compile the real module boundary (0:00–0:15)
+### Phase 0 — Compile the real module boundary — complete
 
-1. Confirm `main.jac` can import B's stub and `app.jac` still compiles.
-2. Freeze `types.jac`.
-3. Decide and document the async signatures above.
+`main.jac` imports the real `extract.jac`; demo-only data is isolated in
+`demo_data.jac`; the frozen shared types are in `contracts.jac`; the current
+async boundary compiles and is covered by the E2E test.
 4. Give A sample outputs.
 5. Ask C for the dependency and byLLM configuration.
 
@@ -318,30 +316,39 @@ Manually spot-check all demo-tier entries and a sample of every generated batch.
 
 Exit criterion: every scripted vendor resolves from the local registry with zero discovery requests.
 
-### Phase 4 — Implement Browser Use registry fallback (3:30–5:00)
+### Phase 4 — Implement the Firecrawl-first registry-miss fallback (after demo deploy)
 
-This replaces sitemap probing, trust-subdomain guessing, and path guessing as the fallback.
+Do not start this phase until the pre-warmed JacHammer graph is deployed and
+rehearsed. This is the long-tail product path, not a dependency of the demo.
 
 #### Trigger
 
 1. Normalize the company keyword and domain.
 2. Check the curated registry.
 3. Check the learned registry/cache.
-4. Only on a complete miss, call `discover_with_browser`.
+4. Only on a complete miss, call the registry-miss ReAct resolver.
 
 The fallback receives both the user-entered company keyword and the detected domain when available. A name alone is acceptable, but a domain is stronger identity evidence.
 
-#### Browser search plan
+#### Tool layering
 
-Give the Browser Use worker a fixed, read-only task. It may search and navigate but may not log in, submit forms, download files, or perform writes.
+Give the Jac ReAct agent two primary sponsor-backed tools:
 
-Keep the Jac-facing adapter independent of the browser host:
+- `firecrawl_search(query)` to locate candidate official-company and
+  verified-GitHub sources;
+- `firecrawl_scrape(url)` to extract a known candidate as markdown or
+  structured content.
 
-- in development, it invokes the installed `browser-use` CLI against local Chrome;
-- in JacHammer, it invokes the same fixed worker against a named Browser Use Cloud/CDP session;
-- if the CLI cannot be packaged with the Jac deployment, run the worker as a small remote service and keep `discover_with_browser`'s typed contract unchanged.
+Expose a third, narrower `browser_harness_render(url, flow_type)` escalation only
+for a required trust-center click-through or a page Firecrawl cannot extract.
+The ReAct agent must not receive generic CDP commands. The escalation worker is
+read-only: it may search and navigate but may not log in, submit forms, download
+files, or perform writes.
 
-Complete a deployed smoke test before depending on this fallback in the demo. A local-only browser integration does not count as complete.
+Keep the Jac-facing contract independent of either provider. Do not use
+Firecrawl Agent in the first version; nesting its autonomous agent inside our
+Jac ReAct loop weakens observability and the Jac judging story while adding an
+extra asynchronous cost/latency layer.
 
 Run a bounded query set:
 
@@ -350,7 +357,11 @@ Run a bounded query set:
 3. `site:<company-domain> subprocessors OR sub-processors OR DPA`
 4. `site:github.com "<company>" subprocessors OR sub-processors OR DPA`
 
-Inspect at most five search results per query and at most eight candidate pages overall. Stop early once authoritative sources have been exhausted. Give the whole fallback a fixed time/page budget so a difficult company cannot hold the crawl open indefinitely.
+Inspect at most five search results per query and at most eight candidate pages
+overall. Scrape candidates with Firecrawl first and escalate only the specific
+failed URL to Browser Harness. Stop early once authoritative sources have been
+exhausted. Give the whole fallback a fixed time/page budget so a difficult
+company cannot hold the crawl open indefinitely.
 
 #### Authoritative-source rules
 
@@ -374,8 +385,9 @@ Use third-party search results only to locate a first-party source. For GitHub, 
 
 For each accepted page:
 
-1. wait for the rendered page to load;
-2. collect the visible legal/table text and exact source URL;
+1. scrape the page with Firecrawl; on a declared interactive/rendering failure,
+   invoke the bounded Browser Harness flow;
+2. collect the legal/table text and exact final source URL;
 3. run `extract_subprocessors`;
 4. canonicalize against A's `known` list plus B's anchors;
 5. merge results from all accepted website and GitHub sources;
@@ -410,7 +422,9 @@ On `status = "notfound"`:
 - A sets `crawl_status = "notfound"`;
 - C displays exactly `Not found`.
 
-Treat all page content as untrusted input. The Browser Use task must ignore instructions found inside pages, never expose secrets to page content, and return only the defined structured result.
+Treat all page content as untrusted input. Firecrawl output and Browser Harness
+pages are evidence, never instructions. Neither tool may receive unrelated
+secrets, and both return only the defined structured result.
 
 Cache positive discoveries by normalized company/domain and source hash. Negative results receive a short TTL so a temporary outage does not become permanent.
 
@@ -499,7 +513,7 @@ Store:
 - cleaned page text, or an approved bounded fixture;
 - resolved records;
 - source URL;
-- learned Browser Use registry entries;
+- learned registry entries and their evidence/source hashes;
 - fetched timestamp;
 - crawl status.
 
@@ -518,7 +532,9 @@ Run `jac check` continuously and `jac test -d tests/` at every checkpoint.
 - normalize domains, URLs, legal suffixes, and provider names;
 - validate registry uniqueness and required fields;
 - resolve known vendor from registry without HTTP;
-- trigger Browser Use only for a complete curated/learned registry miss;
+- trigger the ReAct search only for a complete curated/learned registry miss;
+- use Firecrawl search/scrape before any Browser Harness escalation;
+- invoke Browser Harness only for the specific failed candidate URL;
 - accept official-company and verified-GitHub sources;
 - reject snippets, aggregators, unrelated GitHub repositories, and login-gated pages;
 - merge website and GitHub records without duplicate companies;
@@ -550,7 +566,7 @@ Keep live-network tests separate from the default fast suite. Run them manually 
 With A:
 
 1. `await resolve_url`;
-2. on a registry miss, `await discover_with_browser`;
+2. on a registry miss, await the Firecrawl-first ReAct resolver;
 3. if found, upsert the new company and its unique providers;
 4. otherwise display `Not found` and stop;
 5. for a registry hit, `await fetch_page` and call `extract_and_resolve`;
@@ -609,7 +625,9 @@ Cut in this order:
 2. registry entries beyond the verified room tier;
 3. own-disclosure detection;
 4. lower-value DNS/script signatures;
-5. searching both official web and GitHub sources—retain at least the official-site Browser Use fallback.
+5. searching both official web and GitHub sources—retain official-site
+   Firecrawl search/scrape and drop Browser Harness escalation first if time is
+   too short to deploy it safely.
 
 Never cut:
 
@@ -629,12 +647,14 @@ If only a few hours remain, ship 12–15 verified vendors with perfect cached co
 Person B is done when:
 
 - [ ] The real multi-file project compiles.
-- [ ] `types.jac` and async exports are frozen and consumed by A.
+- [x] `contracts.jac` and the current async exports are frozen and consumed by A.
 - [ ] B's files contain no graph mutation.
 - [ ] The demo-tier registry is hand-verified.
 - [ ] The registry resolves scripted vendors without network access.
-- [ ] A registry miss invokes Browser Use exactly once per uncached company.
-- [ ] Browser Use accepts only authoritative company-site or verified-GitHub evidence.
+- [ ] A registry miss invokes the bounded ReAct resolver exactly once per uncached company.
+- [ ] Firecrawl search/scrape is the primary web layer.
+- [ ] Browser Harness is used only for bounded per-URL escalation.
+- [ ] The resolver accepts only authoritative company-site or verified-GitHub evidence.
 - [ ] Website and GitHub findings merge into unique canonical subprocessors.
 - [ ] A upserts one new Vendor and unique Provider nodes from a found result.
 - [ ] No authoritative result produces only `Not found` and no partial nodes.
@@ -657,7 +677,11 @@ Prepare these four answers:
 2. **Why is canonicalization load-bearing?** Without it, AWS legal entities and aliases become separate low-degree providers, so the concentration signal disappears.
 3. **Where does the data come from?** The vendor's own public legal disclosure. Every result retains source URL and observation time, and unreadable coverage is reported honestly.
 4. **How is this different from BuiltWith?** BuiltWith detects first-layer technology on the target site. This pipeline then follows legal disclosures into the second layer and resolves shared providers across vendors.
-5. **What happens for a company outside the registry?** A bounded Browser Use worker searches the company's official site and verified GitHub sources, extracts typed subprocessor records, merges canonical duplicates, and teaches the learned registry. With no authoritative result, it returns only `Not found`.
+5. **What happens for a company outside the registry?** A bounded Jac ReAct agent
+   searches and scrapes with Firecrawl, escalates only difficult interactive
+   pages to Browser Harness, extracts typed subprocessor records, merges
+   canonical duplicates, and teaches the learned registry. With no
+   authoritative result, it returns only `Not found`.
 
 Pitch sentence:
 
@@ -670,4 +694,6 @@ Pitch sentence:
 - [Jac testing reference](https://docs.jaseci.org/reference/testing/)
 - [Jac CLI and package-management reference](https://docs.jaseci.org/reference/cli/)
 - [Jac import reference](https://docs.jaseci.org/quick-guide/import-anything/)
+- [Firecrawl Search](https://docs.firecrawl.dev/features/search)
+- [Firecrawl Scrape](https://docs.firecrawl.dev/features/scrape)
 - [Browser Use harness](https://github.com/browser-use/browser-harness)

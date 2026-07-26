@@ -7,6 +7,8 @@ obj RegistryEntry {
     has source_type: str;
     has verified_on: str;
     has notes: str = "";
+    has flow_type: str = "rendered_html_guarded";
+    has recommended_flow: str = "";
 }
 
 glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
@@ -16,7 +18,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://1password.com/files/legal/1password-subprocessor-list.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official subprocessor PDF effective January 13, 2026, naming affiliates, infrastructure providers, and third-party subprocessors."
+        notes="Official subprocessor PDF effective January 13, 2026, naming affiliates, infrastructure providers, and third-party subprocessors.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "abnormal.ai": RegistryEntry(
         name="Abnormal Security",
@@ -24,7 +28,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://abnormal.ai/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Abnormal legal disclosure with named subprocessors grouped by processing role, including service purpose and location details."
+        notes="Official Abnormal legal disclosure with named subprocessors grouped by processing role, including service purpose and location details.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "activecampaign.com": RegistryEntry(
         name="ActiveCampaign",
@@ -32,7 +38,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.activecampaign.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, last updated April 2, 2026, and confirmed named infrastructure, network, support, feature-specific, and affiliate subprocessors."
+        notes="Opened the official legal page, last updated April 2, 2026, and confirmed named infrastructure, network, support, feature-specific, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "adobe.com": RegistryEntry(
         name="Adobe",
@@ -40,7 +48,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.adobe.com/privacy/sub-processors.html",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Adobe's official privacy page and confirmed named third-party Cloud Services subprocessors and Adobe affiliates."
+        notes="Opened Adobe's official privacy page and confirmed named third-party Cloud Services subprocessors and Adobe affiliates.",
+        flow_type="rendered_html_guarded",
+        recommended_flow="Open the official URL in Browser Harness, wait for JavaScript rendering, locate the complete named subprocessor table/list through the accessibility tree and rendered DOM, then canonicalize and deduplicate; return notfound if no authoritative complete list becomes available."
     ),
     "adyen.com": RegistryEntry(
         name="Adyen",
@@ -48,7 +58,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.adyen.com/en_GB/legal/list-of-adyen-subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names AWS, Google, Microsoft, and Oracle; last updated July 1, 2026."
+        notes="Public legal list names AWS, Google, Microsoft, and Oracle; last updated July 1, 2026.",
+        flow_type="rendered_html_guarded",
+        recommended_flow="Open the official URL in Browser Harness, wait for JavaScript rendering, locate the complete named subprocessor table/list through the accessibility tree and rendered DOM, then canonicalize and deduplicate; return notfound if no authoritative complete list becomes available."
     ),
     "airbyte.com": RegistryEntry(
         name="Airbyte",
@@ -56,7 +68,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.airbyte.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current official Airbyte Trust Center subprocessor repository, linked by Airbyte's 2026 DPA; the provider table is rendered client-side."
+        notes="Current official Airbyte Trust Center subprocessor repository, linked by Airbyte's 2026 DPA; the provider table is rendered client-side.",
+        flow_type="trust_center_clickthrough",
+        recommended_flow="Open the official trust center in Browser Harness, wait for client rendering, locate and activate the Subprocessors document/section through the accessibility tree, extract the complete named list, then canonicalize and deduplicate; return notfound if the list remains unavailable or incomplete."
     ),
     "airtable.com": RegistryEntry(
         name="Airtable",
@@ -64,7 +78,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.airtable.com/company/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official list updated July 6, 2026, with named core-infrastructure, AI, support, and affiliate subprocessors."
+        notes="Official list updated July 6, 2026, with named core-infrastructure, AI, support, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "allvuesystems.com": RegistryEntry(
         name="Allvue Systems",
@@ -72,7 +88,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.allvuesystems.com/legal-terms/data-privacy/subprocessor-list.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Allvue's official Subprocessor List PDF, versioned June 16, 2026, and confirmed named infrastructure, platform, customer-success, AI, integration, and affiliate subprocessors with use cases and locations."
+        notes="Opened Allvue's official Subprocessor List PDF, versioned June 16, 2026, and confirmed named infrastructure, platform, customer-success, AI, integration, and affiliate subprocessors with use cases and locations.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "amazon.com": RegistryEntry(
         name="Amazon Web Services",
@@ -80,7 +98,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://aws.amazon.com/compliance/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official AWS compliance page with named AWS service and affiliate subprocessors, locations, and processing activities; last updated April 13, 2026."
+        notes="Official AWS compliance page with named AWS service and affiliate subprocessors, locations, and processing activities; last updated April 13, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "amplitude.com": RegistryEntry(
         name="Amplitude",
@@ -88,7 +108,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://amplitude.com/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Amplitude Subprocessor List, last updated May 13, 2026, names providers and describes their services and processing locations."
+        notes="Official Amplitude Subprocessor List, last updated May 13, 2026, names providers and describes their services and processing locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "anthropic.com": RegistryEntry(
         name="Anthropic",
@@ -96,7 +118,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.anthropic.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current Subprocessors page in Anthropic's official Trust Center; the named provider table and processing details are rendered client-side."
+        notes="Current Subprocessors page in Anthropic's official Trust Center; the named provider table and processing details are rendered client-side.",
+        flow_type="trust_center_clickthrough",
+        recommended_flow="Open the official trust center in Browser Harness, wait for client rendering, locate and activate the Subprocessors document/section through the accessibility tree, extract the complete named list, then canonicalize and deduplicate; return notfound if the list remains unavailable or incomplete."
     ),
     "arcticwolf.com": RegistryEntry(
         name="Arctic Wolf",
@@ -104,7 +128,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://arcticwolf.com/terms/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Arctic Wolf terms disclosure with named vendors, platforms, purposes, data residency, and applicable products; updated June 30, 2026."
+        notes="Official Arctic Wolf terms disclosure with named vendors, platforms, purposes, data residency, and applicable products; updated June 30, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "asana.com": RegistryEntry(
         name="Asana",
@@ -112,7 +138,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://asana.com/terms/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Asana legal page updated June 22, 2026, naming infrastructure, analytics, support, feature-specific, and affiliate subprocessors."
+        notes="Official Asana legal page updated June 22, 2026, naming infrastructure, analytics, support, feature-specific, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "ashbyhq.com": RegistryEntry(
         name="Ashby",
@@ -120,7 +148,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.ashbyhq.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57&source=click",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Direct Subprocessors item in Ashby's official SafeBase Trust Center; public updates also name newly added providers and link this full list."
+        notes="Direct Subprocessors item in Ashby's official SafeBase Trust Center; public updates also name newly added providers and link this full list.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "atlassian.com": RegistryEntry(
         name="Atlassian",
@@ -128,7 +158,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.atlassian.com/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Atlassian legal page with named subprocessors by product, purpose, and processing location; effective May 15, 2026."
+        notes="Official Atlassian legal page with named subprocessors by product, purpose, and processing location; effective May 15, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "axonius.com": RegistryEntry(
         name="Axonius",
@@ -136,7 +168,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.axonius.com/legal/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Axonius legal page embeds its May 14, 2026 subprocessor list with named vendors, headquarters, services, and applicable cloud regions."
+        notes="Official Axonius legal page embeds its May 14, 2026 subprocessor list with named vendors, headquarters, services, and applicable cloud regions.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "bamboohr.com": RegistryEntry(
         name="BambooHR",
@@ -144,7 +178,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.bamboohr.com/assets/pdf/bamboo-hr-subcontractor-list-10-09-2025.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official BambooHR subcontractor list PDF names infrastructure, AI, benefits, analytics, support, and other providers; last updated October 2025."
+        notes="Official BambooHR subcontractor list PDF names infrastructure, AI, benefits, analytics, support, and other providers; last updated October 2025.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "bastion.com": RegistryEntry(
         name="Bastion",
@@ -152,7 +188,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://bastion.com/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public subprocessor list names infrastructure, banking, compliance, blockchain, and operations providers; effective April 7, 2026."
+        notes="Public subprocessor list names infrastructure, banking, compliance, blockchain, and operations providers; effective April 7, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "beyondtrust.com": RegistryEntry(
         name="BeyondTrust",
@@ -160,7 +198,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.beyondtrust.com/privacy-center/sub-processors-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official BeyondTrust Privacy Center list with named subprocessors and affiliates, addresses, hosting locations, processing purposes, and contacts."
+        notes="Official BeyondTrust Privacy Center list with named subprocessors and affiliates, addresses, hosting locations, processing purposes, and contacts.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "billtrust.com": RegistryEntry(
         name="Billtrust",
@@ -168,7 +208,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.billtrust.com/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal page names subprocessors by Billtrust product; revised July 22, 2025."
+        notes="Public legal page names subprocessors by Billtrust product; revised July 22, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "blackline.com": RegistryEntry(
         name="BlackLine",
@@ -176,7 +218,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.blackline.com/legal/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened BlackLine's official public list, effective July 1, 2026, and confirmed named hosting, processing, and affiliate subprocessors across Financial Close, Invoice-to-Cash, Intercompany, and Verity Accruals."
+        notes="Opened BlackLine's official public list, effective July 1, 2026, and confirmed named hosting, processing, and affiliate subprocessors across Financial Close, Invoice-to-Cash, Intercompany, and Verity Accruals.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "box.com": RegistryEntry(
         name="Box",
@@ -184,7 +228,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.box.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Box legal page containing named core and customer-enabled AI subprocessors, service categories, and processing locations."
+        notes="Official Box legal page containing named core and customer-enabled AI subprocessors, service categories, and processing locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "braze.com": RegistryEntry(
         name="Braze",
@@ -192,7 +238,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://cdn.sanity.io/files/b7pblshe/marketing-prod/56073d92ae50195865f0258019982d5c3263bb0a.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the current official PDF linked by Braze's legal center; it was revised June 1, 2026 and contains named third-party and Braze-group subprocessors."
+        notes="Opened the current official PDF linked by Braze's legal center; it was revised June 1, 2026 and contains named third-party and Braze-group subprocessors.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "buildkite.com": RegistryEntry(
         name="Buildkite",
@@ -200,7 +248,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://buildkite.com/about/legal/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Buildkite legal page with named subprocessors, service descriptions, and processing locations; updated April 6, 2026."
+        notes="Official Buildkite legal page with named subprocessors, service descriptions, and processing locations; updated April 6, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "calendly.com": RegistryEntry(
         name="Calendly",
@@ -208,7 +258,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://calendly.com/help/calendly-sub-processors-gdpr-ccpa",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official help-center list updated July 10, 2026, naming each subprocessor with activity, privacy contact, and data-center locations."
+        notes="Official help-center list updated July 10, 2026, naming each subprocessor with activity, privacy contact, and data-center locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "canva.com": RegistryEntry(
         name="Canva",
@@ -216,7 +268,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://content-management-files.canva.com/assets/en/f6022a49-58d4-40d8-88d3-803529880cc0",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Most recent official PDF linked from Canva's subprocessor policy page, updated April 17, 2026, with third-party and Canva Group subprocessors."
+        notes="Most recent official PDF linked from Canva's subprocessor policy page, updated April 17, 2026, with third-party and Canva Group subprocessors.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "carta.com": RegistryEntry(
         name="Carta",
@@ -224,7 +278,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://carta.com/legal/privacy/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal table lists current Carta and Carta Europe subprocessors; last updated March 9, 2026."
+        notes="Public legal table lists current Carta and Carta Europe subprocessors; last updated March 9, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "celonis.com": RegistryEntry(
         name="Celonis",
@@ -232,7 +288,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://delivery-p141552-e1488202.adobeaemcloud.com/adobe/assets/urn%3Aaaid%3Aaem%3A855af229-a18a-4d54-8400-0c4786bc5739/original/as/Celonis_Sub-Processor_March2026.docx%20%282%29.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Celonis Subprocessor List effective April 23, 2026, linked from Celonis's official legal hub; names third parties and affiliates with activity and location."
+        notes="Celonis Subprocessor List effective April 23, 2026, linked from Celonis's official legal hub; names third parties and affiliates with activity and location.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "chargebee.com": RegistryEntry(
         name="Chargebee",
@@ -240,7 +298,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.chargebee.com/privacy/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Chargebee's general official list, effective February 15, 2026, and confirmed named affiliate and third-party subprocessors across Billing, Retention/Growth, RevRec, Receivables, and Reveal, with purposes and data-center locations."
+        notes="Opened Chargebee's general official list, effective February 15, 2026, and confirmed named affiliate and third-party subprocessors across Billing, Retention/Growth, RevRec, Receivables, and Reveal, with purposes and data-center locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "circle.com": RegistryEntry(
         name="Circle",
@@ -248,7 +308,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.circle.com/legal/sub-processor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names affiliate and third-party subprocessors; last updated December 22, 2025."
+        notes="Public legal list names affiliate and third-party subprocessors; last updated December 22, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "clickup.com": RegistryEntry(
         name="ClickUp",
@@ -256,7 +318,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://clickup.com/terms/dpa/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official list updated July 10, 2026, naming infrastructure, platform, AI, support, and professional-services subprocessors."
+        notes="Official list updated July 10, 2026, naming infrastructure, platform, AI, support, and professional-services subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "cloudflare.com": RegistryEntry(
         name="Cloudflare",
@@ -264,7 +328,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Cloudflare GDPR disclosure with named service and affiliate subprocessors, purposes, and processing locations; updated October 1, 2025."
+        notes="Official Cloudflare GDPR disclosure with named service and affiliate subprocessors, purposes, and processing locations; updated October 1, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "cockroachlabs.com": RegistryEntry(
         name="Cockroach Labs",
@@ -272,7 +338,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.cockroachlabs.com/cloud-terms-and-conditions/data-processing-addendum/cockroach-labs-sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Cockroach Labs subprocessor page with named cloud providers, payment processor, affiliates, processing purposes, data categories, and duration."
+        notes="Official Cockroach Labs subprocessor page with named cloud providers, payment processor, affiliates, processing purposes, data categories, and duration.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "cohere.com": RegistryEntry(
         name="Cohere",
@@ -280,7 +348,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trustcenter.cohere.com/?format=html",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Cohere Trust Center HTML names subprocessors and gives each provider's function and location."
+        notes="Official Cohere Trust Center HTML names subprocessors and gives each provider's function and location.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "confluent.io": RegistryEntry(
         name="Confluent",
@@ -288,7 +358,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://assets.confluent.io/m/227f69dc22168130/original/20250321-Confluent_Cloud_Subprocessors-March-2025.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Confluent Cloud Subprocessors PDF linked from Confluent's legal site, with named providers, services, and processing locations; dated March 2025."
+        notes="Official Confluent Cloud Subprocessors PDF linked from Confluent's legal site, with named providers, services, and processing locations; dated March 2025.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "contentsquare.com": RegistryEntry(
         name="Contentsquare",
@@ -296,7 +368,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://contentsquare.com/privacy-center/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official privacy-center page, last updated June 2026, and confirmed named affiliate, third-party, and professional-services subprocessors by product."
+        notes="Opened the official privacy-center page, last updated June 2026, and confirmed named affiliate, third-party, and professional-services subprocessors by product.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "coupa.com": RegistryEntry(
         name="Coupa",
@@ -304,7 +378,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://compass.coupa.com/en-us/trust/data-privacy/quick-guide-subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public Trust guide names default, additional, and legacy subprocessors; revised January 5, 2026."
+        notes="Public Trust guide names default, additional, and legacy subprocessors; revised January 5, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "cultureamp.com": RegistryEntry(
         name="Culture Amp",
@@ -312,7 +388,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.cultureamp.com/company/legal/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official legal list names Culture Amp subprocessors with registered office, contact, processing purpose, storage location, and transfer mechanism."
+        notes="Official legal list names Culture Amp subprocessors with registered office, contact, processing purpose, storage location, and transfer mechanism.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "customer.io": RegistryEntry(
         name="Customer.io",
@@ -320,7 +398,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://customer.io/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, revised March 2026, and confirmed named infrastructure, AI-feature, and platform subprocessors."
+        notes="Opened the official legal page, revised March 2026, and confirmed named infrastructure, AI-feature, and platform subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "cyberark.com": RegistryEntry(
         name="CyberArk",
@@ -328,7 +408,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.cyberark.com/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official CyberArk subprocessor page with named service subprocessors, affiliates, and third-party contractors, including activities and locations; updated March 24, 2026."
+        notes="Official CyberArk subprocessor page with named service subprocessors, affiliates, and third-party contractors, including activities and locations; updated March 24, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "dashlane.com": RegistryEntry(
         name="Dashlane",
@@ -336,7 +418,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.dashlane.com/privacy/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official list updated May 15, 2026, grouped by secured, registration, billing, usage, support, marketing, and administrative data."
+        notes="Official list updated May 15, 2026, grouped by secured, registration, billing, usage, support, marketing, and administrative data.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "datadoghq.com": RegistryEntry(
         name="Datadog",
@@ -344,7 +428,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.datadoghq.com/legal/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Datadog legal page listing named infrastructure, product, support, AI, and affiliate subprocessors with service descriptions and locations; updated April 22, 2026."
+        notes="Official Datadog legal page listing named infrastructure, product, support, AI, and affiliate subprocessors with service descriptions and locations; updated April 22, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "digitalocean.com": RegistryEntry(
         name="DigitalOcean",
@@ -352,7 +438,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.digitalocean.com/trust/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official DigitalOcean Trust page with named service and affiliate subprocessors, service descriptions, and processing locations; updated June 10, 2026."
+        notes="Official DigitalOcean Trust page with named service and affiliate subprocessors, service descriptions, and processing locations; updated June 10, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "dixa.com": RegistryEntry(
         name="Dixa",
@@ -360,7 +448,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.dixa.com/legal/3rd-party-services-used-by-dixa",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, last updated December 10, 2025, and confirmed named minimum, group-company, and modular subprocessors."
+        notes="Opened the official legal page, last updated December 10, 2025, and confirmed named minimum, group-company, and modular subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "docker.com": RegistryEntry(
         name="Docker",
@@ -368,7 +458,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.docker.com/trust/privacy/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Docker Trust page with named core, optional AI, and affiliate subprocessors, purposes, hosting locations, and compliance links."
+        notes="Official Docker Trust page with named core, optional AI, and affiliate subprocessors, purposes, hosting locations, and compliance links.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "docusign.com": RegistryEntry(
         name="DocuSign",
@@ -376,7 +468,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://assets.ctfassets.net/3fcisxc3a6xz/4wY1tp0jisFLerBClIRcll/407e05ef8358df558f898519a79e5b8a/Docusign_Services_Subprocessor_List.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current official PDF linked from Docusign's Trust page, updated July 2, 2026, with service-specific names, locations, and processing descriptions."
+        notes="Current official PDF linked from Docusign's Trust page, updated July 2, 2026, with service-specific names, locations, and processing descriptions.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "egnyte.com": RegistryEntry(
         name="Egnyte",
@@ -384,7 +478,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.egnyte.com/subcontractors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official subcontractor/subprocessor disclosure naming cloud, CRM, billing, notification, training, and support providers and locations."
+        notes="Official subcontractor/subprocessor disclosure naming cloud, CRM, billing, notification, training, and support providers and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "elastic.co": RegistryEntry(
         name="Elastic",
@@ -392,7 +488,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.elastic.co/agreements/external_subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Elastic agreements page listing named cloud, support, security, AI, and other external subprocessors with service scope and locations."
+        notes="Official Elastic agreements page listing named cloud, support, security, AI, and other external subprocessors with service scope and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "expensify.com": RegistryEntry(
         name="Expensify",
@@ -400,7 +498,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://use.expensify.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public subprocessor page names data centers and providers and states the data shared with each."
+        notes="Public subprocessor page names data centers and providers and states the data shared with each.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "figma.com": RegistryEntry(
         name="Figma",
@@ -408,7 +508,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.figma.com/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official list updated June 22, 2026, naming infrastructure, AI, support, and affiliate subprocessors."
+        notes="Official list updated June 22, 2026, naming infrastructure, AI, support, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "fivetran.com": RegistryEntry(
         name="Fivetran",
@@ -416,7 +518,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://fivetran.com/docs/security-and-privacy/privacy",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current Fivetran privacy documentation contains named Pipeline Data, AI, and affiliate subprocessor tables with purpose and territory."
+        notes="Current Fivetran privacy documentation contains named Pipeline Data, AI, and affiliate subprocessor tables with purpose and territory.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "fly.io": RegistryEntry(
         name="Fly.io",
@@ -424,7 +528,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://fly.io/legal/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Fly.io legal page listing named hosting, support, observability, communications, and affiliate subprocessors with purposes and locations."
+        notes="Official Fly.io legal page listing named hosting, support, observability, communications, and affiliate subprocessors with purposes and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "flywire.com": RegistryEntry(
         name="Flywire",
@@ -432,7 +538,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.flywire.com/es/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names client- and user-data subprocessors; last modified March 16, 2026."
+        notes="Public legal list names client- and user-data subprocessors; last modified March 16, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "fortinet.com": RegistryEntry(
         name="Fortinet",
@@ -440,7 +548,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.fortinet.com/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Fortinet Trust Resource Center exposes a searchable subprocessor table with named companies, purposes, locations, and applicable Fortinet products."
+        notes="Official Fortinet Trust Resource Center exposes a searchable subprocessor table with named companies, purposes, locations, and applicable Fortinet products.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "freshbooks.com": RegistryEntry(
         name="FreshBooks",
@@ -448,7 +558,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.freshbooks.com/third-party-sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public first-party list names AWS, Google Cloud, Google, Zendesk, and Salesforce as third-party subprocessors."
+        notes="Public first-party list names AWS, Google Cloud, Google, Zendesk, and Salesforce as third-party subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "freshworks.com": RegistryEntry(
         name="Freshworks",
@@ -456,7 +568,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.freshworks.com/privacy/sub-processor-july31-2025/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official Freshworks privacy page and confirmed a named list of infrastructure, service, and group subprocessors."
+        notes="Opened the official Freshworks privacy page and confirmed a named list of infrastructure, service, and group subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "front.com": RegistryEntry(
         name="Front",
@@ -464,7 +578,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://front.com/legal/list-of-subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official list effective July 13, 2026, naming third-party and Front Group subprocessors with processing activities and countries."
+        notes="Official list effective July 13, 2026, naming third-party and Front Group subprocessors with processing activities and countries.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "fullstory.com": RegistryEntry(
         name="Fullstory",
@@ -472,7 +588,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.fullstory.com/legal/subprocessor-list/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, last updated June 2, 2026, and confirmed named subprocessors with purposes, processed data, and locations."
+        notes="Opened the official legal page, last updated June 2, 2026, and confirmed named subprocessors with purposes, processed data, and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "gainsight.com": RegistryEntry(
         name="Gainsight",
@@ -480,7 +598,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.gainsight.com/policy/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official policy page, last updated April 2026, and confirmed its named third-party subprocessor table."
+        notes="Opened the official policy page, last updated April 2026, and confirmed its named third-party subprocessor table.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "getdbt.com": RegistryEntry(
         name="dbt Labs",
@@ -488,7 +608,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.getdbt.com/dbt-assets/cloud/dpa",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current dbt Labs Data Processing Addendum v.9 dated March 14, 2026; Schedule 3 names AWS, Microsoft Azure, and Google Cloud Platform as authorized subprocessors."
+        notes="Current dbt Labs Data Processing Addendum v.9 dated March 14, 2026; Schedule 3 names AWS, Microsoft Azure, and Google Cloud Platform as authorized subprocessors.",
+        flow_type="rendered_html_guarded",
+        recommended_flow="Open the official URL in Browser Harness, wait for JavaScript rendering, locate the complete named subprocessor table/list through the accessibility tree and rendered DOM, then canonicalize and deduplicate; return notfound if no authoritative complete list becomes available."
     ),
     "github.com": RegistryEntry(
         name="GitHub",
@@ -496,7 +618,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official GitHub policy page listing named infrastructure, support, analytics, AI, and affiliate subprocessors with processing descriptions and locations."
+        notes="Official GitHub policy page listing named infrastructure, support, analytics, AI, and affiliate subprocessors with processing descriptions and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "gitlab.com": RegistryEntry(
         name="GitLab",
@@ -504,7 +628,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://about.gitlab.com/privacy/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official GitLab privacy page with named infrastructure, platform, AI, support, and affiliate subprocessors, purposes, and locations."
+        notes="Official GitLab privacy page with named infrastructure, platform, AI, support, and affiliate subprocessors, purposes, and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "gong.io": RegistryEntry(
         name="Gong",
@@ -512,7 +638,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.gong.io/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page and confirmed named subprocessors with purposes and processing locations."
+        notes="Opened the official legal page and confirmed named subprocessors with purposes and processing locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "google.com": RegistryEntry(
         name="Google Cloud",
@@ -520,7 +648,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://cloud.google.com/terms/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Google Cloud terms page with named third-party and affiliate subprocessors, service scope, locations, and activities; modified July 16, 2026."
+        notes="Official Google Cloud terms page with named third-party and affiliate subprocessors, service scope, locations, and activities; modified July 16, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "goteleport.com": RegistryEntry(
         name="Teleport",
@@ -528,7 +658,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.goteleport.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Teleport Trust Center subprocessor directory with named vendors, processing purposes, locations, and vendor websites."
+        notes="Official Teleport Trust Center subprocessor directory with named vendors, processing purposes, locations, and vendor websites.",
+        flow_type="trust_center_clickthrough",
+        recommended_flow="Open the official trust center in Browser Harness, wait for client rendering, locate and activate the Subprocessors document/section through the accessibility tree, extract the complete named list, then canonicalize and deduplicate; return notfound if the list remains unavailable or incomplete."
     ),
     "grafana.com": RegistryEntry(
         name="Grafana Labs",
@@ -536,7 +668,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://grafana.com/legal/list-of-subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Grafana Labs legal page with named infrastructure, AI, alerting, and federal-cloud subprocessors, countries, and processing purposes."
+        notes="Official Grafana Labs legal page with named infrastructure, AI, alerting, and federal-cloud subprocessors, countries, and processing purposes.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "greenhouse.com": RegistryEntry(
         name="Greenhouse",
@@ -544,7 +678,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.greenhouse.com/subprocessors-in-use",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current first-party legal page names each Greenhouse subprocessor with its processing purpose and location and links archived versions."
+        notes="Current first-party legal page names each Greenhouse subprocessor with its processing purpose and location and links archived versions.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "helpscout.com": RegistryEntry(
         name="Help Scout",
@@ -552,7 +688,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.helpscout.com/company/legal/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page and confirmed its named subprocessor list with purposes and locations."
+        notes="Opened the official legal page and confirmed its named subprocessor list with purposes and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "hex.tech": RegistryEntry(
         name="Hex",
@@ -560,7 +698,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://learn.hex.tech/docs/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Hex legal documentation, last modified June 2, 2026, names subprocessors with purpose, location, and applicable product scope."
+        notes="Official Hex legal documentation, last modified June 2, 2026, names subprocessors with purpose, location, and applicable product scope.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "hootsuite.com": RegistryEntry(
         name="Hootsuite",
@@ -568,7 +708,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.hootsuite.com/legal/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, last updated June 24, 2026, and confirmed named core and service-specific subprocessors."
+        notes="Opened the official legal page, last updated June 24, 2026, and confirmed named core and service-specific subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "hubspot.com": RegistryEntry(
         name="HubSpot",
@@ -576,7 +718,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://legal.hubspot.com/sub-processors-page",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page and confirmed named infrastructure, feature-specific, and affiliate subprocessors."
+        notes="Opened the official legal page and confirmed named infrastructure, feature-specific, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "intercom.com": RegistryEntry(
         name="Intercom",
@@ -584,7 +728,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.intercom.com/legal/subprocessors-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page and confirmed named subprocessors for US, EU, and Australian hosting plus affiliate subprocessors."
+        notes="Opened the official legal page and confirmed named subprocessors for US, EU, and Australian hosting plus affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "iterable.com": RegistryEntry(
         name="Iterable",
@@ -592,7 +738,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://iterable.com/legal/iterable-sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page and confirmed its named subprocessor list with processing activities and locations."
+        notes="Opened the official legal page and confirmed its named subprocessor list with processing activities and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "jotform.com": RegistryEntry(
         name="Jotform",
@@ -600,7 +748,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.jotform.com/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Jotform page naming subprocessors, applicable services, service types, and the categories of data shared."
+        notes="Official Jotform page naming subprocessors, applicable services, service types, and the categories of data shared.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "keepersecurity.com": RegistryEntry(
         name="Keeper Security",
@@ -608,7 +758,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.keepersecurity.com/legal/sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Keeper Security legal list with named software, support, marketing, optional-service, and affiliate subprocessors, including locations and purposes."
+        notes="Official Keeper Security legal list with named software, support, marketing, optional-service, and affiliate subprocessors, including locations and purposes.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "klaviyo.com": RegistryEntry(
         name="Klaviyo",
@@ -616,7 +768,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.klaviyo.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, updated April 10, 2026, and confirmed named third-party and affiliate subprocessors."
+        notes="Opened the official legal page, updated April 10, 2026, and confirmed named third-party and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "kolide.com": RegistryEntry(
         name="Kolide",
@@ -624,7 +778,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.kolide.com/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Kolide by 1Password legal list with named subprocessors, purposes, and GDPR-compliance links; last updated January 16, 2025."
+        notes="Official Kolide by 1Password legal list with named subprocessors, purposes, and GDPR-compliance links; last updated January 16, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "lastpass.com": RegistryEntry(
         name="LastPass",
@@ -632,7 +788,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.lastpass.com/-/media/50dd502f16c34e99ad3ba7ea031d55ab.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official LastPass Sub-Processors disclosure linked from its Trust Center, with hosting and third-party provider tables."
+        notes="Official LastPass Sub-Processors disclosure linked from its Trust Center, with hosting and third-party provider tables.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "lattice.com": RegistryEntry(
         name="Lattice",
@@ -640,7 +798,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://lattice.com/trust/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current Lattice Subprocessor List, last updated July 2, 2026; names providers with service, security reference, and location."
+        notes="Current Lattice Subprocessor List, last updated July 2, 2026; names providers with service, security reference, and location.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "launchdarkly.com": RegistryEntry(
         name="LaunchDarkly",
@@ -648,7 +808,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://launchdarkly.com/policies/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official LaunchDarkly policy page with named infrastructure, CDN, analytics, billing, support, AI, and affiliate subprocessors; effective May 15, 2026."
+        notes="Official LaunchDarkly policy page with named infrastructure, CDN, analytics, billing, support, AI, and affiliate subprocessors; effective May 15, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "linear.app": RegistryEntry(
         name="Linear",
@@ -656,7 +818,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://linear.app/dpa",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official DPA; Exhibit B contains the current List of Authorized Sub-Processors with company, description, and location."
+        notes="Official DPA; Exhibit B contains the current List of Authorized Sub-Processors with company, description, and location.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "loom.com": RegistryEntry(
         name="Loom",
@@ -664,7 +828,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.atlassian.com/legal/loom/privacy",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Atlassian legal page for Loom; its subprocessor section names providers and explains what each processes. Atlassian is Loom's parent company."
+        notes="Official Atlassian legal page for Loom; its subprocessor section names providers and explains what each processes. Atlassian is Loom's parent company.",
+        flow_type="rendered_html_guarded",
+        recommended_flow="Open the official URL in Browser Harness, wait for JavaScript rendering, locate the complete named subprocessor table/list through the accessibility tree and rendered DOM, then canonicalize and deduplicate; return notfound if no authoritative complete list becomes available."
     ),
     "make.com": RegistryEntry(
         name="Make",
@@ -672,7 +838,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://assets.ctfassets.net/un655fb9wln6/78xuveidrchD9EWZLrrCUM/a8333d0c19d7de7910d81d8edd68df71/Make_Sub-Processors_November_2025.docx.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current official Make subprocessor PDF linked from Make's terms page, effective December 12, 2025, with named providers and processing descriptions."
+        notes="Current official Make subprocessor PDF linked from Make's terms page, effective December 12, 2025, with named providers and processing descriptions.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "malwarebytes.com": RegistryEntry(
         name="Malwarebytes",
@@ -680,7 +848,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.malwarebytes.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Malwarebytes legal list with named approved contractors, service scopes, and locations."
+        notes="Official Malwarebytes legal list with named approved contractors, service scopes, and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "maxio.com": RegistryEntry(
         name="Maxio",
@@ -688,7 +858,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.maxio.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public service-provider and subprocessor page names vendors by function and core, optional, add-on, or service scope."
+        notes="Public service-provider and subprocessor page names vendors by function and core, optional, add-on, or service scope.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "miro.com": RegistryEntry(
         name="Miro",
@@ -696,7 +868,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://miro.com/static/legal/Miro-Current-Subprocessors-List.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official current PDF linked from Miro's DPA; it lists Miro subprocessors and third-party AI model providers and was updated July 8, 2026."
+        notes="Official current PDF linked from Miro's DPA; it lists Miro subprocessors and third-party AI model providers and was updated July 8, 2026.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "mixpanel.com": RegistryEntry(
         name="Mixpanel",
@@ -704,7 +878,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://mixpanel.com/legal/subprocessor-list/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Mixpanel legal list published April 24, 2026 names subprocessors by service and applicable data-residency region."
+        notes="Official Mixpanel legal list published April 24, 2026 names subprocessors by service and applicable data-residency region.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "moderntreasury.com": RegistryEntry(
         name="Modern Treasury",
@@ -712,7 +888,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.moderntreasury.com/legal/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names AWS, Anthropic, Hightouch, Datadog, and others; last updated May 27, 2026."
+        notes="Public legal list names AWS, Anthropic, Hightouch, Datadog, and others; last updated May 27, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "monday.com": RegistryEntry(
         name="monday.com",
@@ -720,7 +898,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://monday.com/l/privacy/sub-processors-subsidiaries-support/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official legal portal updated June 24, 2026, with named subprocessors, applicable services, data shared, regions, and conditions."
+        notes="Official legal portal updated June 24, 2026, with named subprocessors, applicable services, data shared, regions, and conditions.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "mongodb.com": RegistryEntry(
         name="MongoDB",
@@ -728,7 +908,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.mongodb.com/products/platform/trust/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official MongoDB Trust Center page with named cloud, support, security, communications, AI, and affiliate subprocessors and processing locations."
+        notes="Official MongoDB Trust Center page with named cloud, support, security, communications, AI, and affiliate subprocessors and processing locations.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "netskope.com": RegistryEntry(
         name="Netskope",
@@ -736,7 +918,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.netskope.com/wp-content/uploads/2026/02/Netskope-sub-processors-march-2026.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official February 2026 Netskope PDF with named product, hosting, customer-support, and affiliate subprocessors, plus applicability, activities, and locations."
+        notes="Official February 2026 Netskope PDF with named product, hosting, customer-support, and affiliate subprocessors, plus applicability, activities, and locations.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "newrelic.com": RegistryEntry(
         name="New Relic",
@@ -744,7 +928,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://newrelic.com/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official New Relic disclosure with named subprocessors, processing purposes, applicable products, and locations."
+        notes="Official New Relic disclosure with named subprocessors, processing purposes, applicable products, and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "notion.so": RegistryEntry(
         name="Notion",
@@ -752,7 +938,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.notion.so/Notion-s-List-of-Subprocessors-268fa5bcfa0f46b6bc29436b21676734?pvs=24",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Notion page titled Notion's List of Subprocessors, with a named third-party subprocessor table."
+        notes="Official Notion page titled Notion's List of Subprocessors, with a named third-party subprocessor table.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "numeric.io": RegistryEntry(
         name="Numeric",
@@ -760,7 +948,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://help.numeric.io/articles/8337651077-subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official knowledge-base list names hosting, email, payments, AI, authentication, and data-movement subprocessors."
+        notes="Official knowledge-base list names hosting, email, payments, AI, authentication, and data-movement subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "okta.com": RegistryEntry(
         name="Okta",
@@ -768,7 +958,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.okta.com/en-gb/legal/trustandcompliance/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Okta legal disclosure with named subprocessors, processing purposes, service applicability, and data-center locations; effective May 2026."
+        notes="Official Okta legal disclosure with named subprocessors, processing purposes, service applicability, and data-center locations; effective May 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "openai.com": RegistryEntry(
         name="OpenAI",
@@ -776,7 +968,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://openai.com/policies/sub-processor-list/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official OpenAI Sub-processor List, last updated July 9, 2026, names third parties and affiliates with product scope, location, and purpose."
+        notes="Official OpenAI Sub-processor List, last updated July 9, 2026, names third parties and affiliates with product scope, location, and purpose.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "optimizely.com": RegistryEntry(
         name="Optimizely",
@@ -784,7 +978,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.optimizely.com/legal/sub-processors/third-party",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page and confirmed its named third-party subprocessors with service, hosting, data, and product applicability details."
+        notes="Opened the official legal page and confirmed its named third-party subprocessors with service, hosting, data, and product applicability details.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "pagerduty.com": RegistryEntry(
         name="PagerDuty",
@@ -792,7 +988,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.pagerduty.com/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official PagerDuty page listing named platform, communications, analytics, support, AI, and affiliate subprocessors with service details."
+        notes="Official PagerDuty page listing named platform, communications, analytics, support, AI, and affiliate subprocessors with service details.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "paloaltonetworks.com": RegistryEntry(
         name="Palo Alto Networks",
@@ -800,7 +998,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.paloaltonetworks.com/content/dam/pan/en_US/assets/pdf/services/list-of-sub-processors-sheet.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official April 2026 product, Unit 42, customer-support, affiliate, and generative-AI subprocessor PDF with named entities, locations, and processing activities."
+        notes="Official April 2026 product, Unit 42, customer-support, affiliate, and generative-AI subprocessor PDF with named entities, locations, and processing activities.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "paychex.eu": RegistryEntry(
         name="Paychex Europe",
@@ -808,7 +1008,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.paychex.eu/data-processing-agreement/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Paychex Europe's official DPA includes Appendix B, an Authorized Subprocessors table naming providers, purposes, and processing locations for European services."
+        notes="Paychex Europe's official DPA includes Appendix B, an Authorized Subprocessors table naming providers, purposes, and processing locations for European services.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "pennylane.com": RegistryEntry(
         name="Pennylane",
@@ -816,7 +1018,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.pennylane.com/fr/legal/subcontractors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="French public legal list names GDPR subprocessors and services; last modified December 16, 2025."
+        notes="French public legal list names GDPR subprocessors and services; last modified December 16, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "pipedrive.com": RegistryEntry(
         name="Pipedrive",
@@ -824,7 +1028,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.pipedrive.com/en/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official repository page, current as of July 13, 2026, and confirmed named hosting, feature, AI, support, and affiliate subprocessors."
+        notes="Opened the official repository page, current as of July 13, 2026, and confirmed named hosting, feature, AI, support, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "pitch.com": RegistryEntry(
         name="Pitch",
@@ -832,7 +1038,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://pitch.com/dpa",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official DPA; Annex 7.2 names the further processors and describes each processing function."
+        notes="Official DPA; Annex 7.2 names the further processors and describes each processing function.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "posthog.com": RegistryEntry(
         name="PostHog",
@@ -840,7 +1048,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.posthog.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57&source=click",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Direct Subprocessors item in PostHog's official SafeBase Trust Center; its subprocessor table is rendered client-side."
+        notes="Direct Subprocessors item in PostHog's official SafeBase Trust Center; its subprocessor table is rendered client-side.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "prefect.io": RegistryEntry(
         name="Prefect",
@@ -848,7 +1058,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.prefect.io/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Prefect Security subprocessor list names providers with processing descriptions and locations."
+        notes="Official Prefect Security subprocessor list names providers with processing descriptions and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "proofpoint.com": RegistryEntry(
         name="Proofpoint",
@@ -856,7 +1068,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.proofpoint.com/us/legal/trust/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Proofpoint Trust disclosure mapping named subprocessors and locations to Proofpoint products and services; updated July 10, 2026."
+        notes="Official Proofpoint Trust disclosure mapping named subprocessors and locations to Proofpoint products and services; updated July 10, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "qualtrics.com": RegistryEntry(
         name="Qualtrics",
@@ -864,7 +1078,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.qualtrics.com/subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official Qualtrics page and confirmed named mandatory, CDN, optional technical, professional-services, and affiliate subprocessors."
+        notes="Opened the official Qualtrics page and confirmed named mandatory, CDN, optional technical, professional-services, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "qualys.com": RegistryEntry(
         name="Qualys",
@@ -872,7 +1088,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://cdn2.qualys.com/docs/mktg/qualys-dpa-agreement.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Qualys Data Privacy Addendum; Annex III names subprocessors and gives their addresses and processing purposes."
+        notes="Official Qualys Data Privacy Addendum; Annex III names subprocessors and gives their addresses and processing purposes.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "rapid7.com": RegistryEntry(
         name="Rapid7",
@@ -880,7 +1098,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.rapid7.com/legal/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Rapid7 legal list with named subprocessors and affiliates, use cases, personal-data types, processing locations, and further information."
+        notes="Official Rapid7 legal list with named subprocessors and affiliates, use cases, personal-data types, processing locations, and further information.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "recurly.com": RegistryEntry(
         name="Recurly",
@@ -888,7 +1108,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://recurly.com/legal/privacy/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names service-specific and infrastructure subprocessors including Appcues, Avalara, AWS, and Google."
+        notes="Public legal list names service-specific and infrastructure subprocessors including Appcues, Avalara, AWS, and Google.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "render.com": RegistryEntry(
         name="Render",
@@ -896,7 +1118,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://render.com/security",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Render security page containing a named Subprocessors table with provider functions and processing locations."
+        notes="Official Render security page containing a named Subprocessors table with provider functions and processing locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "rippling.com": RegistryEntry(
         name="Rippling",
@@ -904,7 +1128,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.rippling.com/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Rippling Security & Trust Center exposes the public Rippling Sub-processors document dated April 30, 2026 under Additional Documents."
+        notes="Official Rippling Security & Trust Center exposes the public Rippling Sub-processors document dated April 30, 2026 under Additional Documents.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "sage.com": RegistryEntry(
         name="Sage",
@@ -912,7 +1138,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.sage.com/en-us/trust-security/privacy/customer-due-diligence/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public due-diligence page lists subprocessors by Sage product, processing location, and activity."
+        notes="Public due-diligence page lists subprocessors by Sage product, processing location, and activity.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "salesforce.com": RegistryEntry(
         name="Salesforce",
@@ -920,7 +1148,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the general official Salesforce Infrastructure and Sub-processors PDF, published July 8, 2026, and confirmed named providers, infrastructure, processing locations, and product applicability across Salesforce online services and managed packages."
+        notes="Opened the general official Salesforce Infrastructure and Sub-processors PDF, published July 8, 2026, and confirmed named providers, infrastructure, processing locations, and product applicability across Salesforce online services and managed packages.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "scale.com": RegistryEntry(
         name="Scale AI",
@@ -928,7 +1158,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://scale.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Scale AI legal page names third-party and affiliate subprocessors with service descriptions and addresses; last updated August 7, 2024."
+        notes="Official Scale AI legal page names third-party and affiliate subprocessors with service descriptions and addresses; last updated August 7, 2024.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "secureframe.com": RegistryEntry(
         name="Secureframe",
@@ -936,7 +1168,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://secureframe.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Secureframe authorized-subprocessor page with named third parties, purposes, and entity countries."
+        notes="Official Secureframe authorized-subprocessor page with named third parties, purposes, and entity countries.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "sentinelone.com": RegistryEntry(
         name="SentinelOne",
@@ -944,7 +1178,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.sentinelone.com/legal/sentinelone-sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official SentinelOne legal page with named third-party and affiliate subprocessors, activities, registered addresses, and processing countries; dated May 20, 2026."
+        notes="Official SentinelOne legal page with named third-party and affiliate subprocessors, activities, registered addresses, and processing countries; dated May 20, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "sentry.io": RegistryEntry(
         name="Sentry",
@@ -952,7 +1188,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://sentry.io/legal/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Sentry legal page with named infrastructure, support, communications, analytics, AI, and affiliate subprocessors; updated June 1, 2026."
+        notes="Official Sentry legal page with named infrastructure, support, communications, analytics, AI, and affiliate subprocessors; updated June 1, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "sigmacomputing.com": RegistryEntry(
         name="Sigma Computing",
@@ -960,7 +1198,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.sigmacomputing.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Sigma Computing list, last updated November 14, 2025, names subprocessors with nature of processing and territory."
+        notes="Official Sigma Computing list, last updated November 14, 2025, names subprocessors with nature of processing and territory.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "slack.com": RegistryEntry(
         name="Slack",
@@ -968,7 +1208,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf?bc=OTH",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current Salesforce Infrastructure and Sub-processors document; the Slack section explicitly applies to Slack, Slack AI, and GovSlack and names the applicable providers."
+        notes="Current Salesforce Infrastructure and Sub-processors document; the Slack section explicitly applies to Slack, Slack AI, and GovSlack and names the applicable providers.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "slite.com": RegistryEntry(
         name="Slite",
@@ -976,7 +1218,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://slite.com/help/1n_zqy6ByfWGTV/List-of-Sub-Processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Slite help-center disclosure with a named provider table covering data type, processing purpose, region, and safeguards."
+        notes="Official Slite help-center disclosure with a named provider table covering data type, processing purpose, region, and safeguards.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "snowflake.com": RegistryEntry(
         name="Snowflake",
@@ -984,7 +1228,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.snowflake.com/en/legal/privacy/snowflake-sub-processors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Snowflake legal page with named infrastructure, support, security, AI, and affiliate subprocessors, purposes, and locations; updated March 6, 2026."
+        notes="Official Snowflake legal page with named infrastructure, support, security, AI, and affiliate subprocessors, purposes, and locations; updated March 6, 2026.",
+        flow_type="rendered_html_guarded",
+        recommended_flow="Open the official URL in Browser Harness, wait for JavaScript rendering, locate the complete named subprocessor table/list through the accessibility tree and rendered DOM, then canonicalize and deduplicate; return notfound if no authoritative complete list becomes available."
     ),
     "snyk.io": RegistryEntry(
         name="Snyk",
@@ -992,7 +1238,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://snyk.io/policies/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Snyk legal policy with named software and affiliate subprocessors, processing locations, data processed, and purposes; dated February 3, 2026."
+        notes="Official Snyk legal policy with named software and affiliate subprocessors, processing locations, data processed, and purposes; dated February 3, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "sophos.com": RegistryEntry(
         name="Sophos",
@@ -1000,7 +1248,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.sophos.com/en-us/legal/sub-processor",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Sophos legal list with named subprocessors, processing locations, purposes, and product relevance; last updated May 2026."
+        notes="Official Sophos legal list with named subprocessors, processing locations, purposes, and product relevance; last updated May 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "spendesk.com": RegistryEntry(
         name="Spendesk",
@@ -1008,7 +1258,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.spendesk.com/legals/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names group and third-party subprocessors; version applicable March 31, 2025."
+        notes="Public legal list names group and third-party subprocessors; version applicable March 31, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "sproutsocial.com": RegistryEntry(
         name="Sprout Social",
@@ -1016,7 +1268,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://sproutsocial.com/legal/subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, last updated January 21, 2026, and confirmed named subprocessors for the core, advocacy, and influencer platforms."
+        notes="Opened the official legal page, last updated January 21, 2026, and confirmed named subprocessors for the core, advocacy, and influencer platforms.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "stripe.com": RegistryEntry(
         name="Stripe",
@@ -1024,7 +1278,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://stripe.com/legal/service-providers",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names AWS, Sprinklr, Salesforce, Twilio, and product-specific subprocessors; page last updated December 20, 2025."
+        notes="Public legal list names AWS, Sprinklr, Salesforce, Twilio, and product-specific subprocessors; page last updated December 20, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "supabase.com": RegistryEntry(
         name="Supabase",
@@ -1032,7 +1288,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://supabase.com/downloads/docs/Supabase%2BDPA%2B250805.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Supabase DPA dated August 5, 2025; Schedule 3 names authorized subprocessors and describes each processing function."
+        notes="Official Supabase DPA dated August 5, 2025; Schedule 3 names authorized subprocessors and describes each processing function.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "surveymonkey.com": RegistryEntry(
         name="SurveyMonkey",
@@ -1040,7 +1298,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.surveymonkey.com/mp/legal/subprocessor-list/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official legal page, effective December 27, 2025, and confirmed the named onward-subprocessor table."
+        notes="Opened the official legal page, effective December 27, 2025, and confirmed the named onward-subprocessor table.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "tailscale.com": RegistryEntry(
         name="Tailscale",
@@ -1048,7 +1308,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://tailscale.com/dpa-subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Tailscale legal list with named subprocessors, purposes, data processed, and locations; last updated September 2, 2025."
+        notes="Official Tailscale legal list with named subprocessors, purposes, data processed, and locations; last updated September 2, 2025.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "temporal.io": RegistryEntry(
         name="Temporal Technologies",
@@ -1056,7 +1318,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.temporal.io/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Temporal's official public Trust Center and confirmed its complete named Subprocessors section, including Auth0, AWS, Elastic, Google Cloud, IBM, Microsoft Azure, and WorkOS with locations and usage details; last updated May 29, 2026."
+        notes="Opened Temporal's official public Trust Center and confirmed its complete named Subprocessors section, including Auth0, AWS, Elastic, Google Cloud, IBM, Microsoft Azure, and WorkOS with locations and usage details; last updated May 29, 2026.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "tenable.com": RegistryEntry(
         name="Tenable",
@@ -1064,7 +1328,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.tenable.com/gdpr-alignment/third-party-data-sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Tenable GDPR disclosure with named third-party subprocessors and affiliates, use cases, personal-data types, processing locations, and justification."
+        notes="Official Tenable GDPR disclosure with named third-party subprocessors and affiliates, use cases, personal-data types, processing locations, and justification.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "thoughtspot.com": RegistryEntry(
         name="ThoughtSpot",
@@ -1072,7 +1338,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.thoughtspot.com/legal/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official ThoughtSpot legal list, last updated June 30, 2026, names infrastructure, support, analytics, security, and AI subprocessors."
+        notes="Official ThoughtSpot legal list, last updated June 30, 2026, names infrastructure, support, analytics, security, and AI subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "tilled.com": RegistryEntry(
         name="Tilled",
@@ -1080,7 +1348,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.tilled.com/sub-processors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Tilled's official public Subprocessors page and confirmed a complete named list for its embedded-payments service, with provider locations and purposes spanning hosting, payment processing, bank verification, analytics, support, and card infrastructure."
+        notes="Opened Tilled's official public Subprocessors page and confirmed a complete named list for its embedded-payments service, with provider locations and purposes spanning hosting, payment processing, bank verification, analytics, support, and card infrastructure.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "typeform.com": RegistryEntry(
         name="Typeform",
@@ -1088,7 +1358,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://help.typeform.com/hc/en-us/articles/360029617191-What-other-companies-do-we-share-data-with",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Typeform's official help-center disclosure and confirmed named subprocessors for response data, optional services, and customer data."
+        notes="Opened Typeform's official help-center disclosure and confirmed named subprocessors for response data, optional services, and customer data.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "uphold.com": RegistryEntry(
         name="Uphold",
@@ -1096,7 +1368,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://uphold.com/legal/uphold-subprocessor-list",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal processor list names banking, KYC, payment, infrastructure, and support providers; last updated July 20, 2026."
+        notes="Public legal processor list names banking, KYC, payment, infrastructure, and support providers; last updated July 20, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "usertesting.com": RegistryEntry(
         name="UserTesting",
@@ -1104,7 +1378,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.usertesting.com/privacy-center/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened the official privacy-center page, last updated March 20, 2026, and confirmed named affiliates and platform-delivery subprocessors."
+        notes="Opened the official privacy-center page, last updated March 20, 2026, and confirmed named affiliates and platform-delivery subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "vanta.com": RegistryEntry(
         name="Vanta",
@@ -1112,7 +1388,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://trust.vanta.com/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Vanta Trust Center subprocessor directory with named vendors, product scope, purpose, processing region, and vendor website."
+        notes="Official Vanta Trust Center subprocessor directory with named vendors, product scope, purpose, processing region, and vendor website.",
+        flow_type="trust_center_clickthrough",
+        recommended_flow="Open the official trust center in Browser Harness, wait for client rendering, locate and activate the Subprocessors document/section through the accessibility tree, extract the complete named list, then canonicalize and deduplicate; return notfound if the list remains unavailable or incomplete."
     ),
     "vercel.com": RegistryEntry(
         name="Vercel",
@@ -1120,7 +1398,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://security.vercel.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57&source=title",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Vercel Trust Center Subprocessors item. Its current named list is client-rendered and the static response leaves the result area blank, so Browser Use is required to render and extract the complete list; published change notices alone are not a complete source."
+        notes="Official Vercel Trust Center Subprocessors item. Its current named list is client-rendered and the static response leaves the result area blank, so Browser Use is required to render and extract the complete list; published change notices alone are not a complete source.",
+        flow_type="rendered_trust_center",
+        recommended_flow="Open the official trust-center URL in Browser Harness, wait for client rendering, activate the Subprocessors section/document through the accessibility tree when needed, extract the complete rendered named list, then canonicalize and deduplicate; return notfound if no complete list renders."
     ),
     "verkada.com": RegistryEntry(
         name="Verkada",
@@ -1128,7 +1408,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://docs.verkada.com/docs/Subprocessor%20List%20v06.2026.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official June 2026 Verkada subprocessor PDF linked from Verkada's Privacy Center disclosure page."
+        notes="Official June 2026 Verkada subprocessor PDF linked from Verkada's Privacy Center disclosure page.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "webflow.com": RegistryEntry(
         name="Webflow",
@@ -1136,7 +1418,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://webflow.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official list updated July 9, 2026, naming each subprocessor, service provided, and location."
+        notes="Official list updated July 9, 2026, naming each subprocessor, service provided, and location.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "withpersona.com": RegistryEntry(
         name="Persona",
@@ -1144,7 +1428,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://withpersona.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names required and conditional subprocessors; last updated June 17, 2026."
+        notes="Public legal list names required and conditional subprocessors; last updated June 17, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "workato.com": RegistryEntry(
         name="Workato",
@@ -1152,7 +1438,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://assets.ctfassets.net/khy5qy7zbpmq/3zc9HDmt3MGXUq5Gkf6wUD/7efa6adab3c94eae2118374bd10a5a3c/Workato_Sub-Processors_2026-04-17.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Workato legal-page asset dated April 17, 2026 names platform and opt-in AI subprocessors with purpose and processing region."
+        notes="Official Workato legal-page asset dated April 17, 2026 names platform and opt-in AI subprocessors with purpose and processing region.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "workday.com": RegistryEntry(
         name="Workday",
@@ -1160,7 +1448,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.workday.com/content/dam/web/en-us/documents/legal/workday-subprocessors.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Current Workday Subprocessor List PDF, last updated July 1, 2026; names affiliate, hosting, CDN, and product-specific subprocessors."
+        notes="Current Workday Subprocessor List PDF, last updated July 1, 2026; names affiliate, hosting, CDN, and product-specific subprocessors.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
     "xero.com": RegistryEntry(
         name="Xero",
@@ -1168,7 +1458,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.xero.com/au/legal/xero-subprocessors/",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Public legal list names third-party and affiliate subprocessors, including AWS, Anthropic, Google Cloud, and Stripe."
+        notes="Public legal list names third-party and affiliate subprocessors, including AWS, Anthropic, Google Cloud, and Stripe.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "zapier.com": RegistryEntry(
         name="Zapier",
@@ -1176,7 +1468,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://zapier.com/legal/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Zapier Subprocessors page posted June 10, 2026 names core, service-specific, support, and affiliate subprocessors."
+        notes="Official Zapier Subprocessors page posted June 10, 2026 names core, service-specific, support, and affiliate subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "zendesk.com": RegistryEntry(
         name="Zendesk",
@@ -1184,7 +1478,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://support.zendesk.com/hc/en-us/articles/4408883061530-Sub-processor-Policy",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Opened Zendesk's official policy and confirmed named infrastructure, service-specific, innovation-service, and group subprocessors."
+        notes="Opened Zendesk's official policy and confirmed named infrastructure, service-specific, innovation-service, and group subprocessors.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "zoom.com": RegistryEntry(
         name="Zoom",
@@ -1192,7 +1488,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.zoom.com/en/trust/subprocessors/?page=1",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Zoom Trust page effective April 29, 2026, with named authorized subprocessors, purposes, data shared, and locations."
+        notes="Official Zoom Trust page effective April 29, 2026, with named authorized subprocessors, purposes, data shared, and locations.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "zscaler.com": RegistryEntry(
         name="Zscaler",
@@ -1200,7 +1498,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.zscaler.com/privacy-compliance/subprocessors",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official Zscaler privacy and compliance page with named subprocessors, applicable products, services provided, and processing locations; updated July 20, 2026."
+        notes="Official Zscaler privacy and compliance page with named subprocessors, applicable products, services provided, and processing locations; updated July 20, 2026.",
+        flow_type="rendered_html",
+        recommended_flow="Open the official URL in Browser Harness, wait for the rendered page, locate the complete named subprocessor table/list in the DOM, extract its rows or list items, then canonicalize and deduplicate; return notfound if the page does not expose a complete current list."
     ),
     "zuora.com": RegistryEntry(
         name="Zuora",
@@ -1208,7 +1508,9 @@ glob VENDOR_REGISTRY: dict[str, RegistryEntry] = {
         subprocessor_url="https://www.zuora.com/wp-content/uploads/2026/01/0102726-Subprocessor-Update-Subprocessors-and-Affiliates.docx.pdf",
         source_type="official_website",
         verified_on="2026-07-26",
-        notes="Official legal PDF names hosting, third-party, and affiliate subprocessors; last updated January 27, 2026."
+        notes="Official legal PDF names hosting, third-party, and affiliate subprocessors; last updated January 27, 2026.",
+        flow_type="pdf_text",
+        recommended_flow="Open the official PDF URL in Browser Harness to verify the source, read the PDF text/table content, extract every named subprocessor, then canonicalize and deduplicate; return notfound if the current complete list cannot be read."
     ),
 };
 
