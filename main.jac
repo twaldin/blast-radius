@@ -267,6 +267,10 @@ def _canonical_name(raw: str, idx: dict[str, Company], use_llm: bool) -> str {
     return clean_provider_name(raw) or raw.strip();
 }
 
+# Resolve any user-supplied identifier to a company. MUST stay consistent with the
+# search ladder and the write path: the alias table is what makes "aws", "gcp" and
+# "azure" reach their canonical node, and every caller (dependents, blast_radius,
+# expand_one, map_company) depends on that.
 def _find_company(key: str) -> Company | None {
     k = key.lower().strip();
     if not k { return None; }
@@ -279,8 +283,63 @@ def _find_company(key: str) -> Company | None {
         if c.slug == ks or c.name.lower() == k { return c; }
         if ck and _canon_key(c.name or c.domain) == ck { return c; }
     }
+    aliased = _alias_for(ck) or _alias_for(_despace(key));
+    if aliased {
+        ak = _canon_key(aliased);
+        for c in _all_companies() {
+            if _canon_key(c.name or c.domain) == ak { return c; }
+        }
+    }
     return None;
 }
+
+# Space-insensitive key: "open ai" and "openai" share a key.
+def _despace(s: str) -> str { return _canon_key(s).replace(" ", ""); }
+
+# Bounded Levenshtein: is edit distance(a, b) <= budget? The length-gap bailout
+# skips hopeless pairs; two-row DP over char lists keeps it simple and typed.
+def _edit_within(a: str, b: str, budget: int) -> bool {
+    gap = len(a) - len(b);
+    if gap < 0 { gap = -gap; }
+    if gap > budget { return False; }
+    ca: list[str] = [ch for ch in a];
+    cb: list[str] = [ch for ch in b];
+    prev: list[int] = [];
+    for j = 0 to j <= len(cb) by j += 1 { prev.append(j); }
+    for i = 1 to i <= len(ca) by i += 1 {
+        curr: list[int] = [i];
+        for j = 1 to j <= len(cb) by j += 1 {
+            cost = 0 if ca[i - 1] == cb[j - 1] else 1;
+            best = prev[j] + 1;
+            if curr[j - 1] + 1 < best { best = curr[j - 1] + 1; }
+            if prev[j - 1] + cost < best { best = prev[j - 1] + cost; }
+            curr.append(best);
+        }
+        prev = curr;
+    }
+    return prev[len(cb)] <= budget;
+}
+
+# mapped = we read its own filing; known = it only appears in others' filings.
+def _state_of(c: Company) -> str {
+    if len([c ->:Subprocesses:->]) > 0 { return "mapped"; }
+    if len([c <-:Subprocesses:<-]) > 0 { return "known"; }
+    return "known";
+}
+
+# One search-result row for a graph company (the /walker/search Result shape).
+def _result_for(c: Company, how: str) -> dict {
+    return {
+        "id": c.slug, "domain": c.domain, "name": c.name or c.domain,
+        "state": _state_of(c),
+        "filing_count": len([c ->:Subprocesses:->]),
+        "dependent_count": len([c <-:Subprocesses:<-]),
+        "crawl_status": c.crawl_status, "source_url": c.subprocessor_url,
+        "match": how
+    };
+}
+
+def _by_name_len(d: dict) -> int { return len((d["name"] as str)); }
 
 # The single write chokepoint. Nothing else may create a Company.
 def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bool) -> Company {
@@ -404,6 +463,61 @@ def _graph_payload(start: Company) -> dict {
     }
     return {"nodes": nodes, "edges": edges,
             "root": start.slug, "root_domain": start.domain, "root_label": start.name};
+}
+
+# The mirror of _graph_payload: BFS over INBOUND edges — "who depends on this".
+# Same Node/Edge shape so the client reuses one canvas; edges keep their REAL
+# direction (source = the dependent), so arrows point INTO the centre.
+def _inbound_payload(center: Company, max_hops: int) -> dict {
+    dist: dict[str, int] = {center.slug: 0};
+    order: list[Company] = [center];
+    frontier: list[Company] = [center];
+    hop = 0;
+    while frontier {
+        if max_hops and hop >= max_hops { break; }
+        hop += 1;
+        nxt: list[Company] = [];
+        for c in frontier {
+            for d in [c <-:Subprocesses:<-] {
+                if d.slug in dist { continue; }
+                dist[d.slug] = hop;
+                order.append(d);
+                nxt.append(d);
+            }
+        }
+        frontier = nxt;
+    }
+    inview: dict[str, bool] = {};
+    for c in order { inview[c.slug] = True; }
+
+    edges: list[dict] = [];
+    indeg: dict[str, int] = {};
+    for d in order {
+        for t in [d ->:Subprocesses:->] {
+            if t.slug not in inview { continue; }
+            purpose = "";
+            region = "";
+            pii = False;
+            for e in [edge d ->:Subprocesses:-> t] {
+                purpose = e.purpose; region = e.region; pii = e.handles_pii;
+            }
+            edges.append({
+                "source": d.slug, "target": t.slug,
+                "kind": "subprocesses",
+                "purpose": purpose, "region": region, "handles_pii": pii
+            });
+            indeg[t.slug] = (indeg[t.slug] if t.slug in indeg else 0) + 1;
+        }
+    }
+    nodes: list[dict] = [];
+    for c in order {
+        nodes.append(_node_payload(
+            c, _tier(dist[c.slug]), indeg[c.slug] if c.slug in indeg else 0));
+    }
+    return {"nodes": nodes, "edges": edges,
+            "root": center.slug, "root_domain": center.domain,
+            "root_label": center.name, "direction": "inbound",
+            "dependent_count": len([center <-:Subprocesses:<-])};
 }
 
 # ------------------------------------------------------------------ the core algorithm
@@ -826,33 +940,120 @@ walker:pub one_look {
     }
 }
 
-# POST /walker/search {"q": "strip"}  -> mapped companies first, then registry offers.
+# POST /walker/search {"q": "aws"}  -> canonicalization-backed resolution ladder.
+# Strongest tier wins; we never fall through to weaker tiers once one matched.
 walker:pub search {
     has q: str = "";
     has limit: int = 20;
     can run with Root entry {
         ql = self.q.lower().strip();
-        hits: list[dict] = [];
-        if not ql { report {"query": self.q, "results": []}; disengage; }
+        if not ql {
+            report {"query": self.q, "resolved": None, "results": []};
+            disengage;
+        }
+        qk = _canon_key(self.q);
+        companies = _all_companies();
+        results: list[dict] = [];
         seen: dict[str, bool] = {};
-        for c in _all_companies() {
-            if ql in c.name.lower() or ql in c.domain.lower() or ql in c.slug {
-                seen[c.domain] = True;
-                hits.append({"id": c.slug, "domain": c.domain, "name": c.name or c.domain,
-                             "mapped": len([c ->:Subprocesses:->]) > 0,
-                             "crawl_status": c.crawl_status});
+        # T1 exact: canonical keys match ("Amazon Web Services, Inc." == the node).
+        for c in companies {
+            if qk and _canon_key(c.name or c.domain) == qk and c.slug not in seen {
+                seen[c.slug] = True;
+                results.append(_result_for(c, "exact"));
             }
         }
-        for dom in VENDOR_REGISTRY {
-            if len(hits) >= self.limit { break; }
-            if dom in seen { continue; }
-            entry = VENDOR_REGISTRY[dom];
-            if ql in dom.lower() or ql in entry.name.lower() {
-                hits.append({"id": _slugify(entry.name), "domain": dom, "name": entry.name,
-                             "mapped": False, "crawl_status": "pending"});
+        # T2 alias: the alias table resolves ("aws" -> Amazon Web Services).
+        if not results {
+            canon2 = _alias_for(qk);
+            if canon2 {
+                ak = _canon_key(canon2);
+                for c in companies {
+                    if _canon_key(c.name or c.domain) == ak and c.slug not in seen {
+                        seen[c.slug] = True;
+                        results.append(_result_for(c, "alias"));
+                    }
+                }
             }
         }
-        report {"query": self.q, "results": hits[:self.limit]};
+        # T3 despaced: spacing differences vanish ("open ai" == "openai").
+        if not results {
+            dq = _despace(self.q);
+            for c in companies {
+                if dq and _despace(c.name or c.domain) == dq and c.slug not in seen {
+                    seen[c.slug] = True;
+                    results.append(_result_for(c, "alias"));
+                }
+            }
+            if not results {
+                canon3 = _alias_for(dq);
+                if canon3 {
+                    dk = _canon_key(canon3);
+                    for c in companies {
+                        if _canon_key(c.name or c.domain) == dk and c.slug not in seen {
+                            seen[c.slug] = True;
+                            results.append(_result_for(c, "alias"));
+                        }
+                    }
+                }
+            }
+        }
+        # T4 slug / domain exact ("openai.com", "amazon-web-services").
+        if not results {
+            for c in companies {
+                if (c.slug == ql or c.domain.lower() == ql) and c.slug not in seen {
+                    seen[c.slug] = True;
+                    results.append(_result_for(c, "exact"));
+                }
+            }
+        }
+        # T5 typo-tolerant fuzzy ("openia" ~ "openai"); skip very short queries.
+        if not results and len(qk) >= 4 {
+            for c in companies {
+                ck = _canon_key(c.name or c.domain);
+                if ck and _edit_within(qk, ck, 2) and c.slug not in seen {
+                    seen[c.slug] = True;
+                    results.append(_result_for(c, "fuzzy"));
+                }
+            }
+        }
+        # T6 substring, shortest name first so the parent brand outranks its
+        # own long-tail affiliates ("Amazon Web Services" over "...MediaConvert").
+        if not results {
+            sub: list[dict] = [];
+            for c in companies {
+                nm = c.name or c.domain;
+                sub_hit = ql in nm.lower() or ql in c.domain.lower() or ql in c.slug;
+                if sub_hit and c.slug not in seen {
+                    seen[c.slug] = True;
+                    sub.append(_result_for(c, "fuzzy"));
+                }
+            }
+            sub.sort(key=_by_name_len);
+            results.extend(sub);
+        }
+        # T7 registry offers: known vendors we have not mapped yet.
+        if not results {
+            for dom in VENDOR_REGISTRY {
+                rentry = VENDOR_REGISTRY[dom];
+                rid = _slugify(rentry.name);
+                if (ql in dom.lower() or ql in rentry.name.lower()) and rid not in seen {
+                    seen[rid] = True;
+                    results.append({
+                        "id": rid, "domain": dom, "name": rentry.name,
+                        "state": "registry", "filing_count": 0, "dependent_count": 0,
+                        "crawl_status": "pending",
+                        "source_url": rentry.subprocessor_url,
+                        "match": "registry"
+                    });
+                }
+            }
+        }
+        results = results[:self.limit];
+        resolved: dict | None = None;
+        if results and (results[0]["match"] == "exact" or results[0]["match"] == "alias") {
+            resolved = results[0];
+        }
+        report {"query": self.q, "resolved": resolved, "results": results};
     }
 }
 
@@ -925,6 +1126,44 @@ walker:pub add_vendors {
                           "name": target.name, "method": "manual"});
         }
         report {"found": len([org ->:Subprocesses:->]), "vendors": added};
+    }
+}
+
+# POST /walker/dependents {"domain": "aws", "max_hops": 2}  -> the INBOUND view:
+# "who depends on this". Same Node/Edge shape as graph so the client reuses one canvas.
+walker:pub dependents {
+    has domain: str = "";
+    has max_hops: int = 2;
+    can run with Root entry {
+        target = _find_company(self.domain);
+        if target {
+            report _inbound_payload(target, self.max_hops);
+        } else {
+            report {"nodes": [], "edges": [], "root": "", "root_domain": "",
+                    "root_label": "", "direction": "inbound", "dependent_count": 0};
+        }
+    }
+}
+
+# POST /walker/map_company {"domain": "figma.com"}  -> on-demand mapping for a
+# company we do not have a filing for: resolve-or-create, crawl, report fresh counts.
+async walker:pub map_company {
+    has domain: str;
+    has name: str = "";
+    has ttl_days: int = 7;
+    async can run with Root entry {
+        found = _find_company(self.domain);
+        if found {
+            target = found;
+        } else {
+            target = _get_or_create_company(self.domain, self.name);
+        }
+        status = await _crawl_company(target, self.ttl_days, False);
+        report {"id": target.slug, "domain": target.domain, "name": target.name,
+                "status": status,
+                "filing_count": len([target ->:Subprocesses:->]),
+                "dependent_count": len([target <-:Subprocesses:<-]),
+                "source_url": target.subprocessor_url};
     }
 }
 

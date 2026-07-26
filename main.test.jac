@@ -125,19 +125,60 @@ test "uncited risk data is never reported" {
     }
 }
 
-test "search covers mapped companies and offers unmapped registry entries" {
+test "search resolves aliases and typos onto the canonical company" {
     _ = root spawn seed_atlas();
 
     found = root spawn search(q="snowflake");
     results = found.reports[0]["results"] as list;
     assert len(results) > 0;
+    hits = [r for r in results if (r["state"] as str) == "mapped"];
+    assert len(hits) >= 1;
 
-    mapped = [r for r in results if r["mapped"]];
-    assert len(mapped) >= 1;
+    # The alias table must carry "aws" onto the canonical node. This query returned
+    # nothing before the resolution ladder landed, and it is the product's key lookup.
+    aws = root spawn search(q="aws");
+    resolved = aws.reports[0]["resolved"];
+    assert resolved is not None;
+    assert (resolved["id"] as str) == "amazon-web-services";
+    # AWS has no filing of its own but many dependents -> the "known" state.
+    assert (resolved["state"] as str) == "known";
+    assert (resolved["dependent_count"] as int) >= 10;
+
+    # Legal-suffix, spacing, and single-character-transposition variants all converge.
+    for variant in ["OpenAI, L.L.C.", "open ai", "openAI"] {
+        v = root spawn search(q=variant);
+        vr = v.reports[0]["resolved"];
+        assert vr is not None;
+        assert (vr["id"] as str) == "openai";
+    }
 
     # An empty query must not scan the registry.
     empty = root spawn search(q="");
     assert len(empty.reports[0]["results"] as list) == 0;
+    assert empty.reports[0]["resolved"] is None;
+}
+
+test "the inbound view answers who depends on this" {
+    _ = root spawn seed_atlas();
+
+    inbound = root spawn dependents(domain="aws");
+    payload = inbound.reports[0];
+    assert (payload["direction"] as str) == "inbound";
+    assert (payload["root_label"] as str) == "Amazon Web Services";
+    assert (payload["dependent_count"] as int) >= 10;
+
+    nodes = payload["nodes"] as list;
+    centre = [n for n in nodes if (n["tier"] as str) == "org"];
+    assert len(centre) == 1;
+    assert (centre[0]["id"] as str) == "amazon-web-services";
+
+    # Edges keep their real direction: dependents point INTO the centre.
+    into = [e for e in (payload["edges"] as list) if (e["target"] as str) == "amazon-web-services"];
+    assert len(into) >= 10;
+
+    # An unknown company degrades to empty rather than raising.
+    miss = root spawn dependents(domain="not-a-real-company");
+    assert len(miss.reports[0]["nodes"] as list) == 0;
 }
 
 test "the atlas lists only companies whose filing we actually read" {

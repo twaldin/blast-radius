@@ -1,9 +1,10 @@
 """Registry resolution, typed extraction, canonicalization, and browser fallback."""
 
 import asyncio;
+import os;
 import re;
 import from datetime { datetime, timezone }
-import from byllm.lib { ByLLMError }
+import from byllm.lib { ByLLMError, Model }
 import from browser_discovery {
     BrowserPageResult,
     browser_read,
@@ -20,6 +21,13 @@ import from registry {
     VENDOR_REGISTRY,
     resolve_registry
 }
+
+
+# byLLM binds `by llm(...)` to a module-global named `llm`. Without this the
+# runtime falls back to OpenAI and every call in this file dies with
+# "Missing credentials" -- which is exactly what it did until now. Bind the
+# provider explicitly; override per-environment with BLAST_RADIUS_MODEL.
+glob llm = Model(model_name=os.getenv("BLAST_RADIUS_MODEL", "gemini/gemini-2.5-flash"));
 
 
 obj BrowserDiscoveryResult {
@@ -561,4 +569,32 @@ async def discover_with_browser(
         source_urls=accepted_sources,
         subprocessors=unique_records
     );
+}
+
+
+"""Resolve a domain to a subprocessor source URL, escalating to the agentic
+browser discovery path only when the deterministic registry lookups miss.
+Never raises: any agent failure degrades to "" (notfound)."""
+async def discover_and_resolve(domain: str, company_keyword: str) -> str {
+    normalized: str = normalize_company_domain(domain);
+    existing: str = await resolve_url(normalized);
+    if existing {
+        return existing;
+    }
+    try {
+        result: BrowserDiscoveryResult = await discover_with_browser(
+            company_keyword or normalized,
+            normalized,
+            []
+        );
+        if result.status == "found" and result.primary_source_url {
+            _ = remember_discovery(
+                result.company_name,
+                result.company_domain or normalized,
+                result.source_urls
+            );
+            return result.primary_source_url;
+        }
+    } except Exception {}
+    return "";
 }

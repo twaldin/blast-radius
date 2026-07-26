@@ -194,10 +194,103 @@ existing five calls keep working unchanged while it migrates.
 | `crawl_progress` | `{domain}` | Unchanged. |
 | `expand_one` | `{domain}` | Crawl exactly one company. |
 | `industry_map` | `{min_degree?}` | **NEW.** Every company, every edge, one payload — powers the Map view (§10). |
-| `search` | `{q}` | **NEW.** Type-ahead over crawled companies **and** uncrawled registry entries. |
+| `search` | `{q, limit?}` | **NEW — landed.** Canonical resolution ladder over crawled companies **and** uncrawled registry entries. Returns `{query, resolved, results}`; `resolved` is non-null only on `exact`/`alias`. See §5.1. |
+| `dependents` | `{domain, max_hops?}` | **NEW — landed.** Inbound BFS — "who depends on this". Same `{nodes, edges}` shape as `graph`, plus `root`, `root_domain`, `root_label`, `direction:"inbound"`, `dependent_count`. Edges keep real direction (source = dependent), so arrows point INTO the centre. See §5.1. |
+| `map_company` | `{domain}` | **NEW — landed.** Promote a `registry`/`unknown` company into the graph (crawl its filing), so a searched dead end becomes a `mapped` node. |
 
 **Dropped:** `expansion_candidates` (the depth-cap justifier — obsolete once depth is
 uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vendors[]}`.
+
+### 5.1 Search resolution and the three company states
+
+The search box is the front door. Everything a user types lands here, and the answer C
+renders depends entirely on **which of four states** the resolved company is in. Render
+each state differently — this is the single most important branch in the frontend.
+
+#### The four states a searched company can be in
+
+| State | Meaning | Count today | What C shows |
+|---|---|---|---|
+| `mapped` | we read its own Article 28 filing | 19 | forward graph: its vendors and their vendors (`graph {domain}`) |
+| `known` | it appears inside others' filings, but we have not read its own | ~270 | **inbound view** — "N companies we mapped depend on this" (`dependents {domain}`) |
+| `registry` | in our 150-vendor registry, not yet in the graph | — | offer "map it now" → `map_company {domain}` |
+| `unknown` | nowhere | — | offer discovery |
+
+A company's `state` is computed from its edges: **≥1 outbound `Subprocesses` edge →
+`mapped`; 0 outbound but ≥1 inbound → `known`; not a graph node but in `VENDOR_REGISTRY` →
+`registry`; otherwise `unknown`.**
+
+#### Why `known` matters
+
+Searching `AWS` used to dead-end. AWS has no filing of its own in our graph, but **19 of
+our 19 mapped companies depend on it.** The inbound view turns ~270 dead ends into valid
+destinations and makes the product's core claim — *"who sits underneath this"* — directly
+searchable. A `known` company is not a failure state; it is the most interesting kind of
+result we have.
+
+#### The resolution ladder
+
+`search` walks these rungs in order and stops at the first that hits. The rung that
+matched is returned as `match` on each `Result`, so C knows how confident to be:
+
+1. **exact** — canonical-key hit (`_canon_key` normalises case/punctuation/suffixes;
+   `"OpenAI, L.L.C."` → the OpenAI node).
+2. **alias** — alias table (`aws` → Amazon Web Services, `open ai` → OpenAI).
+3. **despaced** — whitespace-insensitive canonical hit (`open ai` → `openai`). Returned as
+   `match: "alias"`.
+4. **slug / domain** — the slug or domain matches directly.
+5. **fuzzy** — bounded edit-distance ≤ 2, catches typos (`openia` → OpenAI). `match: "fuzzy"`.
+6. **substring** — legacy naive contains, last resort. `match: "fuzzy"`.
+7. **registry offers** — no graph node, but present in the registry → `match: "registry"`,
+   `state: "registry"`, so C can offer "map it now".
+
+**`resolved` is non-null only for `exact` and `alias` matches.** On those two, the hit is
+unambiguous and C should **auto-navigate** straight to the graph/inbound view. On anything
+lower (`fuzzy`/`substring`/`registry`), leave `resolved: null` and **show the `results`
+list as a picker** — never silently jump on a guess.
+
+#### `POST /walker/search` — `{"q": str, "limit": int = 20}`
+
+```json
+{ "query": "aws",
+  "resolved": { <Result> } | null,
+  "results": [ <Result> ] }
+```
+
+`resolved` = the single unambiguous best hit (match `exact` or `alias` only); otherwise
+`null`. Each `Result`:
+
+```json
+{ "id": "amazon-web-services", "domain": "", "name": "Amazon Web Services",
+  "state": "mapped" | "known" | "registry" | "unknown",
+  "filing_count": 0,        // outbound Subprocesses edges = its own disclosed vendors
+  "dependent_count": 19,    // inbound Subprocesses edges = who depends on it
+  "crawl_status": "pending",
+  "source_url": "",
+  "match": "exact" | "alias" | "fuzzy" | "registry" }
+```
+
+- `state` ∈ `mapped | known | registry | unknown` (definitions above).
+- `filing_count` — outbound `Subprocesses` edges = its own disclosed vendors.
+- `dependent_count` — inbound `Subprocesses` edges = who depends on it.
+- `match` ∈ `exact | alias | fuzzy | registry`.
+
+#### `POST /walker/dependents` — `{"domain": str, "max_hops": int = 2}`
+
+The INBOUND view — "who depends on this". Same `Node`/`Edge` shape as `graph`, so C reuses
+one canvas.
+
+```json
+{ "nodes": [Node], "edges": [Edge], "root": slug, "root_domain": str,
+  "root_label": str, "direction": "inbound", "dependent_count": int }
+```
+
+- Tiers by inbound BFS distance: centre = `org`, direct dependents = `vendor`, their
+  dependents = `provider`. Reuses the same `_node_payload(c, tier, indeg)` helper as `graph`.
+- Edges keep the **real** direction: `source` = the dependent, `target` = the
+  depended-upon. So on the canvas, arrows point **INTO** the centre — the mirror image of
+  the forward `graph` view.
+
 
 ---
 
@@ -214,7 +307,8 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
 8. Degrade gracefully: unsourced downtime/compliance → zero/empty, never fabricated.
 9. **`seed_atlas` — import committed seed data into the graph (§11).** Without this the
    deployed instance is empty and every redeploy wipes the atlas. Non-optional.
-10. `search {q}` walker (B owns the matching behind it).
+10. ~~`search {q}` walker~~ **LANDED.** Canonical resolution ladder (§5.1), the inbound
+   `dependents` view, and `map_company` are all wired and reachable from the search box.
 11. *(post-MVP)* `industry_map` endpoint for §10.
 12. *(post-MVP)* `root.shared` migration — `DECISIONS-A.md` §4.
 
@@ -250,6 +344,10 @@ uncapped), `detect_vendors`/`add_vendors` fold into a single `seed {domain, vend
    pin to 1 — it is one line and it cannot fail on stage.
 9. `min_replicas = 1` is already set — good, no cold start.
 10. *(post-MVP)* Build the Map view — §10.
+11. **Render the inbound view for `known` companies (§5.1).** When `search` resolves to a
+    `known` company, call `dependents {domain}` and draw it on the **same force canvas** as
+    the forward graph — only with arrows pointing **into** the centre. One canvas, two
+    directions.
 
 ---
 
