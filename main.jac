@@ -313,17 +313,22 @@ def _edit_within(a: str, b: str, budget: int) -> bool {
     ca: list[str] = [ch for ch in a];
     cb: list[str] = [ch for ch in b];
     prev: list[int] = [];
-    for j = 0 while j <= len(cb) with j += 1 { prev.append(j); }
-    for i = 1 while i <= len(ca) with i += 1 {
+    j = 0;
+    while j <= len(cb) { prev.append(j); j += 1; }
+    i = 1;
+    while i <= len(ca) {
         curr: list[int] = [i];
-        for j = 1 while j <= len(cb) with j += 1 {
-            cost = 0 if ca[i - 1] == cb[j - 1] else 1;
-            best = prev[j] + 1;
-            if curr[j - 1] + 1 < best { best = curr[j - 1] + 1; }
-            if prev[j - 1] + cost < best { best = prev[j - 1] + cost; }
+        k = 1;
+        while k <= len(cb) {
+            cost = 0 if ca[i - 1] == cb[k - 1] else 1;
+            best = prev[k] + 1;
+            if curr[k - 1] + 1 < best { best = curr[k - 1] + 1; }
+            if prev[k - 1] + cost < best { best = prev[k - 1] + cost; }
             curr.append(best);
+            k += 1;
         }
         prev = curr;
+        i += 1;
     }
     return prev[len(cb)] <= budget;
 }
@@ -365,10 +370,10 @@ def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bo
         }
     }
     prof = provider_profile(label);
-    made: Company = root ++> Company(
+    made: Company = (root ++> Company(
         domain=dom, name=label, slug=prof.slug or _slugify(label) or _slugify(dom),
         category=prof.category, is_sink=prof.is_sink
-    );
+    ))[0];
     idx[key] = made;
     return made;
 }
@@ -1257,5 +1262,15 @@ walker:priv diff_monitor {
         } else {
             report {"new_subprocessors": [], "notice": ""};
         }
+    }
+}
+
+# ------------------------------------------------------------------ client mount
+# The generated client entry always wraps the router in `app`, so this must be
+# exported from the CLIENT bundle -- hence the `cl { }` block, not a bare
+# top-level def (which compiles to the server module and yields MISSING_EXPORT).
+cl {
+    def:pub app(children: any) -> JsxElement {
+        return <>{children}</>;
     }
 }
