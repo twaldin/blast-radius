@@ -100,7 +100,7 @@ def _get_or_create_org(dom: str, nm: str) -> Org {
         if nm { found.name = nm; }
         return found;
     }
-    return root ++> Org(domain=dom, name=nm or _name_from_domain(dom));
+    return (root ++> Org(domain=dom, name=nm or _name_from_domain(dom)))[0];
 }
 
 def _org_or_default(dom: str) -> Org {
@@ -111,7 +111,7 @@ def _org_or_default(dom: str) -> Org {
 def _get_or_create_feature(fname: str) -> Feature {
     existing = [root -->[?:Feature, name == fname]];
     if existing { return existing[0]; }
-    return root ++> Feature(name=fname);
+    return (root ++> Feature(name=fname))[0];
 }
 
 # Node creation from B's returned canonical strings. Seeds curated risk data (B's asset).
@@ -119,12 +119,12 @@ def find_or_create_provider(name: str) -> Provider {
     existing = [root -->[?:Provider, canonical_name == name]];
     if existing { return existing[0]; }
     prof = provider_profile(name);
-    return root ++> Provider(
+    return (root ++> Provider(
         canonical_name=name, slug=prof.slug or _slugify(name), category=prof.category,
         downtime_hours_ytd=prof.downtime_hours_ytd,
         soc2=prof.soc2, hipaa=prof.hipaa,
         supply_chain_risk=prof.supply_chain_risk, is_sink=prof.is_sink
-    );
+    ))[0];
 }
 
 # Accepts either the UI slug ("aws", "gcp") or the canonical name ("Google Cloud").
@@ -268,9 +268,9 @@ walker:pub detect_vendors {
         for d in found {
             rows.append({"id": _slugify(d.name), "domain": d.domain, "name": d.name, "method": d.method});
             if [org ->:Uses:->[?:Vendor, domain == d.domain]] { continue; }
-            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
+            v: Vendor = (org +>:Uses(added_at=_now()):+> Vendor(
                 domain=d.domain, name=d.name, slug=_slugify(d.name),
-                discovery_method=d.method);
+                discovery_method=d.method))[0];
             feat = vendor_feature(d.domain);
             if feat { v +>:Powers:+> _get_or_create_feature(feat); }
         }
@@ -287,8 +287,8 @@ walker:pub add_vendors {
         for dom in self.domains {
             if [org ->:Uses:->[?:Vendor, domain == dom]] { continue; }
             nm = _name_from_domain(dom);
-            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
-                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual");
+            v: Vendor = (org +>:Uses(added_at=_now()):+> Vendor(
+                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual"))[0];
             feat = vendor_feature(dom);
             if feat { v +>:Powers:+> _get_or_create_feature(feat); }
             added.append({"id": v.slug, "domain": dom, "name": nm, "method": "manual"});
