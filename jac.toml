@@ -8,11 +8,6 @@ jac-version = "==0.34.7"
 
 # The deploy builds its own .jac/venv from this table.
 #
-# byllm is deliberately NOT here. Every published byllm uses `global x;`,
-# which jac 0.34.7 cannot parse, so installing it makes the server fail to
-# boot while compiling byllm's own sources. The `by llm()` declarations in
-# extract.jac compile without the package; only calling them would need it,
-# and the rehearsed path is cache-only.
 [dependencies]
 # jac-scale reaches for requests at deploy time and does not vendor it
 requests = ">=2.28"

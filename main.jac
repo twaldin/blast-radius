@@ -313,10 +313,10 @@ def _edit_within(a: str, b: str, budget: int) -> bool {
     ca: list[str] = [ch for ch in a];
     cb: list[str] = [ch for ch in b];
     prev: list[int] = [];
-    for j = 0 to j <= len(cb) by j += 1 { prev.append(j); }
-    for i = 1 to i <= len(ca) by i += 1 {
+    for j = 0 while j <= len(cb) with j += 1 { prev.append(j); }
+    for i = 1 while i <= len(ca) with i += 1 {
         curr: list[int] = [i];
-        for j = 1 to j <= len(cb) by j += 1 {
+        for j = 1 while j <= len(cb) with j += 1 {
             cost = 0 if ca[i - 1] == cb[j - 1] else 1;
             best = prev[j] + 1;
             if curr[j - 1] + 1 < best { best = curr[j - 1] + 1; }
