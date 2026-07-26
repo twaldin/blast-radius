@@ -67,29 +67,29 @@ compliance-fallout example).
 ## Remaining work split — one layer each, own your file
 
 ### Person A — Graph & Traversal (`main.jac`) — *this is you*
-Replace the hardcoded reports with real object-spatial logic. **Only A creates nodes/edges.**
+The deterministic demo graph is implemented. **Only A creates nodes/edges.**
 
-1. Graph model — `node`/`edge` with **typed endpoints** (`edge Uses: Org --> Vendor`). Add the new fields already in the contract: `Provider.soc2/hipaa/supply_chain_risk/downtime_hours_ytd`, `Subprocesses.handles_pii`.
-2. `DetectVendors` + `AddVendors` walkers — write vendor nodes from B's `detect_all` output + the manual text box.
-3. `Expand` walker — BFS, `max_depth=2`, `seen` guard for cycles; calls B's `extract_and_resolve`; creates `Provider` nodes + `Subprocesses` edges via `find_or_create_provider`.
-4. `Chokepoints` — `[prov <-:Subprocesses:<-]`, the core algorithm. Score `share × downtime_hours_ytd = exposure`.
-5. `BlastRadius` — backward traversal → affected vendors → features.
-6. `ComplianceFallout` — same inbound query; flag providers with `not soc2` or `supply_chain_risk != ""`, propagate up.
-7. `one_look` wiring (calls B/ C's `by llm` `one_look`) + `DiffMonitor` on `@schedule` (Tier 3).
-8. Switch `walker:pub` → `walker:priv` for per-user root isolation once C's auth is wired.
+1. [x] Typed `Org`, `Vendor`, `Provider`, `Feature`, and `Snapshot` nodes and typed edges.
+2. [x] `detect_vendors` + `add_vendors` graph writes.
+3. [x] Async BFS `expand` with cache state, seen guard, typed extraction boundary, and provider upsert.
+4. [x] `chokepoints` via `[prov <-:Subprocesses:<-]` and `share × downtime = exposure`.
+5. [x] `blast_radius` backward traversal to affected vendors and features.
+6. [x] `compliance_fallout` propagation.
+7. [x] Deterministic `one_look`, crawl progress, and scheduled diff code.
+8. [ ] Switch `walker:pub` → `walker:priv` after C wires auth; this is post-demo.
 **Keep the JSON report shapes byte-identical to the contract above** so C never rebuilds.
 
 ### Person B — Data & Extraction (`extract.jac`, `registry.jac`)
 Everything from "a domain" to "clean canonical records." **Returns values, never touches the graph.** Both `by llm()` calls + the ReAct agent are yours.
 
-1. `registry.jac` — ~150 SaaS vendors → exact subprocessor URL. **Seed the ~20 anchor providers** (AWS, GCP, Azure, Cloudflare, Fastly, Twilio, SendGrid, Snowflake, Datadog…) — canonicalization needs anchors or the chokepoint never appears.
-2. Seed provider **compliance + downtime** data (`soc2`, `hipaa`, `supply_chain_risk`, `downtime_hours_ytd`) for the top ~20 — same curated asset.
-3. `detect_all(domain)` — MX / SPF-DMARC TXT / CNAME / HTTP headers / `<script>` tags **+ IP-range → cloud** (jachammer.ai resolves to AWS us-east-2 IPs on Route 53; that's the live detect).
-4. `fetch_page` — real UA, 5s timeout, concurrency ~10, cache by domain. **Pre-warm the demo cache** for the manually-added jachammer.ai stack.
-5. `extract_subprocessors` (`by llm`, `sem`) → `list[SubprocessorRecord]`.
-6. `canonicalize` (`by llm`) — the load-bearing entity-resolution call.
-7. `extract_and_resolve(page_text, known) -> list[ResolvedSubprocessor]` — the single export A calls.
-8. **Registry-miss ReAct fallback (§4.3, deferred until after the demo):**
+1. [x] 150 SaaS vendors → exact authoritative subprocessor URL, generated from six research batches.
+2. [ ] Expand provider compliance + downtime beyond the five providers required by the demo.
+3. [ ] Replace demo-only `detect_all(domain)` with real MX/TXT/CNAME/header/script/IP-range detection after deployment.
+4. [x] Pre-warmed, network-independent JacHammer demo path; live fetch hardening remains post-demo.
+5. [x] Typed `extract_subprocessors` (`by llm`, `sem`) → `list[SubprocessorRecord]`.
+6. [x] Deterministic anchors plus `by llm` canonicalization.
+7. [x] Deduplicating `extract_and_resolve(page_text, known) -> list[ResolvedSubprocessor]`.
+8. [ ] **Registry-miss ReAct fallback (§4.3, deferred until after the demo):**
    `resolve_url` = exact curated/learned registry lookup first. Only on a true
    miss, the Jac ReAct agent gets narrow Firecrawl `search` and `scrape` tools.
    Search locates official company or verified GitHub candidates; scrape
@@ -103,7 +103,7 @@ Everything from "a domain" to "clean canonical records." **Returns values, never
    results by source hash and negative results with a short TTL. If no
    authoritative complete list is found, return `notfound`. Firecrawl Agent is
    a later tertiary option, not the first implementation.
-9. Defense adapter — DoD prime → sub → tier-3 (renders on the same canvas).
+9. [ ] Defense adapter — DoD prime → sub → tier-3 (renders on the same canvas).
 
 ### Person C — Interface, Deploy & Pitch (`app.jac`)
 Build the entire UI against the frozen endpoints **right now** — the real demo

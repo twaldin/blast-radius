@@ -7,6 +7,11 @@ async def _run_demo_expand() -> list[dict] {
     return result.reports;
 }
 
+async def _run_demo_expand_one(vendor_id: str) -> list[dict] {
+    result = await (root spawn expand_one(vendor_id=vendor_id));
+    return result.reports;
+}
+
 test "builds and traverses the complete JacHammer demo graph" {
     detected = root spawn detect_vendors(
         domain="jachammer.ai",
@@ -34,6 +39,16 @@ test "builds and traverses the complete JacHammer demo graph" {
     assert top["vendors_affected"] == 5;
     assert top["share"] == 0.625;
     assert top["exposure"] == 5.75;
+
+    stripe_reports = asyncio.run(_run_demo_expand_one("stripe"));
+    stripe = stripe_reports[0];
+    assert stripe["status"] == "cached";
+    assert len(stripe["subprocessors"]) == 1;
+
+    depth = root spawn expansion_candidates();
+    depth_report = depth.reports[0];
+    assert depth_report["terminal_providers"] == 3;
+    assert depth_report["recommended"] == ["cloudflare"];
 
     outage = root spawn blast_radius(failed_provider="AWS");
     blast = outage.reports[0];
