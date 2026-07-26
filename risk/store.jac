@@ -12,6 +12,7 @@ import from react { createContext, use }
 
 glob RiskCtx = createContext(None);
 glob PRUNE_ABOVE: int = 10;
+glob SEED_DOMAIN: str = "jachammer.ai";
 
 async def call_walker(name: str, payload: any) -> any {
     resp = await fetch("/walker/" + name, {
@@ -118,6 +119,14 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         timer: any = setInterval(lambda { poll_progress(); }, 700);
         try {
             graph = await call_walker("expand", {});
+            # `expand` only crawls vendors that already exist. On a cold graph
+            # detection has to run first, otherwise every view renders empty.
+            # jachammer.ai resolves through the pre-warmed cache, so the
+            # scripted path never touches the network (spec 10, PLAN B4).
+            if len(graph["nodes"] as list) == 0 {
+                await call_walker("detect_vendors", {"domain": SEED_DOMAIN});
+                graph = await call_walker("expand", {});
+            }
             built = build_graph(graph["nodes"], graph["edges"]);
             nodes = built["nodes"];
             links = built["links"];
