@@ -1,0 +1,20 @@
+{
+  "domain": "segment.com",
+  "name": "Segment",
+  "subprocessor_url": "https://www.twilio.com/en-us/legal/sub-processors",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T21:22:08",
+  "subprocessors": [
+    {"name": "AWS", "purpose": "Infrastructure Provider providing hosting services and storage.", "region": "USA*"},
+    {"name": "AWS", "purpose": "Infrastructure Provider providing hosting services and storage.", "region": "USA or EU (Dublin) as selected by customers"},
+    {"name": "Anthropic", "purpose": "Vendor for AI functionality in product", "region": "USA"},
+    {"name": "Amazon Bedrock", "purpose": "Vendor for AI functionality in product", "region": "USA"},
+    {"name": "Clickhouse", "purpose": "Infrastructure Provider providing hosting services and storage.", "region": "USA, EU"},
+    {"name": "Datadog", "purpose": "Operational monitoring", "region": "USA"},
+    {"name": "Google", "purpose": "Data storage compute and queries", "region": "USA or EU (Zurich & London) as selected by Customers"},
+    {"name": "Lakera", "purpose": "AI security monitoring, data leakage prevention, and real-time threat detection within automated workflows.", "region": "USA"},
+    {"name": "Microsoft Azure", "purpose": "Vendor for AI functionality in product", "region": "USA"},
+    {"name": "OpenAI", "purpose": "Vendor for AI functionality in product", "region": "USA"},
+    {"name": "Twilio Inc.", "purpose": "Provision of the Twilio Services", "region": "USA*"}
+  ]
+}

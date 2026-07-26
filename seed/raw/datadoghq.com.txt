@@ -1,0 +1,57 @@
+Subprocessors List
+
+Last updated
+
+APRIL 22, 2026
+What is a subprocessor?
+Third-Party Subprocessors
+Affiliates
+What is a subprocessor?
+
+In order to provide our services, Datadog may engage third parties or other members of the Datadog corporate group (affiliates) to carry out data-processing activities that involve access to customer data. These organizations, called “subprocessors,” are identified below with their locations and the types of services they provide to Datadog.
+
+Third-Party Subprocessors
+Vendor	Country	Purpose of Processing
+Amazon Web Services, Inc.	United States
+Australia
+Italy
+Japan
+United Kingdom	Infrastructure services
+Anthropic, PBC	United States	AI services
+Google LLC	United States
+Germany	Infrastructure services
+Email and office applications
+Hyperdoc Inc.	United States	Meeting transcription and recording services
+Mailgun Technologies, Inc.	United States	Email and office applications
+Microsoft Corporation (Azure)	United States	Infrastructure services
+OpenAI, LLC	United States	AI services
+Reversing Labs International GmbH	Switzerland	Threat intelligence services
+Salesforce, Inc.	United States	Customer support platform
+Snowflake, Inc.	United States	Data warehouse services
+Twilio, Inc.	United States	Communication services
+Vonage Business, Inc.	United States	Communication services
+Zendesk, Inc.	United States	Customer support platform
+Affiliates
+Name	Location
+Datadog Arabia	Saudi Arabia
+Datadog Brasil LTDA	Brazil
+Datadog Cloud India Private Limited	India
+Datadog Cloud Spain SLU	Spain
+Datadog France SAS	France
+Datadog Germany GmbH	Germany
+Datadog International Limited	Ireland
+Sweden
+Switzerland
+Datadog Ireland Limited	Australia
+Ireland
+United Kingdom
+Datadog Israel Ltd.	Israel
+Datadog Japan G.K.	Japan
+Datadog Korea, Inc.	South Korea
+Datadog México, S. de R.L. de C.V.	Mexico
+Datadog Netherlands BV	Netherlands
+Datadog Services Canada, Inc.	Canada
+DDog Singapore PTE. LTD.	Singapore
+Updates
+
+As we grow and expand our services, we may need to add or remove subprocessors. If you'd like to receive a notification when this list changes, you can subscribe using your business email address below.

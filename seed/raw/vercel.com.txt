@@ -1,0 +1,498 @@
+Trust Center
+Start your security review
+Get access
+​
+​
+
+Overview
+
+Welcome to Vercel's Trust Center. Here you can find information about our security and compliance program and request access to security documentation.
+
+Vercel’s platform provides the tools and self-driving infrastructure to build, scale, and secure intelligent applications. As the most popular DX platform for frontend development and the team behind v0, Next.js, and AI SDK, we help customers like OpenAI, PayPal, Ramp, and Supreme build for the AI-native web – and ship at the speed of ideas.
+
+To experience the future of AI application development, visit vercel.com.
+
+Compliance
+SOC 2
+ISO/IEC 27001
+PCI DSS
+HIPAA
+HITECH
+GDPR
+CCPA
+CPRA
+EU-US DPF
+Swiss-US DPF
+UK Extension to EU-US DPF
+PIPEDA
+DSA
+NIS 2
+DORA
+nFADP
+TISAX
+Vercel is reviewed and trusted by
+OpenAI
+Under Armour
+HashiCorp
+Adobe
+The Washington Post
+Okta
+Documents
+All
+Public
+Private
+Get access
+Bulk download
+REPORTS
+HIPAA Report
+REPORTS
+Network Diagram
+REPORTS
+Other Reports and Documents
+REPORTS
+PCI DSS
+REPORTS
+Pentest Report
+REPORTS
+Security Whitepaper
+REPORTS
+SOC 2 Report
+COMPLIANCE
+HIPAA
+COMPLIANCE
+ISO/IEC 27001
+COMPLIANCE
+PCI DSS
+COMPLIANCE
+SOC 2
+APP SECURITY
+Application Penetration Testing
+View all documents
+Reports
+Architecture Diagram
+HIPAA Report
+Network Diagram
+View more
+Legal
+Subprocessors
+Data Processing Agreement
+Data Subject Requests
+View more
+Risk Profile
+Impact Level
+Substantial
+Critical Dependence
+Yes
+Third Party Dependence
+Yes
+View more
+Product Security
+Audit Logging
+Data Security
+Integrations
+View more
+Data Security
+Access Monitoring
+Data Backups
+Data Erasure
+View more
+App Security
+Responsible Disclosure
+Application Penetration Testing
+Bot Detection
+View more
+AI
+AI Training Data and Bias
+AI Security
+AI Monitoring
+View more
+ESG
+Anti-Modern Slavery
+Health & Safety Standards
+Supplier Code of Conduct
+Data Privacy
+Cookies
+Data Breach Notifications
+Data Privacy Officer
+View more
+Access Control
+Data Access
+Internal Single-Sign-On (SSO)
+Least Privilege
+View more
+Infrastructure
+Status Monitoring
+All Systems Operational
+Amazon Web Services
+Anti-DDoS
+View more
+Endpoint Security
+Anti-Malware
+Disk Encryption
+Mobile Device Management
+Network Security
+Firewall
+Spoofing Protection
+Virtual Private Cloud
+View more
+Corporate Security
+Asset Management Practices
+Email Protection
+Employee Training
+View more
+Policies
+Acceptable Use Policy
+Access Control Policy
+Anti-Malicious Software Policy
+View more
+Security Grades
+SecurityScorecard
+Vercel
+HSTS Preload List
+Vercel.com
+Qualys SSL Labs
+vercel.com
+A+
+vercel.app
+View more
+Incident Response
+Incident Reporting Process
+Risk Management
+Risk Assessments
+Supply Chain Risk Management
+Third-Party Dependence
+Asset Management
+Asset Inventories (Hardware/Software)
+Asset Tracking
+Automated Asset Detection
+View more
+Business Continuity Plan (BCP)
+Business Continuity Plan (BCP)
+Data Backup/Backup Protection
+Disaster Recovery Plan (DRP)
+View more
+Change Management
+Change Management Program
+Continuous Monitoring
+Automated Alert Response
+Automated Compliance Monitoring
+Event & Audit Log Management
+View more
+Subprocessors
+​
+​
+Company
+Purpose
+Location
+Amazon Web Services (AWS)
+Hosting, storage and generative AI services
+United States
+Google
+Cloud computing, storage and generative AI services
+United States
+Microsoft
+Hosting, storage and generative AI services
+United States
+Datadog
+Cloud monitoring and security services
+United States
+Honeycomb
+Real-time monitoring and debugging service
+United States
+Redis
+Real-time logging and security services
+United States
+WorkOS
+Audit log services
+United States
+Algolia
+Real-time site search services
+United States
+Knock Labs
+Customer notification services
+United States
+Salesforce
+Customer relationship management (CRM) and support services
+United States
+Stripe
+Payment processing services
+United States
+Tinybird
+Analytics services
+Spain
+tray.io
+Customer support process automation and productivity platform
+United States
+Twilio
+Customer communication services
+United States
+Upstash
+Serverless storage services
+United States
+Neon
+Serverless storage services
+United States
+Kasada
+Fraud prevention services
+United States
+Discourse
+Community support and communication services
+United States
+ClickHouse
+Analytics services
+United States
+OpenAI
+Generative AI services
+United States
+Fireworks AI
+Generative AI services
+United States
+Anthropic
+Generative AI services
+United States
+Exa.ai
+AI search services
+United States
+Plain
+Customer support services
+United Kingdom
+Groq
+Generative AI services
+United States
+Cerebras Systems Inc
+AI model inference services
+United States
+Baseten Labs Inc
+AI model inference services
+United States
+Invisible Tools Inc (dba Raindrop.ai)
+AI monitoring and analytics services
+United States
+Trust Center Updates
+Subscribe
+Vercel April 2026 Security Incident
+Copy link
+Incidents
+April 19, 2026
+
+We’ve identified a security incident that involved unauthorized access to certain internal Vercel systems. We are actively investigating and have engaged incident response experts to help investigate and remediate. We have notified law enforcement. At this time, we have identified a subset of customers that were impacted and are engaging with them directly. Information about the incident, including any steps customers should take can be found at our Security Bulletin.
+
+Subprocessor Update
+Copy link
+Subprocessors
+January 28, 2026
+
+We have updated our subprocessor list, as it pertains to services utilized for our AI products.
+
+Additional Subprocessors
+
+The following subprocessors are being engaged to support our v0 product and have been added to the subprocessor list:
+
+Cerebras Systems Inc. to provide model inference services.
+Baseten Labs Inc. to provide model inference services.
+Invisible Tools Inc. (dba Raindrop.ai) to provide AI monitoring and analytics services.
+
+To review our complete subprocessor list, visit our Trust Center. If you have any questions or require further information, please do not hesitate to contact us at privacy@vercel.com.
+
+October 27, 2025
+
+We have updated our subprocessor list, as it pertains to services utilized for our AI products.
+
+Additional Subprocessor
+
+The following subprocessor is currently engaged to support our v0 product and has been added to the subprocessor list:
+
+Groq, Inc. to provide AI services.
+
+To review our complete subprocessor list, visit our Trust Center. If you have any questions or require further information, please do not hesitate to contact us at privacy@vercel.com.
+
+PCI DSS Attestation of Compliance
+Copy link
+Compliance
+January 14, 2026
+
+We’re pleased to announce that we recently completed our 2025 Self-Assessment Questionnaire Attestation of Compliance (SAQ-D AOC) for Service Providers. Our SAQ-D AOC and Responsibility Matrix are now available for download.
+
+January 15, 2025
+
+We’re thrilled to announce that we have completed our 2024 Self-Assessment Questionnaire Attestation of Compliance (SAQ-D AOC) for Service Providers. Our SAQ-D AOC is now available for download and includes transitioning to version 4.0. In addition, we have also made available Vercel's Responsibility Matrix for download.
+
+February 7, 2024
+
+We’re pleased to announce that we recently completed our Self-Assessment Questionnaire Attestation of Compliance (SAQ-D AOC) for Service Providers! Our SAQ-D AOC report is available for download. For more information, see our blog post at https://vercel.com/blog/pci-compliance-for-ecommerce-teams.
+
+CVE-2025-55182
+Copy link
+Vulnerabilities
+December 3, 2025
+
+React Server Components Vulnerability (CVE-2025-55182)
+
+A critical vulnerability in React Server Components (RSC) was disclosed on December 3, 2025. Vercel has assessed the issue and there is currently no known impact to Vercel or its customers. The Vercel platform includes safeguards that block the malicious request patterns associated with this vulnerability, significantly reducing exploitation risk for applications hosted on Vercel.
+
+Recommended Actions:
+
+We strongly recommend updating to the patched versions outlined in the Vercel Changelog.
+
+A banner in the Vercel dashboard will indicate any projects running affected versions.
+
+Ongoing Monitoring:
+
+Vercel’s Security and Engineering teams continue to actively monitor the situation and will provide updates if new information emerges. Vercel remains committed to maintaining the confidentiality, integrity, and availability of its systems and customer data.
+
+For questions, please contact the Security Team at security@vercel.com
+
+TISAX Assessment
+Copy link
+Compliance
+October 29, 2025
+
+We’re excited to share that Vercel has successfully completed its TISAX Assessment Level 2 (AL2) assessment, a standard developed by the Association of the German Automotive Industry (VDA) and governed by the European Network Exchange (ENX), an association of European automotive manufacturers. This standard provides the European automotive industry a consistent approach and criteria for assessing information security and the use of cloud services throughout the supply chain.
+
+Vercel customers can access TISAX assessment results through the ENX portal.
+
+To view the assessment details:
+
+Sign in to your account on the ENX portal
+Search for Vercel or look up the following details:
+Assessment ID: AMR06H-1
+Scope ID: SYN3TM
+
+For more details, please visit our blog post.
+
+1
+2
+3
+4
+If you need help using this Trust Center, please contact us.
+Contact support
+If you think you may have discovered a vulnerability, please send us a note.
+Report issue
+
+Share Trust Center
+Subscribe to updates
+Legal
+Subprocessors
+Copy link
+​
+​
+Company
+Purpose
+Location
+Amazon Web Services (AWS)
+Hosting, storage and generative AI services
+United States
+Google
+Cloud computing, storage and generative AI services
+United States
+Microsoft
+Hosting, storage and generative AI services
+United States
+Datadog
+Cloud monitoring and security services
+United States
+Honeycomb
+Real-time monitoring and debugging service
+United States
+Redis
+Real-time logging and security services
+United States
+WorkOS
+Audit log services
+United States
+Algolia
+Real-time site search services
+United States
+Knock Labs
+Customer notification services
+United States
+Salesforce
+Customer relationship management (CRM) and support services
+United States
+Stripe
+Payment processing services
+United States
+Tinybird
+Analytics services
+Spain
+tray.io
+Customer support process automation and productivity platform
+United States
+Twilio
+Customer communication services
+United States
+Upstash
+Serverless storage services
+United States
+Neon
+Serverless storage services
+United States
+Kasada
+Fraud prevention services
+United States
+Discourse
+Community support and communication services
+United States
+ClickHouse
+Analytics services
+United States
+OpenAI
+Generative AI services
+United States
+Fireworks AI
+Generative AI services
+United States
+Anthropic
+Generative AI services
+United States
+Exa.ai
+AI search services
+United States
+Plain
+Customer support services
+United Kingdom
+Groq
+Generative AI services
+United States
+Cerebras Systems Inc
+AI model inference services
+United States
+Baseten Labs Inc
+AI model inference services
+United States
+Invisible Tools Inc (dba Raindrop.ai)
+AI monitoring and analytics services
+United States
+
+Vercel engages third parties as subprocessors to process Customer Data as this term is defined in our Data Processing Addendum (DPA) available at https://vercel.com/legal/dpa
+
+Last updated 6/4/25
+
+Data Processing Agreement
+Copy link
+
+https://vercel.com/legal/dpa
+
+Data Subject Requests
+Copy link
+
+If you wish to exercise your individual rights please complete the following form: https://datarequest.vercel.com/
+
+For more information see Vercel's Privacy Policy available at https://vercel.com/legal/privacy-policy
+
+Master Services Agreement
+Copy link
+
+https://vercel.com/legal
+
+Privacy Policy
+Copy link
+https://vercel.com/legal/privacy-policy
+Service-Level Agreement
+Copy link
+
+99.99% for Enterprise customers. Full details are available here: https://vercel.com/legal/sla
+
+Terms of Service
+Copy link
+https://vercel.com/legal/terms

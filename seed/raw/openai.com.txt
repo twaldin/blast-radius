@@ -1,0 +1,788 @@
+Skip to main content
+Research
+Products
+Business
+Developers
+Company
+Foundation
+(opens in a new window)
+Log in
+Try ChatGPT
+(opens in a new window)
+OpenAI Sub-processor list | OpenAI
+Select language
+English (United States)
+العربية
+አማርኛ
+հայերեն
+বাংলা
+bosanski
+български
+မြန်မာ
+català
+hrvatski
+čeština
+dansk
+Nederlands
+eesti
+suomi
+français (Canada)
+français (France)
+ქართული
+Deutsch
+Ελληνικά
+ગુજરાતી
+हिन्दी
+magyar
+íslenska
+Indonesia
+Gaeilge
+italiano
+日本語
+ಕನ್ನಡ
+қазақ тілі
+한국어
+latviešu
+lietuvių
+Macedonian
+Melayu
+മലയാളം
+Malti
+मराठी
+Mongolian
+norsk bokmål
+polski
+português (Brasil)
+português (Portugal)
+română
+русский
+slovenčina
+slovenščina
+српски (Србија)
+Soomaali
+español (Latinoamérica)
+español (España)
+Kiswahili
+svenska
+Filipino
+தமிழ்
+తెలుగు
+ไทย
+Türkçe
+українська
+اردو
+Tiếng Việt
+中文 (中国)
+中文 (台灣)
+中文 (香港)
+
+Last updated: July 9, 2026
+
+OpenAI Sub-processor list
+
+OpenAI engages the following entities to provide processing activities for Customer Data (as defined in the OpenAI Data Processing Agreement).
+
+Third Party Sub-processors
+
+Entity Name
+
+	
+
+OpenAI Product or Service
+
+	
+
+Location of Processing
+
+	
+
+Purpose of Processing
+
+
+
+
+Cloudflare, Ltd.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Processing is performed at the data center⁠
+(opens in a new window)
+ that is closest to the End User
+
+	
+
+Content delivery network provider
+
+Web Hosting
+
+
+
+
+Microsoft Corporation
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Australia
+Brazil
+Canada
+France
+Germany
+India
+Indonesia
+Ireland
+Italy
+Japan
+Mexico
+Netherlands
+Norway
+Poland
+Singapore
+South Africa
+South Korea
+Spain
+Sweden
+Switzerland
+United Arab Emirates 
+United Kingdom
+United States
+
+	
+
+Cloud infrastructure
+
+
+
+
+CoreWeave, Inc.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Norway
+Spain
+Sweden
+United Kingdom
+United States
+
+	
+
+Cloud infrastructure
+
+
+
+
+Oracle Cloud Infrastructure
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Brazil
+Japan
+Malaysia
+Netherlands
+United Kingdom
+United States
+
+	
+
+Cloud infrastructure
+
+
+
+
+Google Cloud Platform
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Finland
+Japan
+Netherlands
+Norway
+United Kingdom
+United States
+
+	
+
+Cloud infrastructure
+
+
+
+
+Amazon Web Services, Inc.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+Cloud infrastructure
+
+
+
+
+Cerebras
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+Canada
+
+	
+
+Cloud infrastructure
+
+
+
+
+Snowflake, Inc.
+
+	
+
+API*
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+Data warehousing
+
+
+
+
+TaskUs, LLC
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Philippines
+
+	
+
+All Services:
+Customer support
+
+API & ChatGPT Business:
+Moderation of content
+
+ChatGPT Enterprise, Edu & ChatGPT Business: 
+Moderation of GPTs
+
+
+
+
+
+
+
+Intercom, Inc.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+Customer support
+
+
+
+
+Salesforce
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Australia
+Brazil
+Canada
+France
+Germany
+India
+Indonesia
+Ireland
+Italy
+Japan
+Singapore
+South Africa
+South Korea
+Sweden
+Switzerland
+The Netherlands
+United Arab Emirates
+United Kingdom
+United States
+
+	
+
+Customer support
+
+
+
+
+Pylon Labs
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+
+	
+
+United States
+
+	
+
+Customer support***
+
+
+
+
+Accenture International Limited
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+Canada
+Philippines
+
+	
+
+Customer support
+
+API & ChatGPT Business:
+Moderation of content
+
+
+
+
+Fivetran, Inc.
+
+	
+
+Assistants API
+
+	
+
+United States
+
+	
+
+ETL provider
+
+
+
+
+Confluent
+
+	
+
+API*
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+Infrastructure management
+
+
+
+
+Cinder Technologies, Inc.
+
+	
+
+API*
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+API & ChatGPT Business:
+Platform for content moderation
+
+ChatGPT Enterprise, Edu & ChatGPT Business:
+Platform for moderation of GPTs
+
+
+
+
+WorkOS, Inc.**
+
+	
+
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+Cross-domain identity management
+
+
+
+
+Okta, Inc. 
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+User authentication services (via Auth0)
+
+
+
+
+Merge API, Inc.**
+
+	
+
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Australia
+Canada
+France
+India
+Ireland
+Japan
+Singapore
+South Korea
+Sweden
+United Kingdom
+United States
+
+	
+
+Infrastructure management
+
+* Except where Zero Data Retention (ZDR) is used
+** At election of customer
+***At election of customer; applicable to premium support only
+
+Detail about processing purposes:
+
+Customer Support: Customer Support services are initiated by the Customer, and Customer Data is only processed to the extent Customer explicitly elects to share such data in the course of the support case. 
+
+Moderation: For content that OpenAI’s models flag as being in violation of OpenAI’s policies, OpenAI may share samples of the flagged Customer Content with relevant Sub-processors to assist OpenAI in its review and enforcement. Sharing with the Sub-processor platform only occurs when content is flagged, the Sub-processor platform only retains samples of content for the period of review, and OpenAI’s Sub-processors only process the content to assist OpenAI in its review.
+
+For GPTs that are kept private to an individual or workspace, moderation activities must be initiated by the Customer, for instance if a user within the Customer’s workspace reports the GPT or appeals an action taken on the GPT. For GPTs published to the public, moderation may also be conducted if OpenAI determines the GPT may violate our policies. 
+
+Web Hosting: Hosting of ChatGPT Sites created web pages. Applicable subprocessors may run security and safety classifiers on web pages  and share results with OpenAI.
+
+Infrastructure management: Merge API is only used when the Customer chooses to enable Connectors in ChatGPT⁠
+(opens in a new window)
+.
+
+Processing for ChatGPT Pro and Plus users:
+
+ChatGPT Sites: The OpenAI Subprocessors listed above may provide web hosting, infrastructure, content moderation and support services for ChatGPT Sites created web pages. Web Hosting providers may run security and safety classifiers on web pages and share results with OpenAI and its subprocessors.
+
+OpenAI entities
+
+The following OpenAI affiliate companies provide technical and operational support for the Services. We use the Standard Contractual Clauses as a valid transfer mechanism among affiliates.
+
+Entity Name
+
+	
+
+OpenAI Product or Service
+
+	
+
+Location of Processing
+
+	
+
+Parent Company
+
+
+
+
+OpenAI, OpCo, LLC
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+OpenAI Global, LLC
+
+
+
+
+OpenAI, LLC
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United States
+
+	
+
+OpenAI, OpCo, LLC
+
+
+
+
+OpenAI Ireland Ltd.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Ireland
+
+	
+
+OpenAI, LLC
+
+
+
+
+OpenAI UK Ltd.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+United Kingdom
+
+	
+
+OpenAI, LLC
+
+
+
+
+OpenAI Japan Ltd.
+
+	
+
+API
+ChatGPT Enterprise
+ChatGPT Edu
+ChatGPT Business
+
+	
+
+Japan
+
+	
+
+OpenAI, LLC
+
+Subscribe to new Sub-processor notifications
+
+Sign up to receive notification of new third party Subprocessors by filling out this form⁠
+(opens in a new window)
+. 
+
+Please contact privacy@openai.com with any questions or concerns.
+
+Research
+Research Index
+Research Overview
+Economic Research
+Latest Advancements
+GPT-5.6
+GPT-5.5
+GPT-5.4
+Safety
+Safety Approach
+Deployment Safety
+(opens in a new window)
+Security & Privacy
+Trust & Transparency
+Products
+ChatGPT
+(opens in a new window)
+ChatGPT Business
+(opens in a new window)
+ChatGPT Enterprise
+(opens in a new window)
+ChatGPT for Education
+(opens in a new window)
+Codex
+Release Notes
+API Platform
+Overview
+API Log In
+(opens in a new window)
+Docs
+(opens in a new window)
+Business
+Overview
+Solutions
+Resources
+Customer Stories
+Partner Network
+Contact Sales
+Developers
+Apps SDK
+(opens in a new window)
+Open Models
+Docs
+(opens in a new window)
+Resources
+(opens in a new window)
+Developer Forum
+(opens in a new window)
+Company
+About Us
+Our Charter
+Careers
+News
+Support
+Help Center
+(opens in a new window)
+More
+Stories
+Academy
+Supply Co.
+Livestreams
+Podcast
+RSS
+Terms & Policies
+Terms of Use
+Privacy Policy
+Other Policies
+(opens in a new window)
+(opens in a new window)
+(opens in a new window)
+(opens in a new window)
+(opens in a new window)
+(opens in a new window)
+(opens in a new window)
+OpenAI © 2015–2026
+Your privacy choices
+English
+United States

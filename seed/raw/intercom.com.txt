@@ -1,0 +1,166 @@
+Product
+Customers
+Resources
+Pricing
+Log in
+Contact sales
+View demo
+Start free trial
+Fin AI Agent
+Terms & Policies
+Terms of Service
+Intercom Additional Product Terms
+Privacy Policy
+Data Processing Addendum
+Product Privacy Notice
+Intercom Regional Data Hosting Addendum
+Support Policy
+Deployment Services Terms
+Cookie Policy
+Subprocessors List
+Security, Privacy and Compliance Information for Intercom
+EU Data Hosting
+Australia Data Hosting
+Intercom Affiliate Subprocessors
+Data Privacy Framework Notice
+Intercom Website Terms of Use
+Academy Terms
+Service Level Agreement
+Acceptable Use Policy
+Code of Conduct
+Trademark Usage
+Intercom Global Anti-Corruption Statement
+Intercom Partner Code of Conduct
+Intercom DMCA Policy
+Law Enforcement Guidelines
+European Digital Services Act Notice
+EU Data Act Addendum
+Fin Guarantee
+Referral Program
+Partner Offer
+Intercom Podcast Offer
+Promotional Offer Terms
+Subprocessors List
+
+Effective June 25, 2026
+
+Print this page
+
+(prior version of the Subprocessors List available to view here)
+
+Security, Privacy and Compliance Information for Intercom
+
+Intercom is a data processor and engages certain onward subprocessors that may process personal data submitted to Intercom's services by the controller. These subprocessors are listed below, with a description of the service and the location where data is hosted. By default, hosting occurs in the United States. For Intercom's regional data hosting services that customers may have elected to use, scroll further down the page to see the specific subprocessors list for the designated region. These lists may be updated by Intercom from time to time in accordance with the terms of the Data Processing Addendum.
+
+Amazon Web Services, Inc. - Hosting, storage and processing (including AI processing) of Customer Data (USA).
+Snowflake Inc. - Data warehouse services and processing (including AI processing) (USA).
+Mailgun Technologies, L.L.C. - Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (USA).
+Message Systems, Inc. (d/b/a Sparkpost) - Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services (USA).
+Twilio, Inc. - SMS and Phone functionality (USA).
+Cloudflare, Inc. - Transport Layer Security ("TLS") protection for customers using a custom domain to host their Intercom Articles (USA).
+OpenAI, L.L.C. - AI processing (USA).
+PlanetScale Inc. - Database storage and caching (USA).
+Anthropic, PBC - AI processing (USA).
+Google L.L.C. - AI processing (USA).
+Microsoft Corporation - AI processing (USA)
+Eleven Labs, Inc. - AI processing (text to speech) (USA)
+Ably Realtime Ltd. – message delivery service to support real-time delivery of messages via messenger products (USA)
+Cartesia AI, Inc. - AI processing (text to speech) (USA)
+EU Data Hosting
+
+For customers participating in EU data hosting (AWS hosting is in Dublin, Ireland - AWS region eu-west-1), the following subprocessors apply.
+
+Amazon Web Services (AWS) - Hosting, storage and processing (including AI processing) of Customer Data (Ireland).
+Snowflake Inc. - Data warehouse services and processing (including AI processing) (Ireland).
+Mailgun Technologies, L.L.C. - Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services. For EDH, Intercom relies on separate Mailgun EU email infrastructure (Belgium); however once an email is sent, it is considered data in transit over the (global) Internet and may be processed by email processing servers hosted globally.
+Message Systems, Inc. (d/b/a Sparkpost) Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services. For EDH, Intercom relies on separate Sparkpost EU email infrastructure; however once an email is sent, it is considered data in transit over the (global) Internet and may be processed by email processing servers hosted globally.
+Twilio, Inc. SMS and Phone functionality (USA) - ONLY applicable if Customers elect to use SMS as part of a feature where a bot can collect phone numbers from leads and/or Phone services where Customer makes and receives phone calls, video calls and screen share from Intercom's Services. If Customers do not elect to use SMS and/or Phone, Twilio, Inc. will not be leveraged to deliver any part of the Services to them.
+Cloudflare, Inc. - Transport Layer Security ("TLS") protection for customers using a custom domain to host their Intercom Articles. Compute and storage infrastructure for Intercom MCP server (Ireland).
+Microsoft Corporation - AI processing (EU).
+PlanetScale Inc. - Database storage and caching (Ireland).
+Google - AI processing (EU).
+OpenAI, L.L.C. - AI processing (EU)
+Eleven Labs, Inc. - AI processing (text to speech) (EU)
+Ably Realtime Ltd. – message delivery service to support real-time delivery of messages via messenger products (EU)
+Cartesia AI, Inc. - AI processing (text to speech) (EU)
+Australia Data Hosting
+
+For customers participating in Australian data hosting (AWS hosting is in Sydney, Australia - AWS region ap-southeast-2), the following subprocessors apply.
+
+Amazon Web Services (AWS) - Hosting, storage and processing (including AI processing) of Customer Data (Australia, except as set forth below).
+AI processing via models hosted on AWS Bedrock services occurs in the USA.
+Snowflake Inc. - Data warehouse services and processing (including AI processing) (Australia).
+Message Systems, Inc. (d/b/a Sparkpost) (USA) - Email delivery services for individual emails and bulk email campaigns initiated from Intercom's services. Once an email is sent, it is considered data in transit over the (global) Internet and may be processed by email processing servers hosted globally.
+Twilio, Inc. (USA) - ONLY applicable if Customers elect to use SMS as part of a feature where a bot can collect phone numbers from leads and/or Phone services where Customer makes and receives phone calls, video calls and screen share from Intercom's Services. If Customers do not elect to use SMS and/or Phone, Twilio, Inc. will not be leveraged to deliver any part of the Services to them.
+Cloudflare, Inc. - Transport Layer Security ("TLS") protection for customers using a custom domain to host their Intercom Articles (Australia).
+OpenAI, L.L.C. (USA) - AI processing.
+Anthropic, PBC (USA) - AI processing.
+PlanetScale Inc. - Database storage and caching (Australia).
+Google (USA) - AI processing.
+Eleven Labs, Inc. - AI processing (text to speech) (USA).
+Ably Realtime Ltd. – message delivery service to support real-time delivery of messages via messenger products (Australia)
+Cartesia AI, Inc. - AI processing (text to speech) (USA)
+Intercom Affiliate Subprocessors
+
+The following entities are Intercom Affiliates which may function as sub-processors in providing the services and/or for support.
+
+Intercom, Inc. (USA)
+Intercom R&D Unlimited Company (Ireland)
+Intercom Software Australia Pty Ltd (Australia)
+Intercom Software UK Limited (UK)
+HELPDESK FEATURES
+Intercom 2
+Inbox
+Live Chat
+Copilot
+Tickets
+Omnichannel
+Help Center
+Apps & Integrations
+Reporting
+Knowledge Hub
+Outbound
+FIN FEATURES
+Fin overview
+Capabilities
+AI Engine
+PRICING
+Intercom pricing
+Fin pricing
+LEARN
+Events
+Intercom blog
+Academy
+YouTube
+AI Agent Blueprint
+Learning Center
+2026 Transformation Report
+EVALUATE
+Why choose Intercom
+Safety & security
+ROI calculator
+Customer case studies
+SUPPORT
+Changes
+Help Center
+Developer hub
+Intercom community
+Status
+COMPANY
+About
+Careers
+Contact Press
+PROGRAMS
+Solution partner
+Technology partner
+Early stage
+INTERCOM IN ACTION
+View demo
+Free trial
+Contact sales
+Sign in
+Terms
+Privacy
+Security
+Your Privacy Choices
+This site employs cookies and other technologies that we and our third party vendors use to monitor and record personal information about you and your interactions with the site (including content viewed, cursor movements, screen recordings, and chat contents) for the purposes described in our Cookie Policy. By continuing to visit our site, you agree to our Website Terms of Use, Privacy Policy and Cookie Policy.

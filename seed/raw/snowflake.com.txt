@@ -1,0 +1,539 @@
+skip_to_content
+Product
+Solutions
+Why Snowflake
+Resources
+Developers
+Pricing
+
+LANGUAGES
+
+English
+
+日本語
+
+한국어
+
+中文（简体）
+
+Português
+
+Deutsch
+
+Français
+
+Español
+
+Italiano
+
+SIGN IN
+CONTACT SALES
+START FOR FREE
+SNOWFLAKE SUB-PROCESSORS & AFFILIATES
+
+Last Updated: March 6, 2026
+
+To deliver services, Snowflake Inc. (“Snowflake”) and its Affiliates may use third-party data processors (“Third-Party Sub-processors”) and Snowflake Affiliates to process Customer Data. Capitalized terms not defined on this page have the meanings ascribed to them by the terms set forth in the Snowflake Terms of Service or the written agreement between you and Snowflake, as applicable (the “Agreement”). 
+
+By subscribing to receive updates about this page, you will be notified by email about relevant updates to Third-Party Sub-processors and Snowflake Affiliates that are involved in processing your Customer Data.
+
+Authorized Third-Party Sub-processors
+Sub-processor	Purpose	Location	Transfer Mechanism	Sub-processor Resources
+Amazon Web Services	Cloud hosting and infrastructure provider	Customer Selected*	SCCs	AWS Sub-processors
+Amazon Web Services	Snowflake Data Clean Rooms Web App	See Documentation*	SCCs	AWS Sub-processors
+Amazon Web Services	Native app security scanning for customer accounts in Google Cloud Platform regions	See Documentation*	SCCs	AWS Sub-processors
+Amazon Web Services	Cross-region inference feature of Cortex for Google Cloud Platform and Microsoft Azure regions	See Documentation*	SCCs	AWS Sub-processors
+Microsoft Azure	Cloud hosting and infrastructure provider	Customer Selected*	SCCs	Microsoft Sub-processors
+Microsoft Azure	Cross-region inference feature of Cortex for Google Cloud Platform and Amazon Web Services regions	See Documentation*	SCCs	Microsoft Sub-processors
+Google Cloud Platform	Cloud hosting and infrastructure provider	Customer Selected*	SCCs	GCP Sub-processors
+Google Cloud Platform	Cross-region inference feature of Cortex for Microsoft Azure and Amazon Web Services regions	See Documentation*	SCCs	GCP Sub-processors
+Cloudflare	R2 cloud storage for optional use in connection with Snowflake’s Egress Cost Optimizer feature	See Documentation*	SCCs	Cloudflare Sub-processors
+
+* The table below specifies which Sub-processors are engaged for respective locations.
+
+Sub-processor	Legal Name and Address	Region Name
+Amazon Web Services	Amazon Web Services, Inc.
+410 Terry Ave North, Seattle, Washington, USA, 98109	US West (Oregon)
+US East (Ohio)
+US East (N. Virginia)
+US Gov East 1 (FedRAMP High Plus)
+US Gov West 1 (FedRAMP High Plus)
+US Gov West 1 (DoD)
+US East (Commercial Gov - N. Virginia)
+US West (Commercial Gov - Oregon)
+Africa (Cape Town)
+Asia Pacific (Tokyo)
+Asia Pacific (Osaka)
+Asia Pacific (Mumbai)
+Middle East (UAE)
+All AWS cross-regions as described in the Documentation
+Amazon Web Services	Amazon Web Services EMEA SARL
+38 Avenue John F. Kennedy, L-1855, Luxembourg, Luxembourg	EU (Frankfurt)
+EU (Zurich)
+EU (Stockholm)
+EU (Ireland)
+Europe (London)
+EU (Paris)
+Asia Pacific (Seoul)
+Asia Pacific (Singapore)
+Asia Pacific (Jakarta)
+All AWS cross-regions as described in the Documentation
+Amazon Web Services	Amazon Web Services Australia Pty Ltd
+Level 37, 2-26 Park Street, Sydney, NSW, 2000, Australia	Asia Pacific (Sydney)
+All AWS cross-regions as described in the Documentation
+Amazon Web Services	Amazon Web Services Canada, Inc.
+120 Bremner Blvd, 26th Floor, Toronto, ON, M5J 0A8, Canada	Canada (Central)
+All AWS cross-regions as described in the Documentation
+Amazon Web Services	Amazon AWS Serviços Brasil Ltda.
+A. Presidente Juscelino Kubitschek, 2.041, Torre E - 18th and 19th Floors, Vila Nova Conceicao, São Paulo, Brasil	South America (Sao Paulo)
+All AWS cross-regions as described in the Documentation
+Microsoft Azure	Microsoft Corporation
+1 Microsoft Way, Redmond, Washington, USA, 98052	Canada Central (Toronto)
+East US (Virginia)
+East US 2 (Virginia)
+Central US (Iowa)
+South Central US (Texas)
+West US 2 (Washington)
+Mexico Central (Querétaro)
+North Europe (Ireland)
+Switzerland North (Zurich)
+West Europe (Netherlands)
+UAE North (Dubai)
+UK South (London)
+Australia East (New South Wales)
+Central India (Pune)
+Japan East (Tokyo)
+Southeast Asia (Singapore)
+Korea Central (Seoul)
+US Gov Virginia
+US Gov Virginia (FedRAMP High Plus)
+All Azure cross-regions as described in the Documentation
+Google Cloud Platform	Google LLC
+1600 Amphitheatre Parkway, Mountain View, California, USA, 94043	US Central1 (Iowa)
+US East4 (N. Virginia)
+Europe West2 (London)
+Europe West3 (Frankfurt)
+Europe West4 (Netherlands)
+Middle East Central2 (Dammam)
+Australia Southeast 2 (Melbourne)
+All GCP cross-regions as described in the Documentation
+Cloudflare	Cloudflare, Inc.
+101 Townsend Street, San Francisco, CA 94107	All Snowflake-managed ECO cache regions as described in the Documentation
+
+** Please email privacy@snowflake.com to request further information regarding these Sub-processors, including their LEI numbers.
+
+Authorized Snowflake Affiliates
+Affiliate	Address	Purpose	Location	Transfer Mechanism
+Snowflake Computing Pty Ltd.	100 Miller Street, Suite 2, Level 25
+North Sydney NSW 2060, Australia	Provision of technical services, support services, and supporting the provision, management and maintenance of the Service.	Australia	SCCs
+Snowflake Computing Pty Ltd.	100 Miller Street, Suite 2, Level 25
+North Sydney NSW 2060, Australia	New Zealand	SCCs
+Snowflake Computing Canada ULC	Suite 2600, 1066 West Hastings Street
+Vancouver, BC V6E 3X1, Canada	Canada	SCCs
+Snowflake Computing France SAS	183 Rue de Courcelles
+75017 Paris, France	France	SCCs
+Snowflake Computing GmbH	Leipziger Platz 18
+10117 Berlin, Germany	Germany	SCCs
+SNFL Cloudtech India Private Limited	Survey No 206/2, CTS No, Tower B of Panchshil Business Park
+8th & 9th Floors, 78 to 85
+Viman Nagar Rd, Lohegaon
+Pune- 411014, Mahārāshtra, India	India	SCCs
+Snowflake Computing Netherlands B.V.	FOZ Building, Gustav Mahlerlaan 300-314
+1082 ME Amsterdam, Netherlands	Netherlands	SCCs
+Snowflake Computing Singapore Pte. Ltd.	12 Marina Boulevard, #26-01, Marina Bay Financial Centre Tower 3
+Singapore 018982, Singapore	Singapore	SCCs
+Snowflake Computing U.K. Limited	5 Churchill Place, 10th Floor
+London E14 5HU, United Kingdom	United Kingdom	SCCs
+SNFL Technologies AB	P.O. Box 162 85
+103 25 Stockholm, Sweden	Sweden	SCCs
+Snowflake Computing Spain S.L.	Paseo de Castellana 35, Block, Floor 5th
+28046 Madrid, Spain	Spain	SCCs
+Snowflake Computing Switzerland GmbH	Zweigniederlassung, Zurich Limmatquai 72
+8001 Zürich, Switzerland	Switzerland	SCCs
+Snowflake G.K.	30F Yaesu Central Tower, Tokyo Midtown Yaesu
+2-2-1 Yaesu, Chuo-ku, Tokyo, 104-0028, Japan	Japan	SCCs
+Snowflake Inc.	251 Little Falls Drive
+Wilmington, DE 19808, United States of America	United States	SCCs
+Snowflake Cloudtech Israel Ltd.	58 Harakevet St., 12th Floor
+Tel Aviv 6777016, Israel	Israel	SCCs
+Snowflake Finland Oy	Uudenmaankatu 1-5
+00120 Helsinki, Finland	Finland	SCCs
+Snowflake Finland Oy	Uudenmaankatu 1-5
+00120 Helsinki, Finland	Denmark	SCCs
+Snowflake Poland Sp. z o.o.	ul. Marcina Kasprzaka 4
+01-211 Warsaw, Poland	Poland	SCCs
+Snowflake Korea YH	The Executive Center, Level 4, Gangnam Finance Center
+152 Teheran-ro, Suites: 401B, 403, 405
+Gangnam-gu, 06236 Seoul Seoul, Korea, Republic of	South Korea	SCCs
+Snowflake Middle East FZ-LLC	Dubai, Dubai, 19th Floor Business Central Towers
+Offices 1902A, 1903A, 1904A, United Arab Emirates	United Arab Emirates	SCCs
+Snowflake Technologies Mexico S. de R.L. de C.V.	34 Jacobo Callot, Office 301
+Santa Maria Nonoalco, 01420 Mexico City, Mexico	Mexico	SCCs
+Snowflake Italy S.r.l.	Via F. Cucchi, No 8
+Bergamo, Italy	Italy	SCCs
+Snowflake Computing Ireland Limited	70 Sir John Rogerson's Quay
+Dublin 2, D02 R296, Co. Dublin, Ireland	Ireland	SCCs
+Snowflake Brazil ltda.	Av. das Nações Unidas, 12901
+Sala 23-126 Cenu Torre N.
+Brooklin Paulista, Sao Paulo- SP, 04578-910, Brazil	Brazil	SCCs
+Snowflake Costa Rica, S.R.L.	House 36 N. 1st Ave. & 27th Street
+San Jose, Costa Rica	Costa Rica	SCCs
+Snowflake Colombia S.A.S.	Calle 70 Bis No. 4 - 41
+Bogotá D.C. 110231, Colombia	Colombia	SCCs
+Snowflake Arabia Limited	Regus Hamad Tower, 4th Floor, King Fahad Branch Road
+Suite 404, Al Olaya District, Riyadh 12212, Saudi Arabia	Saudi Arabia	SCCs
+Snowflake Regional Headquarter Company	Regus Hamad Tower, 4th Floor, King Fahad Branch Road
+Suite 404, Al Olaya District, Riyadh 12212, Saudi Arabia	Saudi Arabia	SCCs
+Snowflake Technologies Malaysia Sdn. Bhd.	12th Floor, Menara Symphony, No. 5 Jalan Prof. Khoo Kay Kim, Seksyen 13
+46200 Petaling Jaya, Selangor Malaysia	Malaysia	SCCs
+Snowflake Technologies Turkey Data Teknoloji Limited Sirketi	Istanbul Yarsuvat & Yarsuvat Avukatlık Ortaklığı Reşitpaşa Mahallesi, Eski Büyükdere Cad. No.
+14 Park Plaza K. 11 Maslak, Sariyer, 34467 İstanbul, Türkiye	Türkiye	SCCs
+
+An overview of relevant laws and practices of applicable third countries for purposes of Clause(14)(c) of the standard contractual clauses approved pursuant to Commission Decision (EU) 2021/914 of 4 June 2021 and the International Data Transfer Addendum issued by the Information Commissioner’s Office under s.119(A) of the UK Data Protection Act 2018, are available by emailing privacy@snowflake.com. Where an update to this page (as indicated in the Updates Summary below) is regarding Clause(14)(c), please email privacy@snowflake.com to request further information regarding such change. 
+
+
+How can current Snowflake customers object to a new Sub-processor?
+
+If you are a current Snowflake customer, with a fully executed data processing agreement (“DPA”) in place with Snowflake, you may notify us of an objection to Snowflake’s use of a new Third-Party Sub-processor used to process your Customer Data by sending such objection to privacy@snowflake.com within twenty-eight (28) days after Snowflake’s notice of such new Third-Party Sub-processor, or such other period of time as set forth in your DPA. Objections shall be handled as described in your DPA. 
+
+How to subscribe to updates:
+
+You must subscribe to receive email notification of updates to Third-Party Sub-processors and such Snowflake Affiliates by submitting (1) the email address for such notifications and (2) the full name of the legal entity on whose behalf you are subscribing. By submitting this information, you represent that you have all necessary rights to provide this information to Snowflake.
+
+By submitting this form, I understand Snowflake will process my personal information in accordance with its Privacy Notice. I may unsubscribe through unsubscribe links at any time.
+
+SUBMIT
+Updates Summary
+Date	Summary
+March 6, 2026	Added optional Third-party Sub-processors for cross-region inference feature of Cortex. Added new regions available for selection by customers to the list. Updated addresses for some Snowflake Affiliates. Added Snowflake Affiliates in Malaysia and Türkiye.
+August 14, 2025	Corrected legal names of Amazon Web Services European entity and Microsoft Azure Third-Party Sub-processors to match registered names. Added new regions available for selection by customers to the list. Changed Amazon Web Services’ contracting entity for Asia Pacific (Tokyo), Asia Pacific (Osaka), and Asia Pacific (Mumbai) Amazon Web Services regions.
+June 12, 2025	Updated by adding legal entity names, addresses, and mapping to respective regions for all Authorized Third-Party Sub-processors and addresses for all Authorized Snowflake Affiliates. Added Denmark and New Zealand to the list of locations of Authorized Snowflake Affiliates. Updated the list of Authorized Third-Party Sub-processors by removing an offering that was identified as not processing.
+April 11, 2025	Updated adding Cloudflare as an optional Third-party Sub-processor.
+January 16, 2025	Updated adding Snowflake Affiliates in Saudi Arabia, each as described above, and removing one of the Snowflake Affiliates in Poland.
+May 29, 2024	Updated adding Amazon Web Services as an optional Third-party Sub-processor for native app security scans for customer accounts in Google Cloud Platform regions.
+April 30, 2024	Updated adding Amazon Web Services as an optional Third-party Sub-processor for Snowflake Data Clean Rooms Web App.
+January 9, 2024	Updated name of affiliate in Switzerland to match registered name.
+November 16, 2023	Updated name of affiliate in Japan to match registered name.
+August 24, 2023	Updated names of affiliates in Canada and Costa Rica to match registered names.
+February 22, 2023	Update adding Snowflake Affiliates in Poland, Costa Rica and Colombia, as described above.
+October 7, 2022	Update adding Amazon Web Services SES as an optional Third-party Sub-processor.
+July 8, 2022	Update adding Snowflake Affiliate in Brazil, as described above.
+June 13, 2022	Update adding Snowflake Affiliates in Italy and Ireland, each as described above.
+November 04, 2021	Update adding Snowflake Affiliates in South Korea, United Arab Emirates, and Mexico, each as described above.
+September 07, 2021	General updates to page, including sub-processor URL links and formatting changes; Addition of Snowflake Affiliates in Finland, Poland, and Israel; Update to reflect a change to the Snowflake Indian Affiliate employing Snowflake personnel.
+August 24, 2020	Updated names of affiliates in Spain and Sweden to match registered names after final incorporation
+
+Subscribe to our monthly newsletter
+
+Stay up to date on Snowflake’s latest products, expert insights and resources—right in your inbox!
+
+Country
+United States
+Canada
+United Kingdom
+Germany
+France
+Australia
+Japan
+Aland Islands
+Albania
+Algeria
+American Samoa
+Andorra
+Angola
+Anguilla
+Antarctica
+Antigua and Barbuda
+Argentina
+Armenia
+Aruba
+Australia
+Austria
+Azerbaijan
+Bahamas
+Bahrain
+Bangladesh
+Barbados
+Belarus
+Belgium
+Belize
+Benin
+Bermuda
+Bhutan
+Bolivia
+Bosnia and Herzegovina
+Botswana
+Bouvet Island
+Brazil
+British Indian Ocean Territory
+Brunei Darussalam
+Bulgaria
+Burkina Faso
+Burundi
+Cambodia
+Cameroon
+Canada
+Cape Verde
+Cayman Islands
+Central African Republic
+Chad
+Chile
+China
+Christmas Island
+Cocos (Keeling) Islands
+Colombia
+Comoros
+Congo
+Congo The Democratic Republic of The
+Cook Islands
+Costa Rica
+Cote D'Ivoire (Ivory Coast)
+Croatia (Hrvatska)
+Cyprus
+Czech Republic
+Denmark
+Djibouti
+Dominica
+Dominican Republic
+Ecuador
+Egypt
+El Salvador
+Equatorial Guinea
+Eritrea
+Estonia
+Ethiopia
+Falkland Islands (Malvinas)
+Faroe Islands
+Fiji
+Finland
+France
+French Guiana
+French Polynesia
+French Southern Territories
+Gabon
+Gambia
+Georgia
+Germany
+Ghana
+Gibraltar
+Greece
+Greenland
+Grenada
+Guadeloupe
+Guam
+Guatemala
+Guinea
+Guinea-Bissau
+Guyana
+Haiti
+Heard and McDonald Islands
+Holy See (Vatican City State)
+Honduras
+Hong Kong
+Hungary
+Iceland
+India
+Indonesia
+Iraq
+Ireland
+Isle of Man
+Israel
+Italy
+Jamaica
+Japan
+Jordan
+Kazakhstan
+Kenya
+Kiribati
+Korea Republic of (South)
+Kuwait
+Kyrgyzstan
+Lao People's Democratic Republic
+Latvia
+Lebanon
+Lesotho
+Liberia
+Liechtenstein
+Lithuania
+Luxembourg
+Macau
+Macedonia
+Madagascar
+Malawi
+Malaysia
+Maldives
+Mali
+Malta
+Marshall Islands
+Martinique
+Mauritania
+Mauritius
+Mayotte
+Mexico
+Micronesia Federated States of
+Moldova Republic of
+Monaco
+Mongolia
+Montenegro
+Montserrat
+Morocco
+Mozambique
+Namibia
+Nauru
+Nepal
+Netherlands
+Netherlands Antilles
+New Caledonia
+New Zealand
+Nicaragua
+Niger
+Nigeria
+Niue
+Norfolk Island
+Northern Mariana Islands
+Norway
+Oman
+Pakistan
+Palau
+Palestinian Territory Occupied
+Panama
+Papua New Guinea
+Paraguay
+Peru
+Philippines
+Pitcairn
+Poland
+Portugal
+Puerto Rico
+Qatar
+Reunion
+Romania
+Russian Federation
+Saint Helena
+Saint Kitts and Nevis
+Saint Lucia
+Saint Pierre and Miquelon
+Saint Vincent and the Grenadines
+Samoa
+San Marino
+Sao Tome and Principe
+Saudi Arabia
+Senegal
+Serbia
+Seychelles
+Sierra Leone
+Singapore
+Slovakia
+Slovenia
+Solomon Islands
+Somalia
+South Africa
+South Georgia and The South Sandwich Island
+Spain
+Sri Lanka
+Suriname
+Svalbard and Jan Mayen Islands
+Swaziland
+Sweden
+Switzerland
+Taiwan
+Tajikistan
+Tanzania United Republic of
+Thailand
+Timor-Leste
+Togo
+Tokelau
+Tonga
+Trinidad and Tobago
+Tunisia
+Turkey
+Turkmenistan
+Turks and Caicos Islands
+Tuvalu
+Uganda
+Ukraine
+United Arab Emirates
+United Kingdom
+United States Minor Outlying Islands
+Uruguay
+Uzbekistan
+Vanuatu
+Venezuela
+Viet Nam
+Virgin Islands (British)
+Virgin Islands (U.S.)
+Wallis and Futuna Islands
+Western Sahara
+Yemen
+Zambia
+Zimbabwe
+Add me to the list to receive dedicated product updates and general availability emails.
+By submitting this form, I understand Snowflake will process my personal information in accordance with its Privacy Notice. I may unsubscribe through unsubscribe links at any time.
+
+SUBMIT
+
+Product
+
+Platform
+Snowflake CoWork
+Data Engineering
+Analytics
+AI
+Applications & Collaboration
+Pricing
+
+Support
+
+Support
+Priority Support
+Status
+
+Industries
+
+Advertising, Media & Entertainment
+Financial Services
+Healthcare & Life Sciences
+Manufacturing
+Public Sector
+Retail & Consumer Goods
+Telecom
+Technology
+
+Company
+
+About Snowflake
+Leadership & Board
+Careers
+Investor Relations
+Trust Center
+Brand Guidelines
+Contact
+Newsroom
+Environmental, Social & Governance
+Snowflake Ventures
+End Data Disparity
+Snowflake Summit 26
+
+Learn
+
+Resource Library
+Live Demos
+Fundamentals
+Training
+Certifications
+Snowflake University
+Developer Guides
+Documentation
+Data Governance
+© 2026 Snowflake Inc. All Rights Reserved
+Privacy Policy
+Site Terms
+Communication Preferences
+Cookies Settings
+Do Not Share My Personal Information
+Legal
+SNOWFLAKE'S USE OF COOKIES
+We use cookies to enhance your experience, to display customized content, and to analyze site traffic. By clicking "Accept Cookies" or closing this banner, you provide your consent to our use of cookies. To learn more about the cookies we use and to set your own preferences, see ourCookie Statement.
+Cookies Settings
+REJECT ALL
+ACCEPT ALL COOKIES

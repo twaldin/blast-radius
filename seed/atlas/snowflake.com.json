@@ -1,0 +1,29 @@
+{
+  "domain": "snowflake.com",
+  "name": "Snowflake",
+  "subprocessor_url": "https://www.snowflake.com/en/legal/privacy/snowflake-sub-processors/",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T14:22:34",
+  "subprocessors": [
+    {
+      "name": "Amazon Web Services",
+      "purpose": "Cloud hosting and infrastructure provider; Snowflake Data Clean Rooms Web App; Native app security scanning for customer accounts in Google Cloud Platform regions; Cross-region inference feature of Cortex for Google Cloud Platform and Microsoft Azure regions",
+      "region": "Customer Selected; See Documentation"
+    },
+    {
+      "name": "Microsoft Azure",
+      "purpose": "Cloud hosting and infrastructure provider; Cross-region inference feature of Cortex for Google Cloud Platform and Amazon Web Services regions",
+      "region": "Customer Selected; See Documentation"
+    },
+    {
+      "name": "Google Cloud Platform",
+      "purpose": "Cloud hosting and infrastructure provider; Cross-region inference feature of Cortex for Microsoft Azure and Amazon Web Services regions",
+      "region": "Customer Selected; See Documentation"
+    },
+    {
+      "name": "Cloudflare",
+      "purpose": "R2 cloud storage for optional use in connection with Snowflake\u2019s Egress Cost Optimizer feature",
+      "region": "See Documentation"
+    }
+  ]
+}

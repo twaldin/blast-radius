@@ -1,0 +1,1380 @@
+Skip to content
+Oktane registration is officially open. Join us at the AI security event of the year. Register now →
+opens in a new tab
+020 3880 5178
+Search
+United Kingdom
+Login
+Products
+Solutions
+Learning & Support
+Developers
+Company
+Free trial
+Contact us
+Okta Sub-processors
+
+Effective Date: May 2026
+
+Posted Date: May 2026
+
+Download
+
+A list of Sub-processors currently authorized by Okta, Inc. (“Okta”) to process Personal Data (as defined in Okta’s Data Processing Addendum, which is published at https://www.okta.com/trustandcompliance/) on behalf of Customer and assist Okta with respect to the provision of the applicable Service under the Okta Master Subscription Agreement which is published at https://www.okta.com/agreements/ (the “Agreement”) is set out below. All capitalized terms not defined herein shall have the meaning set forth in the Agreement.
+
+The following Sub-processors are authorized by Okta to process Personal Data and assist Okta with respect to Okta Workforce Identity and Okta Customer Identity subscriptions:
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc. 
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+Standard Service – USA
+
+Canada Cell – Canada
+
+India Cell – India
+
+EU Cell – Germany, Ireland
+
+Australia Cell – Australia
+
+Japan Cell – Japan
+
+
+
+
+Google, Inc.
+
+	
+
+Cyber Defense - detect, investigate and respond to cyberthreats
+
+	
+
+Standard Service – USA
+
+Australia Cell – USA
+
+India Cell – USA
+
+Canada Cell – USA
+
+Japan Cell – USA
+
+EU Cell – EMEA
+
+
+
+
+Splunk, Inc. 
+
+	
+
+Business analytics
+
+	
+
+Standard Service – USA
+
+Australia Cell – USA
+
+India Cell – EMEA
+
+Canada Cell – USA
+
+Japan Cell – USA
+
+EU Cell – Germany, Ireland, United Kingdom
+
+
+
+
+Salesforce.com, Inc. 
+
+	
+
+Support and maintenance ticketing process 
+
+	
+
+USA
+
+
+
+
+Twilio, Inc.
+
+	
+
+SMS authenticator 
+
+	
+
+USA
+
+
+
+
+S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)
+
+	
+
+24x7 customer support team
+
+	
+
+No data centers; CGS may access the data center(s) Okta utilizes for Amazon Web Services and salesforce.com while providing support. Support team is located in Romania
+
+
+
+
+SendGrid, Inc.
+
+	
+
+Email notifications and email access request inbox
+
+	
+
+USA
+
+
+
+
+TeleSign Corporation 
+
+	
+
+SMS authenticator
+
+	
+
+USA, Netherlands
+
+
+
+
+Snowflake Computing, Inc.
+
+	
+
+Data warehouse services
+
+	
+
+Standard Service – USA
+
+Canada Cell – Canada
+
+India Cell – India
+
+EU Cell – Germany
+
+Australia Cell – Australia
+
+Japan Cell – Japan
+
+In addition to the Sub-processors in the Workforce Identity Cloud table, the following Sub-processors are authorized by Okta to process Personal Data on behalf of Customer and assist Okta with respect to the provision of Access Governance subscriptions, which is made available to Customer as part of (1) Okta Identity Governance subscriptions; and (2) if enabled by Customer, the Governance for Okta Admin Roles feature within Workforce Identity Cloud subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Google, Inc. 
+
+	
+
+Hosting and cloud infrastructure 
+
+	
+
+Standard Service – USA
+
+Canada Cell – Canada
+
+India Cell – India
+
+EU Cell – Germany, Belgium
+
+Australia Cell – Australia
+
+Japan Cell – Japan
+
+
+
+
+MongoDB, Inc.
+
+	
+
+Managed database services
+
+	
+
+Standard Service – USA
+
+Canada Cell – Canada
+
+India Cell – India
+
+EU Cell – Germany, Belgium,
+
+Netherlands
+
+Australia Cell – Australia
+
+Japan Cell – Japan
+
+
+
+
+DataDog, Inc.
+
+	
+
+Business analytics
+
+	
+
+Standard Service – USA
+
+Canada Cell – USA
+
+India Cell – USA
+
+Australia Cell – USA
+
+Japan Cell – USA
+
+EU Cell – Germany
+
+In addition to the Sub-processors set forth in the Workforce Identity Cloud table, the following Sub-processors are authorized by Okta to process Personal Data on behalf of Customer and assist Okta with respect to Advanced Server Access subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+DataDog, Inc.
+
+	
+
+Business analytics 
+
+	
+
+USA
+
+In addition to the Sub-processors in the Workforce Identity Cloud table, the following Sub-processors are authorized by Okta to process Personal Data on behalf of Customer and assist Okta with respect to Okta Privileged Access subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Google, Inc. 
+
+	
+
+Hosting and cloud infrastructure 
+
+	
+
+Standard Service - USA
+
+Canada Cell – Canada
+
+India Cell –  India
+
+EU Cell – Germany, Belgium
+
+Australia Cell – Australia
+
+Japan Cell – Japan
+
+
+
+
+MongoDB, Inc.
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+Standard Service – USA
+
+Canada Cell – Canada
+
+India Cell – India
+
+EU Cell – Germany, Belgium, Netherlands
+
+Australia Cell – Australia
+
+Japan Cell – Japan
+
+
+
+
+DataDog, Inc.
+
+	
+
+Business analytics
+
+	
+
+Standard Service - USA
+
+Canada Cell – USA
+
+India Cell – USA
+
+Australia Cell – USA
+
+Japan Cell – USA
+
+EU Cell - Germany
+
+In place of the Sub-processors in the Workforce Identity Cloud table, the following Sub-processors are authorized by Okta to process Personal Data and assist Okta with respect to Okta for Government Moderate subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc. 
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+USA
+
+
+
+
+salesforce.com, inc.
+
+	
+
+Support and maintenance ticketing process 
+
+	
+
+USA
+
+
+
+
+Twilio, Inc. 
+
+	
+
+SMS authenticator 
+
+	
+
+USA
+
+
+
+
+SendGrid, Inc. 
+
+	
+
+Email notifications
+
+	
+
+USA
+
+
+
+
+TeleSign Corporation
+
+	
+
+SMS authenticator
+
+	
+
+USA
+
+
+
+
+Snowflake Computing, Inc.
+
+	
+
+Data warehouse services
+
+	
+
+USA, Germany, Australia
+
+
+
+
+S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)
+
+	
+
+Customer support (Note that CGS does not provide support for the Government Moderate services, but may have access to the data entered into support tickets located in salesforce.com)
+
+	
+
+No data centers. Support team is located in the USA.
+
+
+
+
+Splunk, Inc.
+
+	
+
+Business analytics
+
+	
+
+USA
+
+
+
+
+DataDog, Inc.
+
+	
+
+Business analytics
+
+	
+
+USA
+
+
+
+
+MongoDB, Inc.
+
+	
+
+Managed database services
+
+	
+
+USA
+
+
+
+
+Google, Inc.
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+USA
+
+In place of the Sub-processors in the Workforce Identity Cloud table, the following Sub-processors are authorized by Okta to process Personal Data and assist Okta with respect to Okta for Government High and Okta US Military subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc. 
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+USA
+
+
+
+
+salesforce.com, inc.
+
+	
+
+Support and maintenance ticketing process 
+
+	
+
+USA
+
+
+
+
+Snowflake Computing, Inc.
+
+	
+
+Data warehouse services
+
+	
+
+USA
+
+
+
+
+DataDog, Inc.
+
+	
+
+Business analytics
+
+	
+
+USA
+
+
+
+
+MongoDB, Inc.
+
+	
+
+Managed database services
+
+	
+
+USA
+
+
+
+
+Splunk, Inc.
+
+	
+
+Business analytics
+
+	
+
+USA
+
+In addition to the Sub-processors in the Workforce Identity Cloud table, the following Sub-processor(s) are authorized by Okta to process Personal Data and assist Okta with respect to Okta’s provision of the Workforce Identity Cloud Service Log Investigator feature that leverages generative artificial intelligence:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Google Inc.
+
+	
+
+Non-training generative artificial intelligence services
+
+	
+
+USA
+
+The following Sub-processors are authorized by Okta to process Personal Data and assist Okta with respect to Identity Security Posture Management subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc. 
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+Standard Service – USA
+
+EU Cell - Germany
+
+APAC Cell - Australia
+
+Japan Cell – Japan
+
+
+
+
+MongoDB, Inc
+
+	
+
+Data warehouse services
+
+	
+
+Standard Service – USA
+
+EU Cell - Germany
+
+APAC Cell - Australia
+
+
+
+
+Sentry
+
+	
+
+Security event analysis and incident response
+
+	
+
+Standard Service – USA
+
+EU Cell - Germany
+
+APAC Cell - USA
+
+
+
+
+Snowflake Computing Netherlands B.V
+
+	
+
+Data warehouse services
+
+	
+
+Standard Service – USA
+
+EU Cell - Germany
+
+APAC Cell - Australia
+
+
+
+
+Splunk, Inc.
+
+	
+
+Business analytics 
+
+	
+
+Standard Service – USA
+
+EU Cell - Germany, Ireland, United
+
+Kingdom
+
+APAC Cell – USA
+
+
+
+
+salesforce.com, inc.
+
+	
+
+Support and maintenance ticketing process
+
+	
+
+USA
+
+
+
+
+S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)
+
+	
+
+24x7 customer support team
+
+	
+
+No data centers; CGS may access the data center(s) Okta utilizes for Amazon Web Services and salesforce.com while providing support. Support team is located in Romania.
+
+
+
+
+SendGrid, Inc.
+
+	
+
+Email notifications 
+
+	
+
+USA
+
+
+
+
+Slack Technologies, LLC M
+
+	
+
+Messaging and collaboration
+
+	
+
+USA
+
+The following Sub-processors are authorized by Okta to process Personal Data and assist Okta with respect to Auth0 (formerly Customer Identity Cloud) subscriptions:
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc. 
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+During deployment, Customer may select from the following regions:
+
+Public Cloud: USA, Canada, United Kingdom, European Union, Japan, Australia
+
+Private Cloud: USA, Canada, Brazil, Germany, Hong Kong, Indonesia, Ireland, Italy, United Arab Emirates, United Kingdom, France, Sweden, South Africa, Bahrain, India, Japan, South Korea, Singapore, Australia, Mexico, Thailand
+
+
+
+
+DataDog, Inc. 
+
+	
+
+Business analytics
+
+	
+
+USA
+
+
+
+
+Microsoft, Inc.
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+Public Cloud: For Customers deployed in Canada, Japan and Australia on AWS, a regional failover component is hosted on Microsoft Azure
+
+Private Cloud: During deployment, Customer may select from the following regions: USA, Canada, Brazil, Ireland, Netherlands, France, Switzerland, Norway, Germany, Sweden, South Africa, United Arab Emirates, United Kingdom, India, South Korea, Australia, Japan
+
+
+
+
+salesforce.com, inc. 
+
+	
+
+Support and maintenance ticketing process
+
+	
+
+USA
+
+
+
+
+Snowflake Computing, Inc. 
+
+	
+
+Data warehouse services
+
+	
+
+Germany
+
+
+
+
+MongoDB, Inc. 
+
+	
+
+Managed database services
+
+	
+
+The data center location corresponds to the region selected by Customer for hosting and cloud infrastructure (in AWS or Microsoft Azure)
+
+
+
+
+Aiven Ltd
+
+	
+
+Managed database services
+
+	
+
+The data center location corresponds to the region selected by Customer for hosting and cloud infrastructure (in AWS or Azure)
+
+
+
+
+SendGrid, Inc. 
+
+	
+
+Email notifications
+
+	
+
+USA
+
+
+
+
+Twilio, Inc. 
+
+	
+
+SMS authenticator
+
+	
+
+USA
+
+
+
+
+S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA) 
+
+	
+
+24x7 customer support team
+
+	
+
+No data centers; CGS may access the data center(s) Okta utilizes for Amazon Web Services, Azure, and salesforce.com while providing support.
+
+Support team is located in Romania.
+
+
+
+
+Content Delivery Networks (“CDNs”)
+CDNs are commonly-used systems of distributed services that expedite the transmission of content. Due to the nature of CDNs, CDNs may process data in any country, regardless of the Customer’s location, to better support Users of the Auth0 Platform.
+
+
+
+
+Cloudflare, Inc. 
+
+	
+
+Content delivery network and distributed-denial-of-service attack prevention services
+
+	
+
+Global
+
+The following Sub-processors are authorized by Okta to process Personal Data and assist Okta with respect to Auth0 Fine-Grained Authorization subscriptions:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc.
+
+	
+
+Hosting and cloud infrastructure
+
+	
+
+During deployment, Customer may select from the following regions: 
+
+Public Cloud: USA, European Union, Australia (with the witness region in New Zealand) 
+
+Private Cloud: USA, *Canada, *Brazil, *Germany, *Ireland, *Italy, *United Kingdom, *France, *Sweden, *India, *Japan, *South Korea, *Singapore, *Australia
+
+*Certain private cloud regions may require at least one data center in a different region. 
+
+
+
+
+DataDog, Inc. 
+
+	
+
+Business analytics 
+
+	
+
+USA
+
+
+
+
+Salesforce, Inc.
+
+	
+
+Support and maintenance ticketing process
+
+	
+
+USA
+
+
+
+
+Snowflake Computing, Inc.
+
+	
+
+Data warehouse services
+
+	
+
+Germany
+
+
+
+
+SendGrid, Inc.
+
+	
+
+Email notifications
+
+	
+
+USA
+
+
+
+
+Twilio, Inc.
+
+	SMS authenticator	
+
+USA
+
+In addition to the Sub-processors in the Auth0 table, the following Sub-processor(s) are authorized by Okta to process Personal Data and assist Okta with respect to Okta’s provision of the Auth0 Service(s) Breached Password Detection feature(s) or Credential Guard add-on(s):
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc.
+
+	
+
+Breached password comparison
+
+	
+
+For Customers deployed on Azure, the data center location corresponds to the region selected by Customer for hosting and cloud infrastructure (in Azure): USA, Canada, United Kingdom, European Union, Japan, Australia
+
+In addition to the Sub-processors in the Auth0 table, the following Sub-processor(s) are authorized by Okta to process Personal Data and assist Okta with respect to Okta’s provision of the Auth0 Service(s) Guide feature(s) that leverages generative artificial intelligence:
+
+ 
+
+Sub-processor Entity
+	
+Brief Description of Processing
+	
+Locations of Data Center(s)
+
+
+
+Amazon Web Services, Inc. 
+
+	
+
+Non-training generative artificial intelligence services
+
+	
+
+USA
+
+Depending on the geographic location of Customer or its Users, and the nature of the Service provided, Okta may also engage one or more of the following Affiliates as Sub-processors to deliver some or all of the Service subscriptions provided to Customer:
+
+Sub-processor 
+	
+Entity Type
+
+
+
+Okta International, LLC (Delaware)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta UK LTD (United Kingdom)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Australia PTY Limited (Australia)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Software Canada, Inc. (Canada) 
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta France SAS (France) 
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta GmbH (Germany) 
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Identity Netherlands BV (Netherlands)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Italy S.r.l.
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Poland sp. z o.o. (Poland)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Identity Spain, S.L.
+
+	
+
+Okta Affiliate
+
+ 
+
+
+
+
+Okta SG Pte. Ltd. (Singapore)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Japan K.K. (Japan)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Identity Philippines Inc. (Philippines)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Switzerland GmbH (Switzerland) 
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Identity Korea Limited (South Korea)
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Identity Ireland Limited 
+
+	
+
+Okta Affiliate
+
+
+
+
+Okta Identity India Private Limited (India)
+
+	
+
+Okta Affiliate
+
+
+
+
+SaaSure Mexico, S. de R.L. de C.V. (Mexico)
+
+	
+
+Okta Affiliate
+
+ 
+
+
+
+
+SaaSure Sweden AB (Sweden) 
+
+	
+
+Okta Affiliate
+
+
+
+
+Auth0, LLC (Delaware)
+
+	
+
+Okta Affiliate
+
+
+
+
+Auth0 International LLC (Delaware)
+
+	
+
+Okta Affiliate
+
+
+
+
+Auth0 Argentina S.A. (Argentina)
+
+	
+
+Okta Affiliate
+
+
+
+
+Auth0 Ltd. (United Kingdom) 
+
+	
+
+Okta Affiliate
+
+
+
+
+Auth0 Uruguay S.A. (Uruguay)
+
+	
+
+Okta Affiliate
+
+
+
+
+Spera Cybersecurity, Inc. (Delaware)
+
+	
+
+Okta Affiliate
+
+
+
+
+Spera Cybersecurity Ltd. (Israel)
+
+	
+
+Okta Affiliate
+
+
+
+
+Axiom Security Ltd. (Israel)
+
+	
+
+Okta Affiliate
+
+How to Subscribe to Receive Notification of Change in Sub-processors:
+
+If you are a current Okta customer with a data processing addendum in place with Okta, you may subscribe to receive notifications of new Sub-processor(s) for each applicable Okta Service before Okta authorizes any new Sub-processor(s) to process Personal Data in connection with the provision of the applicable Service.
+
+You can subscribe to receive email notifications for changes to Okta Sub-processors by emailing the following information to subprocessors@okta.com:
+
+Customer name 
+Customer address 
+Executed copy of the Customer-Okta data processing addendum
+Customer email address(es) 
+
+To edit your email notification information, please re-submit a request to subprocessors@okta.com with the subject title “Change in Contact Information” to Okta.
+
+Right to Object to New Sub-processor:
+
+A customer with a data processing addendum in place with Okta may object to Okta’s use of a new Sub-processor by notifying Okta promptly in writing within ten (10) business days after receipt of Okta’s notice in accordance with the mechanism set out above. If you object to a new Sub-processor, and that objection is not unreasonable, Okta will use reasonable efforts to make available to you a change in the applicable Service or recommend a commercially reasonable change to your configuration or use of the applicable Service to avoid processing of Personal Data by the objected-to new Sub-processor without unreasonably burdening you. If Okta is unable to make available such change within a reasonable time, which shall not exceed thirty (30) days, you may terminate the applicable Order Form(s) with respect only to the Service(s) which cannot be provided by Okta without the use of the objected-to new Sub-processor by providing written notice to Okta at:
+
+Okta, Inc.
+100 First Street, Sixth Floor
+San Francisco, California 94105 USA
+Attn: Legal Department
+
+To connect with a product expert today, email us or call +1-800-425-1267.
+
+Contact us
+opens in a new tab
+opens in a new tab
+opens in a new tab
+Starting with Okta
+Okta Platform
+Auth0 Platform
+Pricing
+Free Trial
+Contact Sales
+Help & Support
+Help & Support
+Contact Us
+Okta Platform Status
+Auth0 Platform Status
+Legal
+Privacy Policy
+Site Terms
+Security
+Sitemap
+Cookie Preferences
+Your Privacy Choices
+United Kingdom
+Copyright © 2026 Okta. All rights reserved.
+We use cookies and similar technologies to improve your experience and to understand our marketing efforts. We may share data with ad partners. Opt out of this sharing via cookie settings or by configuring the GPC signal for this browser. To learn more, visit our Privacy Policy
+Settings
+Reject All
+Accept All

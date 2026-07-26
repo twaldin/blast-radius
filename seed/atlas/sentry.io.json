@@ -1,0 +1,64 @@
+{
+  "domain": "sentry.io",
+  "name": "Sentry",
+  "subprocessor_url": "https://sentry.io/legal/subprocessors/",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T00:00:00",
+  "subprocessors": [
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Cloud infrastructure services",
+      "region": "European Union, United States"
+    },
+    {
+      "name": "Anthropic, PBC",
+      "purpose": "AI/ML services",
+      "region": "United States"
+    },
+    {
+      "name": "Cloudflare, Inc.",
+      "purpose": "Cloud infrastructure services",
+      "region": "European Union, United States"
+    },
+    {
+      "name": "Google LLC (Google Cloud Platform)",
+      "purpose": "Cloud infrastructure services",
+      "region": "European Union, United States"
+    },
+    {
+      "name": "Intercom, Inc.",
+      "purpose": "Customer support and messaging services",
+      "region": "United States"
+    },
+    {
+      "name": "OpenAI, L.L.C.",
+      "purpose": "AI/ML services",
+      "region": "United States"
+    },
+    {
+      "name": "Sinch Email (Mailgun)",
+      "purpose": "Email delivery services",
+      "region": "European Union"
+    },
+    {
+      "name": "Twilio Inc. (SendGrid)",
+      "purpose": "Email delivery services",
+      "region": "United States"
+    },
+    {
+      "name": "Functional Software GmbH",
+      "purpose": "Provides parts of the Service and related technical support",
+      "region": ""
+    },
+    {
+      "name": "Sentry Software Canada Inc.",
+      "purpose": "Provides parts of the Service and related technical support",
+      "region": ""
+    },
+    {
+      "name": "Sentry Software Netherlands B.V.",
+      "purpose": "Provides parts of the Service and related technical support",
+      "region": ""
+    }
+  ]
+}

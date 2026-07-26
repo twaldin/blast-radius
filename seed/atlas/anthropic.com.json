@@ -1,0 +1,109 @@
+{
+  "domain": "anthropic.com",
+  "name": "Anthropic",
+  "subprocessor_url": "https://trust.anthropic.com/subprocessors",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T14:23:18",
+  "subprocessors": [
+    {
+      "name": "Google Cloud Platform",
+      "purpose": "Cloud infrastructure",
+      "region": "Worldwide"
+    },
+    {
+      "name": "Amazon Web Services",
+      "purpose": "Cloud Infrastructure",
+      "region": "Worldwide"
+    },
+    {
+      "name": "Microsoft Azure",
+      "purpose": "Cloud Infrastructure",
+      "region": "Worldwide"
+    },
+    {
+      "name": "Cloudflare",
+      "purpose": "Traffic Routing (CDN)",
+      "region": "Worldwide (Local to Customer)"
+    },
+    {
+      "name": "Stripe",
+      "purpose": "Billing",
+      "region": "United States"
+    },
+    {
+      "name": "WorkOS",
+      "purpose": "Security, Single Sign-On",
+      "region": "United States"
+    },
+    {
+      "name": "Intercom",
+      "purpose": "User support",
+      "region": "United States"
+    },
+    {
+      "name": "Nutun",
+      "purpose": "User support",
+      "region": "South Africa"
+    },
+    {
+      "name": "Boldr",
+      "purpose": "User support",
+      "region": "Canada"
+    },
+    {
+      "name": "Twilio",
+      "purpose": "Analytics, email/SMS communications",
+      "region": "United States"
+    },
+    {
+      "name": "Iterable",
+      "purpose": "Email communications",
+      "region": "United States"
+    },
+    {
+      "name": "Functional Software, dba Sentry",
+      "purpose": "Error Handling, User Support",
+      "region": "United States"
+    },
+    {
+      "name": "Sift",
+      "purpose": "Fraud and abuse detection",
+      "region": "United States"
+    },
+    {
+      "name": "Arkose Labs",
+      "purpose": "Fraud and abuse detection",
+      "region": "United States"
+    },
+    {
+      "name": "Brave Search",
+      "purpose": "Web Search",
+      "region": "United States"
+    },
+    {
+      "name": "ElevenLabs",
+      "purpose": "Text to speech",
+      "region": "United States"
+    },
+    {
+      "name": "Palantir Federal Cloud Service (PFCS)",
+      "purpose": "FedRAMP Cloud",
+      "region": "United States"
+    },
+    {
+      "name": "TurboPuffer",
+      "purpose": "Web Search",
+      "region": "United States"
+    },
+    {
+      "name": "Persona",
+      "purpose": "Fraud and abuse detection, identity verification",
+      "region": "United States"
+    },
+    {
+      "name": "Yoti",
+      "purpose": "Fraud and abuse detection, identity verification",
+      "region": "United Kingdom"
+    }
+  ]
+}

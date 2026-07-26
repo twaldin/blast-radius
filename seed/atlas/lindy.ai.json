@@ -1,0 +1,29 @@
+{
+  "domain": "lindy.ai",
+  "name": "Lindy",
+  "subprocessor_url": "https://app.drata.com/trust/9cb791f0-0c38-11ee-865f-029d78a187d9",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T14:24:13",
+  "subprocessors": [
+    {"name": "Datadog", "purpose": "Infrastructure monitoring and APM", "region": "USA"},
+    {"name": "OpenAI", "purpose": "", "region": "USA"},
+    {"name": "Anthropic", "purpose": "AI inference and AI services (Claude LLM)", "region": "USA"},
+    {"name": "Exa Labs, Inc.", "purpose": "AI-powered web search API for retrieving and processing web content for AI applications", "region": "United States"},
+    {"name": "Orb Labs, Inc.", "purpose": "Usage-based billing and metering", "region": "United States"},
+    {"name": "Omni", "purpose": "", "region": "United States"},
+    {"name": "Fivetran", "purpose": "Data warehousing and analytics", "region": "United States"},
+    {"name": "Snowflake Inc.", "purpose": "Data warehousing and analytics", "region": "United States"},
+    {"name": "E2B Dev, Inc.", "purpose": "Code execution sandbox (Computer Use)", "region": "United States"},
+    {"name": "WorkOS, Inc.", "purpose": "", "region": "United States"},
+    {"name": "Honeycomb.io (Hound Technology, Inc.)", "purpose": "Distributed tracing and observability", "region": "United States"},
+    {"name": "Recall.ai, Inc.", "purpose": "Meeting bot and recording services", "region": "United States"},
+    {"name": "Deepgram, Inc.", "purpose": "Speech-to-text and audio transcription", "region": "United States"},
+    {"name": "Twilio Inc.", "purpose": "", "region": "United States"},
+    {"name": "Google Cloud Platform", "purpose": "Cloud Infrastructure and Security", "region": "USA"},
+    {"name": "Temporal Technologies, Inc.", "purpose": "Workflow orchestration (Temporal Cloud)", "region": "United States"},
+    {"name": "Perplexity AI, Inc.", "purpose": "AI-powered search and research", "region": "United States"},
+    {"name": "Amazon Web Services", "purpose": "Object storage (S3)", "region": "United States"},
+    {"name": "Posthog", "purpose": "", "region": "USA"},
+    {"name": "Stripe", "purpose": "Payment processing platform", "region": "USA"}
+  ]
+}

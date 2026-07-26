@@ -1,0 +1,150 @@
+Lindy Trust Center
+https://app.drata.com/trust/9cb791f0-0c38-11ee-865f-029d78a187d9
+(Linked as "Trust Center" from https://www.lindy.ai/security; rendered in browser. Fetched 2026-07-26.)
+
+Trust Center - Lindy is continuously monitoring its overall security posture.
+
+Compliance
+
+Documentation of our compliance against global standards including certifications, attestations, and audit reports.
+
+SOC2 Type 2 Report: October 21, 2025
+PIPEDA
+HIPAA
+Policies
+
+Information Security Policy
+Data Retention Policy
+Change Management Policy
+Breach Notification Policy
+Vulnerability Management Policy
+Responsible Disclosure Policy
+Physical Security Policy
+Data Protection Policy
+
+Monitoring
+
+Continuous monitoring
+
+Note: If a control is passing all tests, it will be marked as green. If a control has a failed test that was not resolved within the past 7 days, it will be marked yellow.
+
+App Security
+Code Review Process
+Disclosure Process for Customers
+Employee Disclosure Process
+Web Application Firewall
+Data Security
+Customer Data is Encrypted at Rest
+Daily Database Backups
+SSL/TLS Enforced
+System Access Control Policy
+Infrastructure Security
+Cloud Data Storage Restricted
+Password Policy
+Require Encryption of Web-Based Admin Access
+Security Patches Automatically Applied
+Network Security
+Denial of Public SSH
+Firewalls
+Malware Detection Software Installed
+Unique Accounts Used
+Organization Security
+Acceptable Use Policy
+Code of Conduct
+Disaster Recovery Plan
+Incident Response Plan
+Incident Response Team
+Product Security
+Accepting The Terms of Service
+Acknowledge The Privacy Policy
+Allowable Use and Disclosure
+Annual Access Control Review
+Annual Performance Evaluations
+Auto-Scale Configuration
+Business Associate Agreements
+Credential Keys Managed
+
+Subprocessors (preview on main page)
+
+Datadog
+Infrastructure monitoring and APM
+Data location: USA
+OpenAI
+Data location: USA
+Anthropic
+AI inference and AI services (Claude LLM)
+Data location: USA
+Exa Labs, Inc.
+AI-powered web search API for retrieving and processing web content for AI applications
+Data location: United States
+Recall.ai, Inc.
+Meeting bot and recording services
+Data location: United States
+WorkOS, Inc.
+Data location: United States
+
+Additional details
+
+Lindy's mission is to free humanity from work, by building a no-code platform for AI/LLM agents. We believe that while much of the recent AI developments around LLMs are focused on generative aspects (image, video, and prose generation), there is a large untapped opportunity in using AI to automate employee workloads.
+
+Privacy details
+
+We have designed Lindy's systems and processes around safeguarding users' data privacy and security from the ground up. This includes severely limiting access to user data, employing state-of-the-art in-transit and at-rest encryption, and ensuring compliance with relevant legislation such as HIPAA, PIPEDA, and other applicable legislation.
+
+Subprocessors (full list, "View all" modal)
+
+Datadog
+USA
+Infrastructure monitoring and APM
+OpenAI
+USA
+Anthropic
+USA
+AI inference and AI services (Claude LLM)
+Exa Labs, Inc.
+United States
+AI-powered web search API for retrieving and processing web content for AI applications
+Orb Labs, Inc.
+United States
+Usage-based billing and metering
+Omni
+United States
+Fivetran
+United States
+Data warehousing and analytics
+Snowflake Inc.
+United States
+Data warehousing and analytics
+E2B Dev, Inc.
+United States
+Code execution sandbox (Computer Use)
+WorkOS, Inc.
+United States
+Honeycomb.io (Hound Technology, Inc.)
+United States
+Distributed tracing and observability
+Recall.ai, Inc.
+United States
+Meeting bot and recording services
+Deepgram, Inc.
+United States
+Speech-to-text and audio transcription
+Twilio Inc.
+United States
+Google Cloud Platform
+USA
+Cloud Infrastructure and Security
+Temporal Technologies, Inc.
+United States
+Workflow orchestration (Temporal Cloud)
+Perplexity AI, Inc.
+United States
+AI-powered search and research
+Amazon Web Services
+United States
+Object storage (S3)
+Posthog
+USA
+Stripe
+USA
+Payment processing platform

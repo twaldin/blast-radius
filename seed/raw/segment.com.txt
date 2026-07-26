@@ -1,0 +1,368 @@
+Source URL actually read: https://www.twilio.com/en-us/legal/sub-processors
+(reached via redirect from https://segment.com/legal/subprocessors/ — Segment is a Twilio company and uses the Twilio Sub-Processors disclosure)
+
+=====================================================================
+
+Twilio Sub-Processors
+Last Updated: April 2026
+
+Third Party Sub-Processors
+
+Twilio uses the third party companies below (each, a "sub-processor") to process personal data (i) on behalf of Twilio customers; (ii) in accordance with customer instructions as communicated by Twilio; and (iii) in strict accordance with the terms of a written contract between Twilio and the sub-processor.
+Twilio imposes obligations on its sub-processors to implement appropriate technical and organizational measures ensuring that the sub-processing of personal data is protected to the standards required by applicable data protection laws. Further information relating to sub-processor security measures can be found via the external links below.
+Where the engagement of a sub-processor requires the cross-border transfer of personal data, Twilio has performed Transfer Impact Assessments for such data transfer.
+Twilio maintains an up-to-date list of the names and locations of all sub-processors below. Twilio customers may subscribe to notifications of sub-processor changes to receive updates.
+Duration of processing: For each sub-processor below, processing of personal data will be for the duration that the customer uses and continues to use the applicable service(s), and for the retention periods as set out in customer's agreement with Twilio.
+Please note that telecommunications providers used by Twilio are not processors of Twilio or sub-processors of our customers. Additional information about this position can be found here.
+
+Columns: Sub-Processor | Applicable Service(s) | Subject matter | Nature and purpose of processing | Location(s) of processing | External links for additional information relating to security
+
+---
+
+Adaptive Mobile
+Programmable Messaging
+Personal data contained in communications sent through the Twilio Services
+Prevention of illegal or unwanted communications over Twilio's messaging services
+USA
+
+---
+
+AWS
+All services
+Personal data contained in communications sent through or uploaded to the services.
+Infrastructure Provider providing hosting services and storage.
+USA*
+
+---
+
+AWS
+Programmable Voice
+Personal data contained in voice communications.
+Text to speech functionality for customers using Amazon Polly, Amazon Comprehend, and Amazon Transcribe.
+USA*
+
+---
+
+AWS
+Programmable Video
+Personal data contained in streamed videos.
+Streaming and interactive video.
+USA*
+
+---
+
+AWS
+Marketing Campaigns (SendGrid)
+Personal data contained in email communications.
+Automation and storage services for marketing campaigns.
+USA
+
+---
+
+AWS
+Email (SendGrid)
+Personal data contained in email communications.
+Routing and transmission of emails.
+USA
+EU
+
+---
+
+AWS
+CDP (Segment)
+Personal data contained in communications sent through the Segment Services
+Infrastructure Provider providing hosting services and storage.
+USA or EU (Dublin) as selected by customers
+
+---
+
+Anthropic
+All AI Products
+Personal data contained in communications sent through Flex.
+Vendor for AI functionality in product
+USA
+
+---
+
+Amazon Bedrock
+All AI Products
+Personal data contained in customer defined workflows
+Vendor for AI functionality in product
+USA
+
+---
+
+Clickhouse
+All Products
+Personal data contained in communications sent through the Twilio Services
+Infrastructure Provider providing hosting services and storage.
+USA, EU
+
+---
+
+Datadog
+Segment
+Stytch by Twilio
+System and event logs only
+Operational monitoring
+USA
+
+---
+
+DVELP/Sabio
+Twilio Flex
+Personal data contained in voice communications.
+Connectivity services to customer's Google CCAI instance.
+UK (provision of the services), Belgium, Finland, Germany, Netherlands, and Poland (data persistence/backups)
+
+---
+
+Deepgram
+Programmable Voice
+Personal data contained in voice communications
+Speech to text and text to speech APIs
+USA
+
+---
+
+Elastic
+Stytch by Twilio
+Storage, indexing, and retrieval of log data and User Personal Data (such as User IDs, emails, and metadata) to facilitate search functionality and system monitoring
+Logging and query solution
+USA
+
+---
+
+ElevenLabs
+Conversational Intelligence
+Personal data contained in voice transcriptions
+AI features as enabled by customer for the purpose of summarization and sentiment analysis
+USA
+EU
+
+---
+
+Fivetran
+Stytch by Twilio
+Automated data pipeline service used to replicate and synchronize application data (which may include User Personal Data, billing information, and usage logs) from various third-party sources into a centralized data warehouse for internal analytics and business intelligence
+ETL (Extract, Transform, Load) Service / Automated Data Integration
+USA
+
+---
+
+GoodData Corporation
+Twilio Flex
+Personal data contained in communications sent through Twilio Flex.
+Data analytics functionality for customers who have enabled the feature in Twilio Flex.
+USA
+
+---
+
+Google
+Segment/Twilio Engage
+Personal data contained in communications sent through the Segment Services
+Data storage compute and queries
+USA or EU (Zurich & London) as selected by Customers
+
+---
+
+Google
+Programmable Voice;
+Twilio Flex
+Personal data contained in voice communications.
+Speech recognition functionality for customers who have enabled the feature on supported products.
+USA*
+
+---
+
+Google RCS...
+Verify
+Phone numbers and message content
+Message delivery for outbound/inbound Twilio Verify services.
+USA, South America: Chile, Europe: Ireland, Netherlands, Denmark, Finland, Belgium, Asia: Taiwan, Japan, Singapore
+
+---
+
+Hex
+Stytch by Twilio
+Processing and visualization of User Personal Data (such as User IDs and usage metrics) queried from data warehouse to generate internal business intelligence reports, dashboards, and analytics
+Collaborative data workspace / Analytics & reporting
+USA
+
+---
+
+Honeycomb
+Stytch by Twilio
+Ingestion and analysis of system telemetry data (including traces, logs, and structured events) which may contain User Personal Data (such as User IDs, IP addresses, and request metadata) to facilitate real-time debugging, system reliability, and performance optimization
+Observability & Application Performance Management (APM)
+USA
+
+---
+
+Lakera
+All AI Products
+Personal data contained in communications sent through the Twilio Services
+AI security monitoring, data leakage prevention, and real-time threat detection within automated workflows.
+USA
+
+---
+
+Postmark
+Stytch by Twilio
+Personal data contained in voice communications.
+Outbound email messaging service.
+USA
+
+---
+
+Sinch
+Stytch by Twilio
+Personal data contained in voice communications.
+Outbound SMS messaging service
+USA
+
+---
+
+Meta
+Whatsapp Channel
+Stytch by Twilio
+Phone numbers and message content
+Outbound/inbound message delivery
+USA
+
+---
+
+Microsoft Azure
+Conversational Intelligence
+Personal data contained in voice communications
+Speech recognition functionality for customers who have enabled the feature on supported products.
+USA, EU
+
+---
+
+Microsoft Azure
+All AI Products
+Personal data contained in customer defined workflows
+Vendor for AI functionality in product
+USA
+
+---
+
+Mintlify
+Stytch by Twilio
+Process contact data and communications usage data (device data)
+Processing pseudonymized Customer Account Data to facilitate document gating, and personalized service configurations
+USA
+
+---
+
+OpenAI
+All AI Products
+Personal data contained in customer defined workflows
+Vendor for AI functionality in product
+USA
+
+---
+
+Plain
+Stytch by Twilio
+Storage and processing of User Personal Data (including names, emails, support tickets, and communication history) to facilitate multi-channel customer support, issue tracking, and resolution
+Customer Support Infrastructure / Help Desk Platform
+UK
+
+---
+
+Snowflake
+Marketing Campaigns (SendGrid)
+Personal data contained in email communications.
+Automation and storage services for Marketing Campaigns.
+USA
+
+---
+
+Snowflake
+Stytch by Twilio
+Processing and storage of User Personal Data (including names, email addresses)
+Storage services
+USA
+
+---
+
+Temporal Cloud
+Twilio Flex
+Personal data contained in customer defined workflows
+Scheduling and execution of the customer defined workflows.
+USA
+
+---
+
+Slack
+Stytch by Twilio
+Storage and processing of User Personal Data (including names, emails, support tickets, and communication history) to facilitate customer support
+Customer Support chat/messaging solution.
+USA
+
+---
+
+Svix
+Stytch by Twilio
+Transmission and temporary processing of event notifications (webhook payloads) which may contain User Personal Data (such as User IDs, authentication events, and request metadata) to facilitate real-time updates to customer applications
+Event delivery (webhooks as a Service)
+USA
+
+---
+
+VoiceBase
+Programmable Voice;
+Twilio Flex
+Personal data contained in voice communications.
+Transcription services for customers who have enabled transcriptions on supported products.
+USA
+
+---
+
+* If using Regional Twilio for supported products, Customer Content is stored and processed in the region selected (Ireland or Australia). Exceptions will occur as necessary to investigate issues of fraud and abuse. At this time, all other data relating to your account and use of the Twilio Services will continue to be processed in the United States to allow Twilio to continue to provide and improve our Services to you.
+
+Twilio Group Sub-Processors
+
+Columns: Sub-Processor | Applicable Service(s) | Subject matter | Nature and purpose of processing | Location(s) of processing | External links for additional information relating to security
+
+DataBank
+Sendgrid Services
+Personal data contained in communications sent through or uploaded to the services.
+Infrastructure Provider providing hosting services and storage.
+North America
+
+Lumen
+Sendgrid Services
+Personal data contained in communications sent through or uploaded to the services.
+Infrastructure Provider providing hosting services and storage.
+North America
+
+Digital Realty
+Sendgrid Services
+Personal data contained in communications sent through or uploaded to the services.
+Infrastructure Provider providing hosting services and storage.
+North America
+EU
+
+Twilio Inc.
+All Services
+If Twilio Inc. is not the Twilio party to the agreement, then Twilio Inc. is acting as a sub-processor for that Twilio party. (For example. If you are contracting with Twilio Ireland Ltd, then Twilio Inc. is acting as a sub-processor for the provision of the services.)
+Provision of the Twilio Services
+USA*
+
+---
+
+* If using Regional Twilio for supported products, Customer Content is stored and processed in the region selected (Ireland or Australia). Exceptions will occur as necessary to investigate issues of fraud and abuse. At this time, all other data relating to your account and use of the Twilio Services will continue to be processed in the United States to allow Twilio to continue to provide and improve our Services to you.
+
+=====================================================================
+
+Extraction note: rows included in seed/atlas/segment.com.json are those whose
+"Applicable Service(s)" covers Segment: "All services", "All Products",
+"CDP (Segment)", "Segment", "Segment/Twilio Engage", "All AI Products"
+(Segment AI/ML features confirmed in Twilio's Predictive and Generative AI/ML
+Features Addendum, Exhibit A: "Twilio Segment: Generative Audiences",
+"Twilio Segment: Functions Copilot", "Twilio Segment: Suggested Mappings",
+"Twilio Segment: Product Recommendations"), and the Twilio Group
+"All Services" row (Twilio Inc.).

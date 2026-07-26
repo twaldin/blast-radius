@@ -1,73 +1,97 @@
 """Blast Radius — Graph & Traversal (Person A's file).
 
-Object-spatial core: the ONLY file that creates nodes and edges. Real graph logic
-behind the frozen walker contract (PLAN.md). Vendors/providers are discovered from
-B's `extract.jac` exports (detection, crawl, `by llm` extraction + entity resolution);
-A turns the returned typed records into a graph and answers every question by
-traversal — `[prov <-:Subprocesses:<-]` (who transitively depends on this) is the
-whole product in one line.
+Object-spatial core: the ONLY file that creates nodes and edges. See `SPEC-V2.md`.
+
+ONE node type. A company is a company: OpenAI is a vendor of yours *and* an org with
+its own Article 28 filing *and* a sub-processor of somebody else. Modelling that as
+three node types duplicated the node and made an atlas impossible, so `Org`/`Vendor`/
+`Provider` collapse into `Company`, keyed by slug, existing exactly once.
+
+`tier` (org|vendor|provider) is therefore **not stored** — it is BFS distance from
+whichever company you are looking at, computed per view. The wire contract is unchanged,
+so the client does not care that any of this moved.
+
+Depth: **walking is free, crawling costs money.** Reads are an unbounded BFS over a
+visited set (O(V+E), microseconds). The budget lives on the crawl instead, as
+`max_new` companies. There is no depth cap anywhere.
+
+Honesty rule (SPEC-V2 §2): a risk field is reported only when `risk_source_url` is set.
+No citation, no number — we never emit a plausible-looking fake.
 
 Run:   jac clean --all && jac start main.jac --port 8000
-Then:  curl -s -X POST localhost:8000/walker/detect_vendors -d '{"domain":"jachammer.ai"}'
-       curl -s -X POST localhost:8000/walker/expand        -d '{}'
-       curl -s -X POST localhost:8000/walker/chokepoints   -d '{}'
+       curl -sX POST localhost:8000/walker/seed_atlas -d '{}'
+       curl -sX POST localhost:8000/walker/atlas      -d '{}'
+       curl -sX POST localhost:8000/walker/graph      -d '{"domain":"openai.com"}'
 Envelope: data.reports[0] is the payload.
 """
 
+import json;
+import from pathlib { Path }
 import from datetime { datetime }
 import from hashlib { sha256 }
 import from extract {
-    resolve_url, fetch_page, extract_and_resolve
+    resolve_url, fetch_page, extract_and_resolve,
+    canonicalize, clean_provider_name, PROVIDER_ALIASES
 }
 import from demo_data {
-    detect_all,
-    provider_profile, vendor_feature,
-    draft_status_update, explain_fallout, explain_change, compose_one_look
+    detect_all, provider_profile,
+    draft_status_update, explain_fallout, explain_change
 }
+import from registry { VENDOR_REGISTRY }
 
 # ------------------------------------------------------------------ graph model
-# Typed endpoints so `[org ->:Uses:->]` infers `list[Vendor]` with no [?:Type] filter.
-# Provider is a separate type from Vendor: a company can be both, and keeping them
-# distinct keeps the concentration math honest.
-node Org      { has domain: str; has name: str = ""; }
-node Vendor   { has domain: str; has name: str;
-                has slug: str = "";                        # stable short id for the UI
-                has source_url: str = "";                  # the filing we read (provenance)
-                has discovery_method: str = "";            # dns | headers | scripts | manual
-                has crawl_status: str = "pending";         # pending | ok | unreadable | notfound
-                has last_crawled: str = "";                # ISO ts -> drives TTL re-crawl
-                has content_hash: str = ""; }              # filing digest -> re-extract only on change
-node Provider { has canonical_name: str; has slug: str = ""; has category: str = "";
-                has downtime_hours_ytd: float = 0.0;       # curated historical outage -> risk weight
-                has soc2: bool = True; has hipaa: bool = False;
-                has supply_chain_risk: str = "";           # "" | watchlist | sanctioned | foreign-owned
-                has is_sink: bool = False; }               # hyperscaler: nothing new one layer down
-node Feature  { has name: str; }
-node Snapshot { has taken_at: str; has vendor_count: int = 0;
-                has provider_count: int = 0; has edges: list[str] = []; }
+node Company {
+    has domain: str;
+    has name: str = "";
+    has slug: str = "";                     # stable identity + the UI's node id
+    has category: str = "";
+    has subprocessor_url: str = "";         # the filing we read (provenance)
+    has discovery_method: str = "";         # seed | registry | manual | dns | headers | scripts
+    has crawl_status: str = "pending";      # pending | ok | unreadable | notfound
+    has last_crawled: str = "";
+    has content_hash: str = "";             # re-extract only when the filing changes
+    has is_sink: bool = False;              # terminal hyperscaler
+    has featured: bool = False;             # eligible for the landing rotation
+    # Curated risk data. Reported ONLY when risk_source_url is set (SPEC-V2 §2).
+    has downtime_hours_ytd: float = 0.0;
+    has soc2: bool = True;
+    has hipaa: bool = False;
+    has supply_chain_risk: str = "";
+    has risk_source_url: str = "";
+}
 
-edge Uses:         Org    --> Vendor   { has added_at: str = ""; }
-edge Subprocesses: Vendor --> Provider { has purpose: str = "";
-                                         has confidence: float = 1.0;
-                                         has handles_pii: bool = False;   # gates compliance fallout
-                                         has first_seen: str = "";
-                                         has last_seen: str = ""; }
-edge Powers:       Vendor  --> Feature   {}
-edge CapturedAt:   Org     --> Snapshot  {}
+edge Subprocesses: Company --> Company {
+    has purpose: str = "";
+    has region: str = "";
+    has confidence: float = 1.0;
+    has handles_pii: bool = False;
+    has first_seen: str = "";
+    has last_seen: str = "";
+}
 
-# ------------------------------------------------------------------ graph helpers
+node Snapshot { has taken_at: str; has company_count: int = 0;
+                has edge_count: int = 0; has edges: list[str] = []; }
+edge CapturedAt: Company --> Snapshot {}
+
+obj GraphView {
+    has order: list[Company] = [];
+    has dist: dict[str, int] = {};
+}
+
+# ------------------------------------------------------------------ small helpers
 def _now() -> str { return datetime.now().isoformat(); }
 
+# jac's checker rejects round(x, n); format-string round is the working form.
 def _round(x: float, n: int) -> float { return float(f"%.{n}f" % x); }
 
 def _by_exposure(d: dict) -> float { return (d["exposure"] as float); }
 
-def _by_inbound(d: dict) -> int { return (d["inbound_degree"] as int); }
+def _by_affected(d: dict) -> int { return (d["vendors_affected"] as int); }
 
-def _name_from_domain(dom: str) -> str { return dom.split(".")[0].capitalize(); }
+def _by_indeg(d: dict) -> int { return (d["inbound_degree"] as int); }
 
-# Stable short id for the UI. Slugging the DISPLAY NAME (not the domain) is what makes
-# "Datadog"/datadoghq.com -> `datadog` and "OpenAI" -> `openai`.
+def _by_reach(d: dict) -> int { return (d["vendor_count"] as int); }
+
 def _slugify(s: str) -> str {
     out: list[str] = [];
     prev_dash = False;
@@ -78,7 +102,11 @@ def _slugify(s: str) -> str {
     return "".join(out).strip("-");
 }
 
-# A cached crawl older than the TTL is refetched; everything else is served off the graph.
+def _name_from_domain(dom: str) -> str {
+    bare = dom.replace("www.", "");
+    return bare.split(".")[0].capitalize();
+}
+
 def _is_stale(iso: str, ttl_days: int) -> bool {
     if not iso { return True; }
     try {
@@ -88,424 +116,834 @@ def _is_stale(iso: str, ttl_days: int) -> bool {
     }
 }
 
-def _org() -> Org | None {
-    existing = [root -->[?:Org]];
-    return existing[0] if existing else None;
-}
-
-def _get_or_create_org(dom: str, nm: str) -> Org {
-    existing = [root -->[?:Org, domain == dom]];
-    if existing {
-        found = existing[0];
-        if nm { found.name = nm; }
-        return found;
-    }
-    return root ++> Org(domain=dom, name=nm or _name_from_domain(dom));
-}
-
-def _org_or_default(dom: str) -> Org {
-    existing = [root -->[?:Org]];
-    return existing[0] if existing else _get_or_create_org(dom, "");
-}
-
-def _get_or_create_feature(fname: str) -> Feature {
-    existing = [root -->[?:Feature, name == fname]];
-    if existing { return existing[0]; }
-    return root ++> Feature(name=fname);
-}
-
-# Node creation from B's returned canonical strings. Seeds curated risk data (B's asset).
-def find_or_create_provider(name: str) -> Provider {
-    existing = [root -->[?:Provider, canonical_name == name]];
-    if existing { return existing[0]; }
-    prof = provider_profile(name);
-    return root ++> Provider(
-        canonical_name=name, slug=prof.slug or _slugify(name), category=prof.category,
-        downtime_hours_ytd=prof.downtime_hours_ytd,
-        soc2=prof.soc2, hipaa=prof.hipaa,
-        supply_chain_risk=prof.supply_chain_risk, is_sink=prof.is_sink
-    );
-}
-
-# Accepts either the UI slug ("aws", "gcp") or the canonical name ("Google Cloud").
-def _lookup_provider(pname: str) -> Provider | None {
-    want = pname.lower();
-    for p in [root -->[?:Provider]] {
-        if p.canonical_name.lower() == want or p.slug == want { return p; }
-    }
-    return None;
-}
-
 def _handles_pii(purpose: str) -> bool {
     low = purpose.lower();
-    for kw in ["pii", "payment", "error", "log", "data", "payload", "personal"] {
+    for kw in ["pii", "payment", "error", "log", "personal", "customer data", "analytics"] {
         if kw in low { return True; }
     }
     return False;
 }
 
-# ------------------------------------------------------------------ serialization (frozen Node/Edge shapes)
-def _nodes() -> list[dict] {
-    out: list[dict] = [];
-    org = _org();
-    if org {
-        out.append({"id": org.domain, "label": org.name or org.domain, "tier": "org",
-                    "inbound_degree": 0, "soc2": True, "supply_chain_risk": "",
-                    "downtime_hours_ytd": 0.0, "domain": org.domain, "category": "",
-                    "features": [], "crawl_status": "", "source_url": ""});
-        for v in [org ->:Uses:->] {
-            out.append({"id": v.slug, "label": v.name or v.domain, "tier": "vendor",
-                        "inbound_degree": len([v <-:Subprocesses:<-]), "soc2": True,
-                        "supply_chain_risk": "", "downtime_hours_ytd": 0.0,
-                        "domain": v.domain, "category": "",
-                        "features": [f.name for f in [v ->:Powers:->]],
-                        "crawl_status": v.crawl_status, "source_url": v.source_url});
+# Filings write the same role a dozen ways ("Cloud Infrastructure", "Cloud hosting and
+# infrastructure provider; Cross-region inference..."). Fold case, take the leading
+# clause, dedupe, and cap — otherwise the drafted status post is unreadable.
+def _summarize(raw: list[str]) -> list[str] {
+    seen: dict[str, bool] = {};
+    out: list[str] = [];
+    for p in raw {
+        head = p.split(";")[0].split(",")[0].strip();
+        if not head { continue; }
+        if len(head) > 60 { head = head[:57].rstrip() + "..."; }
+        k = head.casefold();
+        if k in seen { continue; }
+        seen[k] = True;
+        out.append(head);
+    }
+    return out[:6];
+}
+
+def _tier(d: int) -> str {
+    if d == 0 { return "org"; }
+    if d == 1 { return "vendor"; }
+    return "provider";
+}
+
+# ------------------------------------------------------------------ company identity
+#
+# THE load-bearing step. Stripe files "Amazon Web Services, Inc.", Notion files "AWS",
+# Vercel files "Amazon Web Services (AWS)", Slack files "Cloudfront (on Amazon Web
+# Services, Inc.)". Those are one company. Store them raw and the graph shows four
+# providers with one dependent each and THE CHOKEPOINT NEVER APPEARS.
+#
+# So nothing un-canonical is ever written. Every name entering the graph resolves
+# here first: candidate keys -> alias table -> existing company index -> (optional) LLM
+# -> otherwise it becomes a new canonical entry. Reads are then pure traversal.
+
+# True corporate-form suffixes only. Deliberately conservative: over-merging two real
+# companies is a much worse error than leaving two spellings apart.
+glob LEGAL_TOKENS: set[str] = {
+    "inc", "incorporated", "llc", "llp", "lp", "ltd", "limited", "gmbh", "sarl",
+    "sa", "sas", "srl", "spa", "bv", "nv", "ab", "oy", "ag", "plc", "pbc", "pte",
+    "pty", "kk", "kg", "co", "corp", "corporation", "company", "aps", "oyj"
+};
+
+# Brand-level merges observed in the real filings, layered over B's PROVIDER_ALIASES.
+glob ALIAS_EXTRA: dict[str, str] = {
+    "amazon web services emea sarl": "Amazon Web Services",
+    "amazon bedrock": "Amazon Web Services",
+    "aws bedrock": "Amazon Web Services",
+    "amazon chime": "Amazon Web Services",
+    "amazon transcribe": "Amazon Web Services",
+    "cloudfront": "Amazon Web Services",
+    "google": "Google Cloud",
+    "google workspace": "Google Cloud",
+    "microsoft": "Microsoft Azure",
+    "functional software": "Sentry",
+    "anthropic": "Anthropic",
+    "openai opco": "OpenAI",
+    "honeycombio": "Honeycomb",
+    "hound technology": "Honeycomb",
+    "mailgun technologies": "Mailgun",
+    "sinch email": "Mailgun"
+};
+
+def _all_companies() -> list[Company] { return [root -->[?:Company]]; }
+
+# Normalized identity key: dots folded (so "L.L.C." -> "llc"), punctuation to spaces,
+# trailing corporate-form tokens dropped.
+def _canon_key(raw: str) -> str {
+    s = raw.casefold().replace(".", "");
+    cleaned: list[str] = [];
+    for ch in s {
+        cleaned.append(ch if ch.isalnum() else " ");
+    }
+    tokens = "".join(cleaned).split();
+    while tokens and tokens[-1] in LEGAL_TOKENS { _ = tokens.pop(); }
+    return " ".join(tokens);
+}
+
+# One filed string can hide several usable names: the outer name, a parenthetical
+# ("Microsoft Corporation (Microsoft Azure)"), or a d/b/a tail ("Functional Software,
+# dba Sentry"). Try each; first resolution wins.
+def _canon_candidates(raw: str) -> list[str] {
+    out: list[str] = [];
+    base = raw.strip();
+    low = base.casefold();
+    for marker in [" dba ", " d/b/a ", " doing business as "] {
+        if marker in low {
+            idx = low.find(marker) + len(marker);
+            tail = base[idx:].strip(" ()");
+            if tail { out.append(tail); }
         }
     }
-    for p in [root -->[?:Provider]] {
-        out.append({"id": p.slug, "label": p.canonical_name, "tier": "provider",
-                    "inbound_degree": len([p <-:Subprocesses:<-]), "soc2": p.soc2,
-                    "supply_chain_risk": p.supply_chain_risk,
-                    "downtime_hours_ytd": p.downtime_hours_ytd,
-                    "domain": "", "category": p.category,
-                    "features": [], "crawl_status": "", "source_url": ""});
+    if "(" in base and ")" in base {
+        op = base.find("(");
+        cl = base.find(")", op);
+        if cl > op {
+            inner = base[op + 1:cl].strip();
+            for lead in ["by ", "on ", "dba ", "d/b/a "] {
+                if inner.casefold().startswith(lead) { inner = inner[len(lead):].strip(); }
+            }
+            if inner { out.append(inner); }
+            outer = (base[:op] + base[cl + 1:]).strip();
+            if outer { out.append(outer); }
+        }
     }
+    out.append(base);
     return out;
 }
 
-def _edges() -> list[dict] {
-    out: list[dict] = [];
-    org = _org();
-    if org {
-        for v in [org ->:Uses:->] {
-            out.append({"source": org.domain, "target": v.slug, "kind": "uses",
-                        "purpose": "", "handles_pii": False});
-            for p in [v ->:Subprocesses:->] {
-                purpose = "";
-                pii = False;
-                for e in [edge v ->:Subprocesses:-> p] { purpose = e.purpose; pii = e.handles_pii; }
-                out.append({"source": v.slug, "target": p.slug, "kind": "subprocesses",
-                            "purpose": purpose, "handles_pii": pii});
+def _index() -> dict[str, Company] {
+    idx: dict[str, Company] = {};
+    for c in _all_companies() {
+        k = _canon_key(c.name or c.domain);
+        if k and k not in idx { idx[k] = c; }
+    }
+    return idx;
+}
+
+def _alias_for(key: str) -> str {
+    if key in ALIAS_EXTRA { return ALIAS_EXTRA[key]; }
+    if key in PROVIDER_ALIASES { return PROVIDER_ALIASES[key]; }
+    return "";
+}
+
+# Resolve a raw filed name to the canonical name we will actually store.
+def _canonical_name(raw: str, idx: dict[str, Company], use_llm: bool) -> str {
+    for cand in _canon_candidates(raw) {
+        k = _canon_key(cand);
+        if not k { continue; }
+        hit = _alias_for(k);
+        if hit { return hit; }
+        if k in idx { return idx[k].name; }
+    }
+    if use_llm {
+        try {
+            known = [c.name for c in _all_companies()];
+            resolved = canonicalize(raw, known);
+            if resolved { return resolved; }
+        } except Exception {}
+    }
+    return clean_provider_name(raw) or raw.strip();
+}
+
+def _find_company(key: str) -> Company | None {
+    k = key.lower().strip();
+    if not k { return None; }
+    for c in _all_companies() {
+        if c.slug == k or c.domain.lower() == k { return c; }
+    }
+    ks = _slugify(k);
+    ck = _canon_key(key);
+    for c in _all_companies() {
+        if c.slug == ks or c.name.lower() == k { return c; }
+        if ck and _canon_key(c.name or c.domain) == ck { return c; }
+    }
+    return None;
+}
+
+# The single write chokepoint. Nothing else may create a Company.
+def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bool) -> Company {
+    dom = domain.lower().replace("www.", "").strip();
+    label = _canonical_name(name, idx, use_llm) if name else _name_from_domain(dom);
+    key = _canon_key(label);
+    if key in idx {
+        found = idx[key];
+        if dom and not found.domain { found.domain = dom; }
+        return found;
+    }
+    if dom {
+        for c in _all_companies() {
+            if c.domain == dom { idx[key] = c; return c; }
+        }
+    }
+    prof = provider_profile(label);
+    made = (root ++> Company(
+        domain=dom, name=label, slug=prof.slug or _slugify(label) or _slugify(dom),
+        category=prof.category, is_sink=prof.is_sink
+    ))[0];
+    idx[key] = made;
+    return made;
+}
+
+def _get_or_create_company(domain: str, name: str) -> Company {
+    return _upsert_company(domain, name, _index(), False);
+}
+
+# The root of a view. Explicit domain wins; otherwise the most-connected mapped company,
+# so the client's existing no-argument calls keep working.
+def _resolve_root(domain: str) -> Company | None {
+    if domain {
+        hit = _find_company(domain);
+        if hit { return hit; }
+    }
+    best: Company | None = None;
+    best_n = -1;
+    for c in _all_companies() {
+        n = len([c ->:Subprocesses:->]);
+        if n == 0 { continue; }
+        score = n + (100 if c.featured else 0);
+        if score > best_n { best_n = score; best = c; }
+    }
+    return best;
+}
+
+# ------------------------------------------------------------------ the traversal
+# BFS over a visited set. `max_hops = 0` means UNBOUNDED — each company appears exactly
+# once, so it terminates on the number of distinct companies, not on a hop budget.
+# A bound is passed only where the caller genuinely needs less (an atlas card shows
+# "vendors and their vendors", so it asks for 2). It is never a cap on the real graph.
+def _view(start: Company, max_hops: int) -> GraphView {
+    dist: dict[str, int] = {start.slug: 0};
+    order: list[Company] = [start];
+    frontier: list[Company] = [start];
+    hop = 0;
+    while frontier {
+        if max_hops and hop >= max_hops { break; }
+        hop += 1;
+        nxt: list[Company] = [];
+        for c in frontier {
+            for t in [c ->:Subprocesses:->] {
+                if t.slug in dist { continue; }
+                dist[t.slug] = hop;
+                order.append(t);
+                nxt.append(t);
             }
         }
+        frontier = nxt;
+    }
+    return GraphView(order=order, dist=dist);
+}
+
+def _node_payload(c: Company, tier: str, indeg: int) -> dict {
+    cited = c.risk_source_url != "";
+    return {
+        "id": c.slug,
+        "label": c.name or c.domain,
+        "tier": tier,
+        "inbound_degree": indeg,
+        "soc2": c.soc2 if cited else True,
+        "supply_chain_risk": c.supply_chain_risk if cited else "",
+        "downtime_hours_ytd": c.downtime_hours_ytd if cited else 0.0,
+        "domain": c.domain,
+        "category": c.category,
+        "crawl_status": c.crawl_status,
+        "source_url": c.subprocessor_url,
+        "risk_source_url": c.risk_source_url
+    };
+}
+
+def _graph_payload(start: Company) -> dict {
+    view = _view(start, 0);
+    inview: dict[str, bool] = {};
+    for c in view.order { inview[c.slug] = True; }
+
+    edges: list[dict] = [];
+    indeg: dict[str, int] = {};
+    for c in view.order {
+        for t in [c ->:Subprocesses:->] {
+            if t.slug not in inview { continue; }
+            purpose = "";
+            region = "";
+            pii = False;
+            for e in [edge c ->:Subprocesses:-> t] {
+                purpose = e.purpose; region = e.region; pii = e.handles_pii;
+            }
+            edges.append({
+                "source": c.slug, "target": t.slug,
+                "kind": "uses" if view.dist[c.slug] == 0 else "subprocesses",
+                "purpose": purpose, "region": region, "handles_pii": pii
+            });
+            indeg[t.slug] = (indeg[t.slug] if t.slug in indeg else 0) + 1;
+        }
+    }
+    nodes: list[dict] = [];
+    for c in view.order {
+        nodes.append(_node_payload(
+            c, _tier(view.dist[c.slug]), indeg[c.slug] if c.slug in indeg else 0));
+    }
+    return {"nodes": nodes, "edges": edges,
+            "root": start.slug, "root_domain": start.domain, "root_label": start.name};
+}
+
+# ------------------------------------------------------------------ the core algorithm
+# "who depends on this" is the whole product. Computed by tallying the FORWARD edges of
+# the first layer rather than running an inbound query per provider: same answer, but
+# O(edges out of layer 1) instead of O(providers x inbound), which is the difference
+# between a 24-second atlas and a sub-second one.
+def _layer1(view: GraphView) -> list[Company] {
+    out: list[Company] = [];
+    for c in view.order {
+        if view.dist[c.slug] == 1 { out.append(c); }
     }
     return out;
 }
 
-# ------------------------------------------------------------------ core algorithm
-# `[prov <-:Subprocesses:<-]` = who transitively depends on this provider. share x
-# historical downtime = expected exposure.
-def _chokepoints() -> list[dict] {
-    org = _org();
-    vendors = [org ->:Uses:->] if org else [];
-    n = len(vendors);
+def _chokepoints_view(view: GraphView) -> list[dict] {
+    layer1 = _layer1(view);
+    n = len(layer1);
+    tally: dict[str, int] = {};
+    names: dict[str, list[str]] = {};
+    ids: dict[str, list[str]] = {};
+    hold: dict[str, Company] = {};
+    for v in layer1 {
+        vlabel = v.name or v.domain;
+        for t in [v ->:Subprocesses:->] {
+            if view.dist[t.slug] < 2 { continue; }
+            if t.slug not in tally {
+                tally[t.slug] = 0; names[t.slug] = []; ids[t.slug] = []; hold[t.slug] = t;
+            }
+            tally[t.slug] = tally[t.slug] + 1;
+            names[t.slug].append(vlabel);
+            ids[t.slug].append(v.slug);
+        }
+    }
     scored: list[dict] = [];
-    for prov in [root -->[?:Provider]] {
-        exposed = [v for v in [prov <-:Subprocesses:<-] if v in vendors];
-        if not exposed { continue; }
-        share: float = (len(exposed) / n) if n else 0.0;
+    any_cited = False;
+    for slug in tally {
+        p = hold[slug];
+        hits = tally[slug];
+        share: float = (hits / n) if n else 0.0;
+        cited = p.risk_source_url != "";
+        if cited { any_cited = True; }
+        dt: float = p.downtime_hours_ytd if cited else 0.0;
         scored.append({
-            "provider": prov.canonical_name,
-            "provider_id": prov.slug,
-            "vendors_affected": len(exposed),
+            "provider": p.name or p.domain,
+            "provider_id": p.slug,
+            "vendors_affected": hits,
             "share": _round(share, 3),
-            "downtime_hours_ytd": prov.downtime_hours_ytd,
-            "exposure": _round(share * prov.downtime_hours_ytd, 2),
-            "names": [v.name for v in exposed],
-            "vendor_ids": [v.slug for v in exposed]
+            "downtime_hours_ytd": dt,
+            "exposure": _round(share * dt, 2),
+            "downtime_cited": cited,
+            "names": names[slug],
+            "vendor_ids": ids[slug]
         });
     }
-    scored.sort(key=_by_exposure, reverse=True);
+    if any_cited { scored.sort(key=_by_exposure, reverse=True); }
+    else { scored.sort(key=_by_affected, reverse=True); }
     return scored;
 }
 
-# Compliance gap propagates UP the inbound edges, exactly like an outage.
-def _fallout() -> list[dict] {
-    org = _org();
-    vendors = [org ->:Uses:->] if org else [];
+def _chokepoints_for(start: Company) -> list[dict] {
+    return _chokepoints_view(_view(start, 2));
+}
+
+# A compliance gap propagates UP the inbound edges exactly like an outage does.
+# Gated on citation: an uncited flag is an invention, and we do not ship inventions.
+def _fallout_for(start: Company) -> list[dict] {
+    view = _view(start, 2);
+    layer1: list[Company] = [];
+    for c in view.order {
+        if view.dist[c.slug] == 1 { layer1.append(c); }
+    }
     flagged: list[dict] = [];
-    for prov in [root -->[?:Provider]] {
-        if prov.soc2 and not prov.supply_chain_risk { continue; }
+    for p in view.order {
+        if view.dist[p.slug] < 2 { continue; }
+        if not p.risk_source_url { continue; }
+        if p.soc2 and not p.supply_chain_risk { continue; }
         parts: list[str] = [];
-        if prov.supply_chain_risk { parts.append("supply-chain " + prov.supply_chain_risk); }
-        if not prov.soc2 { parts.append("no valid SOC 2"); }
+        if p.supply_chain_risk { parts.append("supply-chain " + p.supply_chain_risk); }
+        if not p.soc2 { parts.append("no valid SOC 2"); }
         reason = "; ".join(parts);
-        for v in [prov <-:Subprocesses:<-] {
-            if v not in vendors { continue; }
+        for v in [p <-:Subprocesses:<-] {
+            if v not in layer1 { continue; }
             pii = False;
-            for e in [edge v ->:Subprocesses:-> prov] { pii = e.handles_pii; }
+            for e in [edge v ->:Subprocesses:-> p] { pii = e.handles_pii; }
             flagged.append({
-                "vendor": v.name, "vendor_id": v.slug,
-                "provider": prov.canonical_name, "provider_id": prov.slug,
-                "handles_pii": pii,
-                "reason": reason, "breaks": explain_fallout(v.name, prov.canonical_name)
+                "vendor": v.name or v.domain, "vendor_id": v.slug,
+                "provider": p.name or p.domain, "provider_id": p.slug,
+                "handles_pii": pii, "reason": reason,
+                "source_url": p.risk_source_url,
+                "breaks": explain_fallout(v.name or v.domain, p.name or p.domain)
             });
         }
     }
     return flagged;
 }
 
+# Deterministic so the rehearsed path never depends on a model being up.
+# B can swap this body for `by llm` without touching the caller.
+def _one_look_for(chokes: list[dict], fallout: list[dict], org: str) -> dict {
+    if not chokes {
+        return {"biggest_risk": f"No shared dependency found for {org} yet — map its sub-processors to see concentration.",
+                "biggest_suggestion": "Expand this company's filing, or pick another from the atlas."};
+    }
+    top = chokes[0];
+    pname = top["provider"];
+    n = top["vendors_affected"];
+    pct = int((top["share"] as float) * 100);
+    risk = f"{pname} sits underneath {n} of {org}'s disclosed sub-processors — {pct}% of the first layer converges on a single provider.";
+    if top["downtime_cited"] {
+        risk = f"{pname} sits underneath {n} of {org}'s disclosed sub-processors ({pct}% of the first layer) and logged {top['downtime_hours_ytd']}h of downtime — the highest expected-exposure dependency.";
+    }
+    names = top["names"] as list;
+    tail = names[-1] if names else "one of them";
+    sug = f"Re-homing {tail} off {pname} severs one of {n} shared paths — the single change that most reduces {org}'s concentration.";
+    if fallout {
+        f0 = fallout[0];
+        sug = f"Start with {f0['vendor']}: it routes through {f0['provider']}, which carries a documented compliance gap, and moving it also breaks a shared {pname} path.";
+    }
+    return {"biggest_risk": risk, "biggest_suggestion": sug};
+}
+
 def _edge_signature() -> list[str] {
-    org = _org();
     sig: list[str] = [];
-    if org {
-        for v in [org ->:Uses:->] {
-            for p in [v ->:Subprocesses:->] { sig.append(v.slug + "->" + p.slug); }
-        }
+    for c in _all_companies() {
+        for t in [c ->:Subprocesses:->] { sig.append(c.slug + "->" + t.slug); }
     }
     return sig;
 }
 
-# ------------------------------------------------------------------ walkers = REST endpoints
-# POST /walker/detect_vendors  {"domain": "jachammer.ai"}
+# ------------------------------------------------------------------ crawl
+# The TTL says WHEN to look again; the content hash says whether looking cost anything.
+# A refresh of an unchanged filing is one fetch and zero LLM calls, which is what makes
+# a short TTL affordable on a graph shared by every caller.
+async def _crawl_company(c: Company, ttl_days: int, force: bool) -> str {
+    if c.crawl_status == "ok" and not _is_stale(c.last_crawled, ttl_days) and not force {
+        return "cached";
+    }
+    url = await resolve_url(c.domain, prefer_demo_cache=c.discovery_method != "manual");
+    if not url { c.crawl_status = "notfound"; c.last_crawled = _now(); return "notfound"; }
+    text = await fetch_page(url);
+    if not text { c.crawl_status = "unreadable"; c.last_crawled = _now(); return "unreadable"; }
+    digest = sha256(text.encode("utf-8")).hexdigest();
+    c.subprocessor_url = url;
+    c.last_crawled = _now();
+    if digest == c.content_hash and c.crawl_status == "ok" { return "unchanged"; }
+    c.content_hash = digest;
+    c.crawl_status = "ok";
+    # Rebuild this company's edges, but carry first_seen across so the weekly diff
+    # still distinguishes a genuinely new sub-processor from the whole list.
+    prior: dict[str, str] = {};
+    for t in [c ->:Subprocesses:->] {
+        for e in [edge c ->:Subprocesses:-> t] { prior[t.slug] = e.first_seen; }
+    }
+    for e in [edge c ->:Subprocesses:->] { del e; }
+    known = [k.name for k in _all_companies()];
+    for rec in extract_and_resolve(text, known) {
+        target = _get_or_create_company("", rec.canonical_name);
+        seen_at = prior[target.slug] if target.slug in prior else _now();
+        c +>:Subprocesses(
+            purpose=rec.purpose, region=rec.region, confidence=rec.confidence,
+            handles_pii=_handles_pii(rec.purpose), first_seen=seen_at, last_seen=_now()
+        ):+> target;
+    }
+    return "ok";
+}
+
+# ------------------------------------------------------------------ seeding
+# SPEC-V2 §11. `.jac/` is gitignored and a redeploy starts empty, so the atlas has to
+# come from committed files or the deployed instance has nothing in it.
+def _seed_one(raw: dict, idx: dict[str, Company], use_llm: bool) -> dict {
+    dom = (raw["domain"] as str) if "domain" in raw else "";
+    if not dom { return {"domain": "", "status": "skipped", "edges": 0}; }
+    nm = (raw["name"] as str) if "name" in raw else "";
+    status = (raw["crawl_status"] as str) if "crawl_status" in raw else "ok";
+    c = _upsert_company(dom, nm, idx, use_llm);
+    c.discovery_method = "seed";
+    c.featured = True;
+    c.crawl_status = status;
+    if "subprocessor_url" in raw { c.subprocessor_url = raw["subprocessor_url"] as str; }
+    if "fetched_at" in raw { c.last_crawled = raw["fetched_at"] as str; }
+    subs = (raw["subprocessors"] as list) if "subprocessors" in raw else [];
+    if status != "ok" { return {"domain": dom, "status": status, "edges": 0}; }
+    prior: dict[str, str] = {};
+    for t in [c ->:Subprocesses:->] {
+        for e in [edge c ->:Subprocesses:-> t] { prior[t.slug] = e.first_seen; }
+    }
+    for e in [edge c ->:Subprocesses:->] { del e; }
+    made = 0;
+    for s in subs {
+        sname = (s["name"] as str) if "name" in s else "";
+        if not sname { continue; }
+        purpose = (s["purpose"] as str) if "purpose" in s else "";
+        region = (s["region"] as str) if "region" in s else "";
+        target = _upsert_company("", sname, idx, use_llm);
+        seen_at = prior[target.slug] if target.slug in prior else _now();
+        c +>:Subprocesses(
+            purpose=purpose, region=region, handles_pii=_handles_pii(purpose),
+            first_seen=seen_at, last_seen=_now()
+        ):+> target;
+        made += 1;
+    }
+    return {"domain": dom, "status": status, "edges": made};
+}
+
+# ------------------------------------------------------------------ walkers = endpoints
+# POST /walker/seed_atlas {}  -> import committed seed/atlas/*.json. Idempotent.
+walker:pub seed_atlas {
+    has directory: str = "seed/atlas";
+    has use_llm: bool = False;      # deterministic by default: the stage path stays offline
+    can run with Root entry {
+        base = Path(self.directory);
+        rows: list[dict] = [];
+        idx = _index();
+        if base.exists() {
+            for f in sorted(base.glob("*.json")) {
+                try {
+                    rows.append(_seed_one(json.loads(f.read_text()) as dict, idx, self.use_llm));
+                } except ValueError {
+                    rows.append({"domain": f.name, "status": "badjson", "edges": 0});
+                }
+            }
+        }
+        ok = 0;
+        edges = 0;
+        for r in rows {
+            if r["status"] == "ok" { ok += 1; }
+            edges += (r["edges"] as int);
+        }
+        report {"seeded": len(rows), "ok": ok, "edges": edges,
+                "companies": len(_all_companies()), "detail": rows};
+    }
+}
+
+# POST /walker/atlas {}  -> the landing rotation: every company we have actually mapped.
+walker:pub atlas {
+    has limit: int = 60;
+    can run with Root entry {
+        out: list[dict] = [];
+        for c in _all_companies() {
+            direct = [c ->:Subprocesses:->];
+            if not direct { continue; }
+            view = _view(c, 2);
+            chokes = _chokepoints_view(view);
+            top = chokes[0] if chokes else None;
+            label = c.name or c.domain;
+            out.append({
+                "id": c.slug, "domain": c.domain, "name": label,
+                "featured": c.featured,
+                "vendor_count": len(direct),
+                "provider_count": len(view.order) - 1 - len(direct),
+                "top_chokepoint": top["provider"] if top else "",
+                "top_chokepoint_id": top["provider_id"] if top else "",
+                "top_share": top["share"] if top else 0.0,
+                "vendors_affected": top["vendors_affected"] if top else 0,
+                "source_url": c.subprocessor_url
+            });
+        }
+        out.sort(key=_by_reach, reverse=True);
+        report {"total": len(out), "companies": out[:self.limit]};
+    }
+}
+
+# POST /walker/graph {"domain": "openai.com"}  -> unbounded BFS read, computed tiers.
+walker:pub graph {
+    has domain: str = "";
+    can run with Root entry {
+        start = _resolve_root(self.domain);
+        if start { report _graph_payload(start); }
+        else { report {"nodes": [], "edges": [], "root": "", "root_domain": "", "root_label": ""}; }
+    }
+}
+
+# POST /walker/expand {"domain": ..., "max_new": 40}
+# Budget-bounded crawl. The cap is on NEW companies fetched, never on depth.
+async walker:pub expand {
+    has domain: str = "";
+    has max_new: int = 40;
+    has ttl_days: int = 7;
+    has force: bool = False;
+    has spent: int = 0;
+    has seen: list[str] = [];
+    async can run with Root entry {
+        start = _resolve_root(self.domain);
+        if not start {
+            report {"nodes": [], "edges": [], "root": "", "root_domain": "", "root_label": ""};
+            disengage;
+        }
+        queue: list[Company] = [start];
+        while queue and self.spent < self.max_new {
+            head = queue[0];
+            queue = queue[1:];
+            if head.slug in self.seen { continue; }
+            self.seen.append(head.slug);
+            if head.is_sink { continue; }
+            status = await _crawl_company(head, self.ttl_days, self.force);
+            if status == "ok" or status == "unchanged" { self.spent += 1; }
+            for t in [head ->:Subprocesses:->] {
+                if t.slug not in self.seen { queue.append(t); }
+            }
+        }
+        report _graph_payload(start);
+    }
+}
+
+# POST /walker/expand_one {"domain": "stripe.com"}  -> crawl exactly one company.
+# Lets the client drive its own per-company spinner with no streaming infrastructure.
+async walker:pub expand_one {
+    has domain: str;
+    has ttl_days: int = 7;
+    has force: bool = False;
+    async can run with Root entry {
+        target = _find_company(self.domain);
+        if not target {
+            report {"id": self.domain, "name": "", "status": "unknown",
+                    "subprocessors": [], "source_url": "", "last_crawled": ""};
+        } else {
+            status = await _crawl_company(target, self.ttl_days, self.force);
+            report {"id": target.slug, "name": target.name, "status": status,
+                    "subprocessors": [t.name for t in [target ->:Subprocesses:->]],
+                    "source_url": target.subprocessor_url,
+                    "last_crawled": target.last_crawled};
+        }
+    }
+}
+
+# POST /walker/crawl_progress {"domain": ...}  -> per-company state + the coverage strip.
+walker:pub crawl_progress {
+    has domain: str = "";
+    can run with Root entry {
+        start = _resolve_root(self.domain);
+        members: list[Company] = _view(start, 0).order if start else [];
+        counts: dict[str, int] = {"pending": 0, "ok": 0, "unreadable": 0, "notfound": 0};
+        rows: list[dict] = [];
+        for c in members {
+            if c.crawl_status in counts { counts[c.crawl_status] = counts[c.crawl_status] + 1; }
+            rows.append({"id": c.slug, "domain": c.domain, "name": c.name,
+                         "crawl_status": c.crawl_status, "source_url": c.subprocessor_url,
+                         "last_crawled": c.last_crawled,
+                         "subprocessors": len([c ->:Subprocesses:->])});
+        }
+        total = len(members);
+        done = total - counts["pending"];
+        report {"total": total, "done": done,
+                "pct": _round((done / total) * 100.0, 1) if total else 0.0,
+                "counts": counts, "companies": rows, "vendors": rows};
+    }
+}
+
+# POST /walker/chokepoints {"domain": ...}
+walker:pub chokepoints {
+    has domain: str = "";
+    can run with Root entry {
+        start = _resolve_root(self.domain);
+        report _chokepoints_for(start) if start else [];
+    }
+}
+
+# POST /walker/blast_radius {"domain": ..., "failed_provider": "aws"}
+walker:pub blast_radius {
+    has failed_provider: str = "";
+    has domain: str = "";
+    can run with Root entry {
+        start = _resolve_root(self.domain);
+        label = self.failed_provider;
+        pid = _slugify(self.failed_provider);
+        hit: list[Company] = [];
+        purposes: list[str] = [];
+        if start {
+            view = _view(start, 2);
+            layer1: list[Company] = [];
+            for c in view.order {
+                if view.dist[c.slug] == 1 { layer1.append(c); }
+            }
+            target = _find_company(self.failed_provider);
+            if target {
+                label = target.name or target.domain;
+                pid = target.slug;
+                for v in [target <-:Subprocesses:<-] {
+                    if v not in layer1 { continue; }
+                    hit.append(v);
+                    for e in [edge v ->:Subprocesses:-> target] {
+                        if e.purpose { purposes.append(e.purpose); }
+                    }
+                }
+            }
+        }
+        report {
+            "provider": label,
+            "provider_id": pid,
+            "vendors_down": [v.name or v.domain for v in hit],
+            "vendor_ids": [v.slug for v in hit],
+            "features_down": _summarize(purposes),
+            "status_post": draft_status_update(label, _summarize(purposes))
+        };
+    }
+}
+
+# POST /walker/compliance_fallout {"domain": ...}  -> [] unless a claim is cited.
+walker:pub compliance_fallout {
+    has domain: str = "";
+    can run with Root entry {
+        start = _resolve_root(self.domain);
+        report _fallout_for(start) if start else [];
+    }
+}
+
+# POST /walker/one_look {"domain": ...}
+walker:pub one_look {
+    has domain: str = "";
+    can run with Root entry {
+        start = _resolve_root(self.domain);
+        if start {
+            report _one_look_for(_chokepoints_for(start), _fallout_for(start),
+                                 start.name or start.domain);
+        } else {
+            report {"biggest_risk": "Nothing mapped yet — seed the atlas.",
+                    "biggest_suggestion": "POST /walker/seed_atlas to import the committed filings."};
+        }
+    }
+}
+
+# POST /walker/search {"q": "strip"}  -> mapped companies first, then registry offers.
+walker:pub search {
+    has q: str = "";
+    has limit: int = 20;
+    can run with Root entry {
+        ql = self.q.lower().strip();
+        hits: list[dict] = [];
+        if not ql { report {"query": self.q, "results": []}; disengage; }
+        seen: dict[str, bool] = {};
+        for c in _all_companies() {
+            if ql in c.name.lower() or ql in c.domain.lower() or ql in c.slug {
+                seen[c.domain] = True;
+                hits.append({"id": c.slug, "domain": c.domain, "name": c.name or c.domain,
+                             "mapped": len([c ->:Subprocesses:->]) > 0,
+                             "crawl_status": c.crawl_status});
+            }
+        }
+        for dom in VENDOR_REGISTRY {
+            if len(hits) >= self.limit { break; }
+            if dom in seen { continue; }
+            entry = VENDOR_REGISTRY[dom];
+            if ql in dom.lower() or ql in entry.name.lower() {
+                hits.append({"id": _slugify(entry.name), "domain": dom, "name": entry.name,
+                             "mapped": False, "crawl_status": "pending"});
+            }
+        }
+        report {"query": self.q, "results": hits[:self.limit]};
+    }
+}
+
+# POST /walker/industry_map {"min_degree": 2}  -> every company, every disclosed edge.
+walker:pub industry_map {
+    has min_degree: int = 0;
+    can run with Root entry {
+        indeg: dict[str, int] = {};
+        raw: list[dict] = [];
+        for c in _all_companies() {
+            for t in [c ->:Subprocesses:->] {
+                raw.append({"source": c.slug, "target": t.slug, "kind": "subprocesses"});
+                indeg[t.slug] = (indeg[t.slug] if t.slug in indeg else 0) + 1;
+            }
+        }
+        keep: dict[str, bool] = {};
+        nodes: list[dict] = [];
+        for c in _all_companies() {
+            d = indeg[c.slug] if c.slug in indeg else 0;
+            out_n = len([c ->:Subprocesses:->]);
+            if d < self.min_degree and out_n == 0 { continue; }
+            keep[c.slug] = True;
+            nodes.append(_node_payload(c, _tier(d if d < 2 else 2), d));
+        }
+        edges = [e for e in raw if (e["source"] in keep) and (e["target"] in keep)];
+        mapped = 0;
+        for c in _all_companies() {
+            if len([c ->:Subprocesses:->]) > 0 { mapped += 1; }
+        }
+        report {"nodes": nodes, "edges": edges,
+                "stats": {"companies": len(nodes), "dependencies": len(edges),
+                          "mapped_filings": mapped}};
+    }
+}
+
+# POST /walker/detect_vendors {"domain": "jachammer.ai"}  -> declared/detected first layer.
 walker:pub detect_vendors {
     has domain: str = "jachammer.ai";
-    has org_name: str = "";              # display name; derived from the domain when blank
+    has org_name: str = "";
     can run with Root entry {
-        org = _get_or_create_org(self.domain, self.org_name);
+        org = _get_or_create_company(self.domain, self.org_name);
+        org.featured = True;
         found = detect_all(self.domain);
         rows: list[dict] = [];
         for d in found {
-            rows.append({"id": _slugify(d.name), "domain": d.domain, "name": d.name, "method": d.method});
-            if [org ->:Uses:->[?:Vendor, domain == d.domain]] { continue; }
-            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
-                domain=d.domain, name=d.name, slug=_slugify(d.name),
-                discovery_method=d.method);
-            feat = vendor_feature(d.domain);
-            if feat { v +>:Powers:+> _get_or_create_feature(feat); }
+            target = _get_or_create_company(d.domain, d.name);
+            target.discovery_method = d.method;
+            rows.append({"id": target.slug, "domain": d.domain, "name": d.name, "method": d.method});
+            if [org ->:Subprocesses:-> target] { continue; }
+            org +>:Subprocesses(first_seen=_now(), last_seen=_now()):+> target;
         }
         report {"found": len(found), "vendors": rows};
     }
 }
 
-# POST /walker/add_vendors  {"domains": ["notion.so", ...]}   -> the manual text box
+# POST /walker/add_vendors {"domain": ..., "domains": [...]}  -> the manual/BYO path.
 walker:pub add_vendors {
     has domains: list[str];
+    has domain: str = "";
     can run with Root entry {
-        org = _org_or_default("jachammer.ai");
+        org = _get_or_create_company(self.domain or "jachammer.ai", "");
+        org.featured = True;
         added: list[dict] = [];
         for dom in self.domains {
-            if [org ->:Uses:->[?:Vendor, domain == dom]] { continue; }
-            nm = _name_from_domain(dom);
-            v: Vendor = org +>:Uses(added_at=_now()):+> Vendor(
-                domain=dom, name=nm, slug=_slugify(nm), discovery_method="manual");
-            feat = vendor_feature(dom);
-            if feat { v +>:Powers:+> _get_or_create_feature(feat); }
-            added.append({"id": v.slug, "domain": dom, "name": nm, "method": "manual"});
+            target = _get_or_create_company(dom, "");
+            target.discovery_method = "manual";
+            if [org ->:Subprocesses:-> target] { continue; }
+            org +>:Subprocesses(first_seen=_now(), last_seen=_now()):+> target;
+            added.append({"id": target.slug, "domain": target.domain,
+                          "name": target.name, "method": "manual"});
         }
-        report {"found": len([org ->:Uses:->]), "vendors": added};
+        report {"found": len([org ->:Subprocesses:->]), "vendors": added};
     }
 }
 
-# One vendor's crawl. Shared by the batch `expand` and the per-vendor `expand_one`.
-# Returns: cached | unchanged | ok | unreadable | notfound.
-#
-# The TTL says WHEN to look again; the content hash says whether looking cost us
-# anything. A refresh of an unchanged filing is one HTTP fetch and zero LLM calls,
-# which is what makes a short TTL affordable on a shared graph.
-async def _crawl_vendor(v: Vendor, ttl_days: int, force: bool) -> str {
-    if v.crawl_status == "ok" and not _is_stale(v.last_crawled, ttl_days) and not force {
-        return "cached";
-    }
-    url = await resolve_url(
-        v.domain,
-        prefer_demo_cache=v.discovery_method != "manual"
-    );
-    if not url { v.crawl_status = "notfound"; v.last_crawled = _now(); return "notfound"; }
-    text = await fetch_page(url);
-    if not text { v.crawl_status = "unreadable"; v.last_crawled = _now(); return "unreadable"; }
-    digest = sha256(text.encode("utf-8")).hexdigest();
-    v.source_url = url;
-    v.last_crawled = _now();
-    if digest == v.content_hash and v.crawl_status == "ok" { return "unchanged"; }
-    v.content_hash = digest;
-    v.crawl_status = "ok";
-    # Re-crawl replaces this vendor's edges, but first_seen survives so the weekly
-    # diff still knows which sub-processors are genuinely new.
-    prior: dict[str, str] = {};
-    for p in [v ->:Subprocesses:->] {
-        for e in [edge v ->:Subprocesses:-> p] { prior[p.canonical_name] = e.first_seen; }
-    }
-    for e in [edge v ->:Subprocesses:->] { del e; }
-    known = [p.canonical_name for p in [root -->[?:Provider]]];
-    for rec in extract_and_resolve(text, known) {
-        prov = find_or_create_provider(rec.canonical_name);
-        seen_at = prior[rec.canonical_name] if rec.canonical_name in prior else _now();
-        v +>:Subprocesses(
-            purpose=rec.purpose, confidence=rec.confidence,
-            handles_pii=_handles_pii(rec.purpose), first_seen=seen_at, last_seen=_now()
-        ):+> prov;
-    }
-    return "ok";
-}
-
-# POST /walker/expand  {}   -> BFS crawl, depth 2, then the full graph for the canvas.
-# BFS is the language default: `visit [-->]` appends to the queue. The `seen` guard is
-# required (the graph has real cycles), not defensive; the TTL makes re-runs cheap.
-async walker:pub expand {
-    has ttl_days: int = 7;               # a cached crawl older than this is refetched
-    has force: bool = False;             # ignore the cache entirely
-    has seen: list[str] = [];
-    can enter with Root entry { visit [-->[?:Org]]; }
-    async can crawl_org with Org entry { visit [->:Uses:->]; }
-    async can crawl_vendor with Vendor entry {
-        if jid(here) in self.seen { skip; }
-        self.seen.append(jid(here));
-        _ = await _crawl_vendor(here, self.ttl_days, self.force);
-    }
-    can finish with Root exit { report {"nodes": _nodes(), "edges": _edges()}; }
-}
-
-# POST /walker/expand_one  {"vendor_id": "stripe"}  -> crawl exactly one vendor.
-# Lets the UI drive its own per-vendor spinner + timeout with no streaming infra:
-# read crawl_progress, then call this for each pending vendor.
-async walker:pub expand_one {
-    has vendor_id: str;
-    has ttl_days: int = 7;
-    has force: bool = False;
-    async can run with Root entry {
-        org = _org();
-        vendors = [org ->:Uses:->] if org else [];
-        hit: list[Vendor] = [];
-        for v in vendors {
-            if v.slug == self.vendor_id or v.domain == self.vendor_id { hit.append(v); }
-        }
-        if not hit {
-            report {"id": self.vendor_id, "name": "", "status": "unknown",
-                    "subprocessors": [], "source_url": "", "last_crawled": ""};
-        } else {
-            target = hit[0];
-            status = await _crawl_vendor(target, self.ttl_days, self.force);
-            report {"id": target.slug, "name": target.name, "status": status,
-                    "subprocessors": [p.canonical_name for p in [target ->:Subprocesses:->]],
-                    "source_url": target.source_url, "last_crawled": target.last_crawled};
-        }
-    }
-}
-
-# POST /walker/expansion_candidates  {}  -> should we go deeper than depth 2?
-# Not a guess: a deeper layer can only change the answer if it can create a NEW
-# shared dependency. So a provider is worth expanding iff it is not a terminal
-# hyperscaler AND at least two of your vendors already share it. Same math as the
-# chokepoint algorithm, one layer down.
-walker:pub expansion_candidates {
-    can run with Root entry {
-        org = _org();
-        vendors = [org ->:Uses:->] if org else [];
-        out: list[dict] = [];
-        sinks = 0;
-        for p in [root -->[?:Provider]] {
-            dependents = [v for v in [p <-:Subprocesses:<-] if v in vendors];
-            if not dependents { continue; }
-            if p.is_sink { sinks += 1; }
-            worth = (not p.is_sink) and len(dependents) >= 2;
-            why = "terminal hyperscaler — one layer down is AWS-on-AWS, no new information";
-            if not p.is_sink {
-                why = "only one dependent — a deeper layer cannot create a shared chokepoint";
-                if worth {
-                    why = f"{len(dependents)} of your vendors share it — a deeper layer could surface a new chokepoint";
-                }
-            }
-            out.append({"provider": p.canonical_name, "provider_id": p.slug,
-                        "inbound_degree": len(dependents), "is_sink": p.is_sink,
-                        "worth_expanding": worth, "why": why});
-        }
-        out.sort(key=_by_inbound, reverse=True);
-        rec = [c["provider_id"] for c in out if c["worth_expanding"]];
-        report {"depth_cap": 2, "terminal_providers": sinks,
-                "candidates": out, "recommended": rec};
-    }
-}
-
-# POST /walker/crawl_progress  {}  -> per-vendor crawl state + provenance for the
-# "searching..." UI and the honest coverage strip (ok / unreadable / notfound).
-walker:pub crawl_progress {
-    can run with Root entry {
-        org = _org();
-        vendors = [org ->:Uses:->] if org else [];
-        counts: dict[str, int] = {"pending": 0, "ok": 0, "unreadable": 0, "notfound": 0};
-        rows: list[dict] = [];
-        for v in vendors {
-            if v.crawl_status in counts { counts[v.crawl_status] = counts[v.crawl_status] + 1; }
-            rows.append({"id": v.slug, "domain": v.domain, "name": v.name,
-                         "crawl_status": v.crawl_status, "source_url": v.source_url,
-                         "last_crawled": v.last_crawled,
-                         "subprocessors": len([v ->:Subprocesses:->])});
-        }
-        total = len(vendors);
-        done = total - counts["pending"];
-        report {"total": total, "done": done,
-                "pct": _round((done / total) * 100.0, 1) if total else 0.0,
-                "counts": counts, "vendors": rows};
-    }
-}
-
-# POST /walker/chokepoints  {}  -> ranked shared providers (share x downtime = exposure)
-walker:pub chokepoints {
-    can run with Root entry { report _chokepoints(); }
-}
-
-# POST /walker/blast_radius  {"failed_provider": "AWS"}  -> backward traversal
-walker:pub blast_radius {
-    has failed_provider: str = "AWS";
-    can run with Root entry {
-        org = _org();
-        vendors = [org ->:Uses:->] if org else [];
-        prov = _lookup_provider(self.failed_provider);
-        hit: list[Vendor] = [];
-        label = self.failed_provider;
-        pid = _slugify(self.failed_provider);
-        if prov {
-            label = prov.canonical_name;
-            pid = prov.slug;
-            for v in [prov <-:Subprocesses:<-] {
-                if v in vendors { hit.append(v); }
-            }
-        }
-        features: list[str] = [];
-        for v in hit {
-            for f in [v ->:Powers:->] { features.append(f.name); }
-        }
-        features = list(set(features));
-        report {
-            "provider": label,
-            "provider_id": pid,
-            "vendors_down": [v.name for v in hit],
-            "vendor_ids": [v.slug for v in hit],
-            "features_down": features,
-            "status_post": draft_status_update(label, features)
-        };
-    }
-}
-
-# POST /walker/compliance_fallout  {}  -> SOC2/HIPAA/watchlist gaps that propagate up
-walker:pub compliance_fallout {
-    can run with Root entry { report _fallout(); }
-}
-
-# POST /walker/one_look  {}  -> the two-sentence headline (calls B/C's narrative one_look)
-walker:pub one_look {
-    can run with Root entry {
-        head = compose_one_look(_chokepoints(), _fallout());
-        report {"biggest_risk": head.biggest_risk, "biggest_suggestion": head.biggest_suggestion};
-    }
-}
-
-# Scheduled diff (Action 2): persistence-by-reachability means the monitor needs no
-# database — last week's graph is still on `root`, so a diff is just a re-read.
+# Persistence-by-reachability: last week's graph is still on root, so a diff is a re-read.
 @schedule(cron="0 9 * * 1")
 walker:priv diff_monitor {
+    has domain: str = "";
     can run with Root entry {
-        org = _org();
-        if org {
+        start = _resolve_root(self.domain);
+        if start {
             current = _edge_signature();
-            snaps = [org ->:CapturedAt:->];
+            snaps = [start ->:CapturedAt:->];
             prev: list[str] = snaps[-1].edges if snaps else [];
             added = [e for e in current if e not in prev];
-            org +>:CapturedAt:+> Snapshot(
-                taken_at=_now(), vendor_count=len([org ->:Uses:->]),
-                provider_count=len([root -->[?:Provider]]), edges=current);
-            report {"new_subprocessors": added, "notice": explain_change(added) if added else ""};
+            start +>:CapturedAt:+> Snapshot(
+                taken_at=_now(), company_count=len(_all_companies()),
+                edge_count=len(current), edges=current);
+            report {"new_subprocessors": added,
+                    "notice": explain_change(added) if added else ""};
         } else {
             report {"new_subprocessors": [], "notice": ""};
         }

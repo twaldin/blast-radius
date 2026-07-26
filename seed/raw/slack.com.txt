@@ -1,0 +1,94 @@
+SOURCE: Salesforce, Inc. — "Salesforce Infrastructure and Sub-processors" (PDF)
+URL: https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf?bc=OTH
+NOTE: slack.com/slack-subprocessors (linked from slack.com/trust/compliance) redirects to this PDF.
+Slack has no separate HTML disclosure; the PDF contains a dedicated "Slack" section (document pages 87-91).
+Text below is the plain visible text of that Slack section, extracted from the PDF (table cells re-wrapped onto single lines for readability; wording unchanged).
+
+================================================================================
+
+Slack
+Applicable to the services branded as (a) Slack, including Slack AI and (b) GovSlack.
+
+Purpose of Processing | Sub-processors | Locations | Additional Details
+
+ROW 1
+Purpose: Slack services, including Slack AI (excluding GovSlack): Hosting provider for all functionality. Customers may select a data region, but as described in this help article, certain Customer Data may be stored outside this data region.
+Sub-processor: Amazon Web Services, Inc.
+Locations: United States, Australia, Brazil, Canada, France, Germany, India, Japan, Singapore, South Korea, Sweden, Switzerland, United Arab Emirates, United Kingdom
+Additional Details: Customer Data from the Germany region is backed up in France, and vice versa. Customer Data from the Sweden region is backed up in Germany. Customer Data from the Switzerland region is backed up in Germany.
+
+ROW 2
+Purpose: Slack services including Slack AI (excluding GovSlack): Hosting provider for Availability zones/Edge servers for all functionality.
+Sub-processor: Amazon Web Services, Inc.
+Locations: United States, Australia, Germany, India, Ireland, Japan, Singapore, South Africa, United Kingdom, Brazil, Sweden
+Additional Details: Customer Data may be transmitted through any Edge region to provide better and faster service response time, depending, for example, on the location of Slack Users.
+
+ROW 3
+Purpose: GovSlack services: Hosting provider for all functionality.
+Sub-processor: Amazon Web Services, Inc.
+Locations: United States
+Additional Details: Customer Data is stored on the AWS US-GOV-EAST instance. Salesforce may route the transmission of encrypted Customer Data through various points, including any of its US AWS GovCloud data centers, but the storage of Customer Data will be limited to the US-GOV-EAST data center.
+
+ROW 4
+Purpose: GovSlack services: Hosting provider for Availability zones/Edge servers for all functionality
+Sub-processor: Amazon Web Services, Inc.
+Locations: United States
+Additional Details: Customer Data may be transmitted through any AWS GovCloud Edge region to provide better and faster service response time depending, for example, on the location of Slack Users.
+
+ROW 5
+Purpose: Slack Huddles functionality (excluding GovSlack): audio and video streams.
+Sub-processor: Amazon Chime (by Amazon Web Services, Inc.)
+Locations: United States, Australia, Brazil, Canada, France, Germany, India, Ireland, Italy, Japan, Singapore, South Africa, South Korea, Sweden, United Kingdom, Switzerland, Germany, United Arab Emirates
+
+ROW 6
+Purpose: Slack Clips functionality (excluding GovSlack): conversion of source video for improved playback
+Sub-processor: Amazon Web Services, Inc. Elemental MediaConvert
+Locations: United States, Australia, Canada, France, Germany, India, Japan, South Korea, United Kingdom, Brazil, Sweden, Switzerland
+
+ROW 7
+Purpose: Slack Huddles and Slack Clips functionality (excluding GovSlack): transcripts for Slack Huddles and Slack Clips
+Sub-processor: Amazon Transcribe (by Amazon Web Services, Inc.)
+Locations: United States, Australia, Canada, France, Germany, India, Japan, South Korea, United Kingdom, Brazil, Sweden, Switzerland
+
+ROW 8
+Purpose: Slack Huddles functionality (GovSlack): audio and video streams.
+Sub-processor: Amazon Chime (by Amazon Web Services, Inc.)
+Locations: United States
+
+ROW 9
+Purpose: Slack Clips functionality (GovSlack): conversion of source video for improved playback
+Sub-processor: Amazon Web Services, Inc. Elemental MediaConvert
+Locations: United States
+
+ROW 10
+Purpose: Slack Huddles and Slack Clips functionality (GovSlack): transcripts for Slack Huddles and Slack Clips
+Sub-processor: Amazon Transcribe (by Amazon Web Services, Inc.)
+Locations: United States
+
+ROW 11 (single table row in the PDF; the purpose cell lists both purposes and the sub-processor cell lists Google LLC once)
+Purpose: Hosting Provider for email notifications (e.g., workspace invitations). Provider of generative artificial intelligence services.
+Sub-processor: Google LLC
+Locations: United States
+
+ROW 12
+Purpose: CDN for all functionality
+Sub-processor: Cloudfront (on Amazon Web Services, Inc.)
+Locations: Global
+
+ROW 13
+Purpose: Service provider of customer support tools
+Sub-processor: Zendesk, Inc.
+Locations: United States
+
+ROW 14
+Purpose: Provider of generative artificial intelligence services.
+Sub-processor: Microsoft Corporation (Microsoft Azure)
+Locations: United States
+
+ROW 15
+Purpose: Provider of web search results for Slackbot.
+Sub-processor: SuSea, Inc. (doing business as You.com)
+Locations: United States
+Additional Details: If enabled by Customer, SuSea, Inc. may transmit public website links and content retrieved by prompts or queries to Slackbot in order to include such links and content in generative output.
+
+(End of Slack section. The next section in the PDF is "Tableau Cloud".)

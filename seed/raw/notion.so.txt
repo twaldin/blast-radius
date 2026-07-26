@@ -1,0 +1,316 @@
+Skip to content
+🌞
+Terms and Privacy
+⚙️
+Notion’s List of Subprocessors
+Get Notion free
+⚙️
+Notion’s List of Subprocessors
+What is a Subprocessor?
+In order to provide our Services, Notion engages the Subprocessors listed in the tables below. A Subprocessor is a third-party engaged by Notion Labs, Inc., and its applicable Affiliates, to process Customer Personal Data. Capitalized terms used herein are defined in Notion’s Data Processing Addendum.
+How do I subscribe to new Subprocessor notifications?
+Customers may sign up to receive notification of new Subprocessors by e-mailing team@makenotion.com with the subject “Subscribe to New Subprocessors.” Once Customer has signed up to receive new Subprocessor notifications, Notion will then provide Customer with notice of any new Subprocessor before authorizing such new Subprocessor to Process Customer Personal Data and allow Customer ten (10) days to submit a legitimate, good-faith objection to such new Subprocessor(s) from Customer’s receipt of Notion’ notice. For additional information, please see our Data Processing Addendum.
+List of Third-Party Subprocessors
+Below is the list of Subprocessors and how we use their services.
+Infrastructure
+We use these Subprocessors for hosting and running our Services. These are third parties that store and process your data within our Service.
+Subprocessor
+	
+Purpose of Processing
+	
+Location
+
+
+AWS
+	
+Hosting and storage systems provider
+	
+USA, European Union, Korea, Japan
+Platform
+We use these Subprocessors to help us manage and provide the Service.
+Subprocessor
+	
+Purpose of Processing
+	
+Location
+
+
+Anthropic
+	
+Service provider for AI agents, hosting large language models and embeddings
+	
+Global
+
+
+Confluent
+	
+Kafka managed streaming storage platform used for in-product audit log data and analytics
+	
+USA, Germany, Korea, Japan
+
+
+Cloudflare
+	
+Content distribution and processing, security, abuse prevention and DNS services
+	
+Global
+
+
+DeepL
+	
+Translation services
+	
+USA
+
+
+Fireworks
+	
+Service provider for hosting large language models and embeddings
+	
+Global
+
+
+OpenAI
+	
+Service provider for hosting large language models and embeddings and for abuse prevention
+	
+Global
+
+
+Splunk
+	
+Security and application logging
+	
+USA
+
+
+Turbopuffer
+	
+Vector database for storing embeddings
+	
+USA, Germany, Korea, Japan
+
+
+Twilio
+	
+Multi-factor Authentication
+	
+USA
+
+
+Exa
+	
+Service provider for providing web search results.
+	
+USA
+
+
+Google LLC
+	
+Service provider for hosting large language models and embeddings.
+	
+Global
+
+
+Cerebras Systems Inc.
+	
+Service provider for hosting large language models and embeddings.
+	
+USA
+
+
+StarTree, Inc.
+	
+Storage platform used for in-product analytics
+	
+USA, Germany, Korea, Japan
+
+
+Baseten Labs, Inc.
+	
+Service provider for hosting large language models and embeddings
+	
+Global
+
+
+Parallel Web Systems
+	
+Service provider for providing web search results and for hosting large language models and embeddings
+	
+USA
+
+
+Mathpix, Inc.
+	
+PDF file conversion
+	
+USA, Germany, Singapore
+
+
+Vercel Inc.
+	
+Compute services that enable code execution and AI agent actions.
+	
+USA
+
+
+Anysource Inc., dba Runlayer
+	
+Security for MCP connections
+	
+USA
+
+
+X.AI LLC
+	
+Service provider for hosting large language models and embeddings
+	
+USA, UK
+Customer and Support Services
+We use these Subprocessors to offer direct support services to you and your team. They are primarily used for communications between Customers and our support teams.
+Subprocessor
+	
+Purpose of Processing
+	
+Location
+
+
+Teleperformance
+	
+Support services
+	
+Greece
+Business Operations
+We use these Subprocessors to manage our business and continue providing you services. From internal documentation to analytics these services are used behind the curtain to help us plan and run the business smoothly.
+Subprocessor
+	
+Purpose of Processing
+	
+Location
+
+
+Amplitude
+	
+Event logging for analytics
+	
+USA
+
+
+Customer.io
+	
+Transactional, broadcast, and marketing messaging
+	
+USA
+
+
+Fivetran
+	
+Data pipeline for connecting systems to our data warehouse
+	
+USA, Germany, Korea, Japan
+
+
+Mailgun Technologies, Inc.
+	
+Transactional, broadcast, and marketing messaging
+	
+USA
+Notion Entities
+Other Notion Entities involved in offering the Services.
+Subprocessor
+	
+Purpose of Processing
+	
+Location
+
+
+Notion Labs, Ireland Limited
+	
+Support services
+	
+Ireland
+
+
+Brain Capital Labs PVT Ltd.
+	
+Support services
+	
+India
+
+
+Notion Labs Japan, G.K.
+	
+Support services
+	
+Japan
+
+
+Notion International Inc.
+	
+Support services
+	
+USA
+
+
+Notion Labs Australia Pty Ltd
+	
+Support services
+	
+Australia
+
+
+Notion Labs United Kingdom, Private Limited
+	
+Support services
+	
+UK
+
+
+Notion Labs Korea Ltd
+	
+Support services
+	
+South Korea
+Notion Calendar
+Notion Calendar uses the following Subprocessor(s).
+Subprocessor
+	
+Purpose of Processing
+	
+Location
+
+
+AWS
+	
+Hosting and storage systems provider
+	
+USA
+
+
+Cloudflare
+	
+Content distribution, security, abuse prevention and DNS services
+	
+Global
+
+
+Amplitude
+	
+Event logging for analytics
+	
+USA
+
+
+Customer.io
+	
+Transactional, broadcast, and marketing messaging
+	
+USA
+
+
+Mailgun Technologies, Inc.
+	
+Transactional messaging
+	
+USA
+Last updated:  @June 1, 2026 

@@ -1,0 +1,149 @@
+{
+  "domain": "vercel.com",
+  "name": "Vercel",
+  "subprocessor_url": "https://security.vercel.com/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57&source=title",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T14:23:10",
+  "subprocessors": [
+    {
+      "name": "Amazon Web Services (AWS)",
+      "purpose": "Hosting, storage and generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Google",
+      "purpose": "Cloud computing, storage and generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Microsoft",
+      "purpose": "Hosting, storage and generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Datadog",
+      "purpose": "Cloud monitoring and security services",
+      "region": "United States"
+    },
+    {
+      "name": "Honeycomb",
+      "purpose": "Real-time monitoring and debugging service",
+      "region": "United States"
+    },
+    {
+      "name": "Redis",
+      "purpose": "Real-time logging and security services",
+      "region": "United States"
+    },
+    {
+      "name": "WorkOS",
+      "purpose": "Audit log services",
+      "region": "United States"
+    },
+    {
+      "name": "Algolia",
+      "purpose": "Real-time site search services",
+      "region": "United States"
+    },
+    {
+      "name": "Knock Labs",
+      "purpose": "Customer notification services",
+      "region": "United States"
+    },
+    {
+      "name": "Salesforce",
+      "purpose": "Customer relationship management (CRM) and support services",
+      "region": "United States"
+    },
+    {
+      "name": "Stripe",
+      "purpose": "Payment processing services",
+      "region": "United States"
+    },
+    {
+      "name": "Tinybird",
+      "purpose": "Analytics services",
+      "region": "Spain"
+    },
+    {
+      "name": "tray.io",
+      "purpose": "Customer support process automation and productivity platform",
+      "region": "United States"
+    },
+    {
+      "name": "Twilio",
+      "purpose": "Customer communication services",
+      "region": "United States"
+    },
+    {
+      "name": "Upstash",
+      "purpose": "Serverless storage services",
+      "region": "United States"
+    },
+    {
+      "name": "Neon",
+      "purpose": "Serverless storage services",
+      "region": "United States"
+    },
+    {
+      "name": "Kasada",
+      "purpose": "Fraud prevention services",
+      "region": "United States"
+    },
+    {
+      "name": "Discourse",
+      "purpose": "Community support and communication services",
+      "region": "United States"
+    },
+    {
+      "name": "ClickHouse",
+      "purpose": "Analytics services",
+      "region": "United States"
+    },
+    {
+      "name": "OpenAI",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Fireworks AI",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Anthropic",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Exa.ai",
+      "purpose": "AI search services",
+      "region": "United States"
+    },
+    {
+      "name": "Plain",
+      "purpose": "Customer support services",
+      "region": "United Kingdom"
+    },
+    {
+      "name": "Groq",
+      "purpose": "Generative AI services",
+      "region": "United States"
+    },
+    {
+      "name": "Cerebras Systems Inc",
+      "purpose": "AI model inference services",
+      "region": "United States"
+    },
+    {
+      "name": "Baseten Labs Inc",
+      "purpose": "AI model inference services",
+      "region": "United States"
+    },
+    {
+      "name": "Invisible Tools Inc (dba Raindrop.ai)",
+      "purpose": "AI monitoring and analytics services",
+      "region": "United States"
+    }
+  ]
+}

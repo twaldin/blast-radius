@@ -1,0 +1,174 @@
+{
+  "domain": "twilio.com",
+  "name": "Twilio",
+  "subprocessor_url": "https://www.twilio.com/en-us/legal/sub-processors",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T14:40:00",
+  "subprocessors": [
+    {
+      "name": "Adaptive Mobile",
+      "purpose": "Prevention of illegal or unwanted communications over Twilio’s messaging services",
+      "region": "USA"
+    },
+    {
+      "name": "AWS",
+      "purpose": "Infrastructure Provider providing hosting services and storage.; Text to speech functionality for customers using Amazon Polly, Amazon Comprehend, and Amazon Transcribe.; Streaming and interactive video.; Automation and storage services for marketing campaigns.; Routing and transmission of emails.",
+      "region": "USA*; USA; USA, EU; USA or EU (Dublin) as selected by customers"
+    },
+    {
+      "name": "Anthropic",
+      "purpose": "Vendor for AI functionality in product",
+      "region": "USA"
+    },
+    {
+      "name": "Amazon Bedrock",
+      "purpose": "Vendor for AI functionality in product",
+      "region": "USA"
+    },
+    {
+      "name": "Clickhouse",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "USA, EU"
+    },
+    {
+      "name": "Datadog",
+      "purpose": "Operational monitoring",
+      "region": "USA"
+    },
+    {
+      "name": "DVELP/Sabio",
+      "purpose": "Connectivity services to customer’s Google CCAI instance.",
+      "region": "UK (provision of the services), Belgium, Finland, Germany, Netherlands, and Poland (data persistence/backups)"
+    },
+    {
+      "name": "Deepgram",
+      "purpose": "Speech to text and text to speech APIs",
+      "region": "USA"
+    },
+    {
+      "name": "Elastic",
+      "purpose": "Logging and query solution",
+      "region": "USA"
+    },
+    {
+      "name": "ElevenLabs",
+      "purpose": "AI features as enabled by customer for the purpose of summarization and sentiment analysis",
+      "region": "USA, EU"
+    },
+    {
+      "name": "Fivetran",
+      "purpose": "ETL (Extract, Transform, Load) Service / Automated Data Integration",
+      "region": "USA"
+    },
+    {
+      "name": "GoodData Corporation",
+      "purpose": "Data analytics functionality for customers who have enabled the feature in Twilio Flex.",
+      "region": "USA"
+    },
+    {
+      "name": "Google",
+      "purpose": "Data storage compute and queries; Speech recognition functionality for customers who have enabled the feature on supported products.",
+      "region": "USA or EU (Zurich & London) as selected by Customers; USA*"
+    },
+    {
+      "name": "Google RCS...",
+      "purpose": "Message delivery for outbound/inbound Twilio Verify services.",
+      "region": "USA, South America: Chile, Europe: Ireland, Netherlands, Denmark, Finland, Belgium, Asia: Taiwan, Japan, Singapore"
+    },
+    {
+      "name": "Hex",
+      "purpose": "Collaborative data workspace / Analytics & reporting",
+      "region": "USA"
+    },
+    {
+      "name": "Honeycomb",
+      "purpose": "Observability & Application Performance Management (APM)",
+      "region": "USA"
+    },
+    {
+      "name": "Lakera",
+      "purpose": "AI security monitoring, data leakage prevention, and real-time threat detection within automated workflows.",
+      "region": "USA"
+    },
+    {
+      "name": "Postmark",
+      "purpose": "Outbound email messaging service.",
+      "region": "USA"
+    },
+    {
+      "name": "Sinch",
+      "purpose": "Outbound SMS messaging service",
+      "region": "USA"
+    },
+    {
+      "name": "Meta",
+      "purpose": "Outbound/inbound message delivery",
+      "region": "USA"
+    },
+    {
+      "name": "Microsoft Azure",
+      "purpose": "Speech recognition functionality for customers who have enabled the feature on supported products.; Vendor for AI functionality in product",
+      "region": "USA, EU; USA"
+    },
+    {
+      "name": "Mintlify",
+      "purpose": "Processing pseudonymized Customer Account Data to facilitate document gating, and personalized service configurations",
+      "region": "USA"
+    },
+    {
+      "name": "OpenAI",
+      "purpose": "Vendor for AI functionality in product",
+      "region": "USA"
+    },
+    {
+      "name": "Plain",
+      "purpose": "Customer Support Infrastructure / Help Desk Platform",
+      "region": "UK"
+    },
+    {
+      "name": "Snowflake",
+      "purpose": "Automation and storage services for Marketing Campaigns.; Storage services",
+      "region": "USA"
+    },
+    {
+      "name": "Temporal Cloud",
+      "purpose": "Scheduling and execution of the customer defined workflows.",
+      "region": "USA"
+    },
+    {
+      "name": "Slack",
+      "purpose": "Customer Support chat/messaging solution.",
+      "region": "USA"
+    },
+    {
+      "name": "Svix",
+      "purpose": "Event delivery (webhooks as a Service)",
+      "region": "USA"
+    },
+    {
+      "name": "VoiceBase",
+      "purpose": "Transcription services for customers who have enabled transcriptions on supported products.",
+      "region": "USA"
+    },
+    {
+      "name": "DataBank",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "North America"
+    },
+    {
+      "name": "Lumen",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "North America"
+    },
+    {
+      "name": "Digital Realty",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "North America, EU"
+    },
+    {
+      "name": "Twilio Inc.",
+      "purpose": "Provision of the Twilio Services",
+      "region": "USA*"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+OpenRouter (openrouter.ai) sub-processor disclosure — crawl notes, 2026-07-26
+
+BLOCKER: An authoritative sub-processor disclosure EXISTS but is ACCESS-GATED.
+OpenRouter operates a SafeBase Trust Center at https://trust.openrouter.ai which
+lists a "Subprocessors" document under its Legal section
+(https://trust.openrouter.ai/?itemUid=e3fae2ca-94a9-416b-b577-5c90e382df57).
+Opening that document does not render the list; it renders a "Get access to
+OpenRouter's Trust Center" form requiring a work email and approval (SafeBase
+access-request wall). No named sub-processor list is publicly readable.
+
+Also checked: https://openrouter.ai/privacy (Privacy Policy, Last Updated:
+July 6, 2026) — mentions only generic "Vendors, service providers, and
+affiliates ... including to Model Providers" and a single named analytics
+example (Google Analytics). This is NOT an Article 28 named sub-processor
+list and was not substituted for one.
+
+Below is the plain visible text of the Trust Center page actually read
+(rendered in a real browser; the page is client-rendered by SafeBase):
+
+----------------------------------------------------------------------
+
+Start your security review
+View & download sensitive information
+Get access
+​
+​
+
+Overview
+
+Started in early 2023 as the first LLM marketplace, OpenRouter has grown to become the largest and most popular AI gateway. We eliminate vendor lock-in while offering better prices, uptime, and enterprise-grade reliability.
+
+Compliance
+SOC 2 Type 2
+Documents
+Get access
+REPORTS
+Pentest Report
+COMPLIANCE
+SOC 2 Type 2
+Legal
+Subprocessors
+Cyber Insurance
+Data Processing Agreement
+View more
+App Security
+Application Penetration Testing
+Vulnerability & Patch Management
+Web Application Firewall
+Data Security
+Data Backups
+Encryption-at-rest
+Encryption-in-transit
+View more
+Product Security
+Logging
+Two-Step Verification
+Passkeys
+View more
+Access Control
+Data Access
+Password Manager
+User Access Review
+Endpoint Security
+Device Lock
+Anti-Malware
+Disk Encryption
+View more
+Continuous Monitoring
+Automated Compliance Monitoring
+Event & Audit Log Management
+Reviews & Updates
+BC/DR
+Tabletop Exercises
+Infrastructure
+Status Monitoring
+Reports
+Pentest Report
+If you need help using this Trust Center, please contact us.
+Contact support
+Built on
+
+Share Trust Center
+Get access to OpenRouter's Trust Center
+To get started, please enter your email
+Work email *
+​
+
+Do you work at OpenRouter? Log into OpenRouter's workspace
+Back to Trust Center
+Continue

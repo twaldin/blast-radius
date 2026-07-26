@@ -1,0 +1,267 @@
+×
+close
+
+We use cookies to improve HubSpot’s site. Some cookies are necessary for our website and services to function properly. Other cookies are optional and help personalize your experience, including advertising and analytics. You can consent to all cookies, decline all optional cookies, or manage optional cookies. Without a selection, our default cookie settings will apply. You can change your preferences at any time. To learn more, check out our Cookie Policy.
+
+Accept All
+Decline All
+Manage Cookies
+Skip to content
+English
+Select a language
+High Contrast
+Customer Support
+Contact Sales
+Log in
+About
+About
+Products
+Products
+Solutions
+Solutions
+Pricing
+Resources
+Resources
+Start free or get a demo
+Legal Center
+HUBSPOT SUB-PROCESSORS PAGE
+Return to Legal Center Homepage
+For Customers
+Show Submenu
+For Partners
+Show Submenu
+For Everyone
+Show Submenu
+
+Last Modified: April 14, 2026
+
+HubSpot Sub-Processors Page
+
+This HubSpot Sub-Processors Page is incorporated into the DPA and Agreement.  This page explains how HubSpot engages with Sub-Processors.
+
+1. Infrastructure Sub-Processors
+
+2. Feature Specific Sub-Processors
+
+3. HubSpot Affiliate Sub-Processors
+
+4. Updates to Sub-Processor Page
+
+Please review each section for additional details.
+
+1. INFRASTRUCTURE SUB-PROCESSORS
+
+To help HubSpot deliver the Subscription Service, we engage Sub-Processors to support our infrastructure. By agreeing to the DPA, you agree all of these Sub-Processors may have access to Customer Data.
+
+Sub-Processor	Purpose	Applicable Service	United States Data Centers Sub-Processor Location	European Union Data Center Sub-Processor Location	Australia Data Center Sub-Processor Location	Canada Data Center Sub-Processor Location
+Amazon Web Services, Inc.	Hosting & Infrastructure	Used as a on-demand cloud computing platforms and APIs	United States	Germany	Australia	Canada
+Cloudflare, Inc.	Content Delivery Network	Used as a web infrastructure and website security, providing content delivery network services, DDoS mitigation, internet security, and distributed domain name server services	United States	
+
+Local
+
+**Data Centers located all around the world. Traffic will be automatically routed to the nearest data center.
+
+	
+
+Local
+
+**Data Centers located all around the world. Traffic will be automatically routed to the nearest data center.
+
+	
+
+Local
+
+**Data Centers located all around the world. Traffic will be automatically routed to the nearest data center.
+
+
+Google LLC	Infrastructure -  Regional Data Processing	Data hosting provider	United States	Germany	United States	United States
+Snowflake Inc.	Infrastructure	Data warehouse solution which serves as the repository of data	United States	Germany	Australia	Canada
+
+**For further information regarding Cloudflare services, visit https://www.cloudflare.com/network.
+
+2. FEATURE SPECIFIC SUB-PROCESSORS
+
+Some of our features and integrations require the use of additional Sub-Processors. Some Sub-Processors will apply to you as a default, and some Sub-Processors will apply to you only if and when you opt-in. In either case, you may choose not to use the Applicable Service provided by these Sub-Processors.  We will notify you before you turn on a feature or install an integration that requires support from an opt-in Sub-Processor.
+
+Sub-Processor	Purpose	Applicable Service	United States Data Center Sub-Processor Location	European Union Data Center Sub-Processor Location	Australia Data Center Sub-Processor Location	Canada Data Center Sub-Processor Location
+Ably Realtime Ltd.	Conversation & Chat Functionality	Support conversations/chat features in the HubSpot product	United States	Ireland and Germany	Australia	Canada
+Amazon Web Services, Inc.	AI Service Provider	HubSpot AI	United States	European Economic Area regions	United States	United States
+ConvertAPI, UAB	File Functionality	Files and documents conversion for websites and web/desktop applications	United States	The Netherlands and Germany	Australia	Canada
+
+
+Google LLC
+
+ 
+
+	reCAPTCHA	Spam prevention	
+
+United States
+
+ 
+
+	
+
+United States
+
+ 
+
+	United States	United States
+AI Service Provider	HubSpot AI	United States	European Economic Area regions	United States	United States
+Dropbox, Inc.	E-Signature Functionality	HubSpot product E-signature solution for deals and quotes	United States	Germany	United States	United States
+Hyperdoc, Inc.	Meeting recordings and transcripts	HubSpot AI	United States	Germany	United States	United States
+Litmus Software, Inc.	Email Functionality	Email previews	United States	United States	United States	United States
+
+
+Meta Platforms, Inc.  
+
+ 
+
+	Conversation Functionality	
+
+Support the connection of your WhatsApp Business account to the conversations inbox
+
+ 
+
+	United States	United States	United States	United States
+Mux, Inc.	Video Functionality	HubSpot video service provider	United States	United States	United States	United States
+OpenAI, L.L.C.	AI Service Provider	HubSpot AI	United States	European Economic Area and Switzerland	United States	United States
+Stripe, Inc.	Payment Processor	Support Commerce Hub products and services	United States	United States	United States	United States
+Twilio Inc.	Calling and SMS Functionality	Support HubSpot calling and SMS functionality	United States	United States	United States	United States
+
+3. HUBSPOT AFFILIATE SUB-PROCESSORS
+
+To help HubSpot deliver the Subscription Service, we engage HubSpot Affiliates as Sub-Processors to assist with our data processing activities.  By agreeing to the DPA, you agree all of these Sub-Processors may have access to Customer Data.
+
+HubSpot Sub-Processor	Purpose	Location
+HubSpot, Inc.	Services & Support	United States
+HubSpot Ireland Ltd	Services & Support	Ireland
+HubSpot Germany GmbH	Services & Support	Germany
+HubSpot Australia Pty. Ltd.	Services & Support	Australia
+HubSpot Asia Pte. Ltd.	Services & Support	Singapore
+HubSpot Japan KK	Services & Support	Japan
+HubSpot Latin America, S.A.S.	Services & Support	Colombia
+HubSpot Sweden	Services & Support	Sweden
+HubSpot France S.A.S.	Services & Support	France
+HubSpot UK Holdings Ltd.	Services & Support	United Kingdom
+HubSpot Belgium NV	Services & Support	Belgium
+HubSpot Canada Inc.	Services & Support	Canada
+HubSpot Spain, S.L.	Services & Support	Spain
+HubSpot Netherlands B.V.	Services & Support	The Netherlands
+HubSpot India Private Limited	Services & Support	India
+
+4. UPDATES TO SUB-PROCESSOR PAGE
+
+Due to the nature of our global business and our ongoing efforts to delight our customers, our Sub-Processors may change from time to time. For example, we may deprecate a Sub-Processor to consolidate and minimize our use of Sub-Processors, or we may add a Sub-Processor if we believe that doing so will enhance our ability to deliver our Subscription Service.
+
+You may subscribe to receive notifications by email if we update this page to add or replace any Sub-Processors, if any of our Sub-Processors materially change the services that they provide, or if they change the country from which they provide them. To subscribe to the notification please complete the form available at https://legal.hubspot.com/subscribe-subprocessor-updates. If you opt-in to receive a notification, we will notify you at least 30 days prior to any such change taking effect.
+
+For more information on HubSpot’s privacy practices, please visit our Privacy Policy. If you have any questions regarding this page, please contact us at privacy@hubspot.com.
+
+Popular Features
+All Products and Features
+All Products and Features
+HubSpot AEO
+HubSpot AEO
+Free Meeting Scheduler App
+Free Meeting Scheduler App
+Breeze AI Tools
+Breeze AI Tools
+Email Tracking Software
+Email Tracking Software
+AI Content Writer
+AI Content Writer
+AI Website Generator
+AI Website Generator
+Email Marketing Software
+Email Marketing Software
+Lead Management Software
+Lead Management Software
+AI Prospecting Agent
+AI Prospecting Agent
+Free Website Builder
+Free Website Builder
+Landing Pages
+Landing Pages
+Free Online Form Builder
+Free Online Form Builder
+Free Chatbot Builder
+Free Chatbot Builder
+Free Live Chat Software
+Free Live Chat Software
+Marketing Analytics
+Marketing Analytics
+Free Landing Page Builder
+Free Landing Page Builder
+Free Web Hosting
+Free Web Hosting
+Free Tools
+See All Free Business Tools
+See All Free Business Tools
+AEO Grader
+AEO Grader
+AI Search Sensor
+AI Search Sensor
+Make My Persona
+Make My Persona
+Email Signature Generator
+Email Signature Generator
+Free Business Templates
+Free Business Templates
+Software Comparisons Library
+Software Comparisons Library
+Website Templates
+Website Templates
+Company
+About Us
+About Us
+Careers
+Careers
+Management Team
+Management Team
+Board of Directors
+Board of Directors
+Investor Relations
+Investor Relations
+Blog
+Blog
+Sustainability
+Sustainability
+Contact Us
+Contact Us
+Customers
+Customer Support
+Customer Support
+Join a Local User Group
+Join a Local User Group
+Partners
+All Partner Programs
+All Partner Programs
+Solutions Partner Program
+Solutions Partner Program
+Technology Partner Program
+Technology Partner Program
+HubSpot for Startups
+HubSpot for Startups
+Affiliate Program
+Affiliate Program
+Facebook
+Instagram
+Youtube
+Twitter
+Linkedin
+Reddit
+Tiktok
+
+Copyright © 2026 HubSpot, Inc.
+
+Legal Center
+ 
+Privacy Policy
+ 
+Security
+ 
+Website Accessibility
+ 
+Manage Cookies
+ 
+ Your Privacy Choices

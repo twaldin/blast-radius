@@ -1,0 +1,454 @@
+{
+  "domain": "okta.com",
+  "name": "Okta",
+  "subprocessor_url": "https://www.okta.com/en-gb/legal/trustandcompliance/subprocessors/",
+  "crawl_status": "ok",
+  "fetched_at": "2026-07-26T14:23:56",
+  "subprocessors": [
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "Standard Service – USA; Canada Cell – Canada; India Cell – India; EU Cell – Germany, Ireland; Australia Cell – Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "Google, Inc.",
+      "purpose": "Cyber Defense - detect, investigate and respond to cyberthreats",
+      "region": "Standard Service – USA; Australia Cell – USA; India Cell – USA; Canada Cell – USA; Japan Cell – USA; EU Cell – EMEA"
+    },
+    {
+      "name": "Splunk, Inc.",
+      "purpose": "Business analytics",
+      "region": "Standard Service – USA; Australia Cell – USA; India Cell – EMEA; Canada Cell – USA; Japan Cell – USA; EU Cell – Germany, Ireland, United Kingdom"
+    },
+    {
+      "name": "Salesforce.com, Inc.",
+      "purpose": "Support and maintenance ticketing process",
+      "region": "USA"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "SMS authenticator",
+      "region": "USA"
+    },
+    {
+      "name": "S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)",
+      "purpose": "24x7 customer support team",
+      "region": "No data centers; CGS may access the data center(s) Okta utilizes for Amazon Web Services and salesforce.com while providing support. Support team is located in Romania"
+    },
+    {
+      "name": "SendGrid, Inc.",
+      "purpose": "Email notifications and email access request inbox",
+      "region": "USA"
+    },
+    {
+      "name": "TeleSign Corporation",
+      "purpose": "SMS authenticator",
+      "region": "USA, Netherlands"
+    },
+    {
+      "name": "Snowflake Computing, Inc.",
+      "purpose": "Data warehouse services",
+      "region": "Standard Service – USA; Canada Cell – Canada; India Cell – India; EU Cell – Germany; Australia Cell – Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "Google, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "Standard Service – USA; Canada Cell – Canada; India Cell – India; EU Cell – Germany, Belgium; Australia Cell – Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "MongoDB, Inc.",
+      "purpose": "Managed database services",
+      "region": "Standard Service – USA; Canada Cell – Canada; India Cell – India; EU Cell – Germany, Belgium,; Netherlands; Australia Cell – Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "Standard Service – USA; Canada Cell – USA; India Cell – USA; Australia Cell – USA; Japan Cell – USA; EU Cell – Germany"
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "Google, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "Standard Service - USA; Canada Cell – Canada; India Cell – India; EU Cell – Germany, Belgium; Australia Cell – Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "MongoDB, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "Standard Service – USA; Canada Cell – Canada; India Cell – India; EU Cell – Germany, Belgium, Netherlands; Australia Cell – Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "Standard Service - USA; Canada Cell – USA; India Cell – USA; Australia Cell – USA; Japan Cell – USA; EU Cell - Germany"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "USA"
+    },
+    {
+      "name": "salesforce.com, inc.",
+      "purpose": "Support and maintenance ticketing process",
+      "region": "USA"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "SMS authenticator",
+      "region": "USA"
+    },
+    {
+      "name": "SendGrid, Inc.",
+      "purpose": "Email notifications",
+      "region": "USA"
+    },
+    {
+      "name": "TeleSign Corporation",
+      "purpose": "SMS authenticator",
+      "region": "USA"
+    },
+    {
+      "name": "Snowflake Computing, Inc.",
+      "purpose": "Data warehouse services",
+      "region": "USA, Germany, Australia"
+    },
+    {
+      "name": "S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)",
+      "purpose": "Customer support (Note that CGS does not provide support for the Government Moderate services, but may have access to the data entered into support tickets located in salesforce.com)",
+      "region": "No data centers. Support team is located in the USA."
+    },
+    {
+      "name": "Splunk, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "MongoDB, Inc.",
+      "purpose": "Managed database services",
+      "region": "USA"
+    },
+    {
+      "name": "Google, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "USA"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "USA"
+    },
+    {
+      "name": "salesforce.com, inc.",
+      "purpose": "Support and maintenance ticketing process",
+      "region": "USA"
+    },
+    {
+      "name": "Snowflake Computing, Inc.",
+      "purpose": "Data warehouse services",
+      "region": "USA"
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "MongoDB, Inc.",
+      "purpose": "Managed database services",
+      "region": "USA"
+    },
+    {
+      "name": "Splunk, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "Google Inc.",
+      "purpose": "Non-training generative artificial intelligence services",
+      "region": "USA"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "Standard Service – USA; EU Cell - Germany; APAC Cell - Australia; Japan Cell – Japan"
+    },
+    {
+      "name": "MongoDB, Inc",
+      "purpose": "Data warehouse services",
+      "region": "Standard Service – USA; EU Cell - Germany; APAC Cell - Australia"
+    },
+    {
+      "name": "Sentry",
+      "purpose": "Security event analysis and incident response",
+      "region": "Standard Service – USA; EU Cell - Germany; APAC Cell - USA"
+    },
+    {
+      "name": "Snowflake Computing Netherlands B.V",
+      "purpose": "Data warehouse services",
+      "region": "Standard Service – USA; EU Cell - Germany; APAC Cell - Australia"
+    },
+    {
+      "name": "Splunk, Inc.",
+      "purpose": "Business analytics",
+      "region": "Standard Service – USA; EU Cell - Germany, Ireland, United; Kingdom; APAC Cell – USA"
+    },
+    {
+      "name": "salesforce.com, inc.",
+      "purpose": "Support and maintenance ticketing process",
+      "region": "USA"
+    },
+    {
+      "name": "S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)",
+      "purpose": "24x7 customer support team",
+      "region": "No data centers; CGS may access the data center(s) Okta utilizes for Amazon Web Services and salesforce.com while providing support. Support team is located in Romania."
+    },
+    {
+      "name": "SendGrid, Inc.",
+      "purpose": "Email notifications",
+      "region": "USA"
+    },
+    {
+      "name": "Slack Technologies, LLC M",
+      "purpose": "Messaging and collaboration",
+      "region": "USA"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "During deployment, Customer may select from the following regions:; Public Cloud: USA, Canada, United Kingdom, European Union, Japan, Australia; Private Cloud: USA, Canada, Brazil, Germany, Hong Kong, Indonesia, Ireland, Italy, United Arab Emirates, United Kingdom, France, Sweden, South Africa, Bahrain, India, Japan, South Korea, Singapore, Australia, Mexico, Thailand"
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "Microsoft, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "Public Cloud: For Customers deployed in Canada, Japan and Australia on AWS, a regional failover component is hosted on Microsoft Azure; Private Cloud: During deployment, Customer may select from the following regions: USA, Canada, Brazil, Ireland, Netherlands, France, Switzerland, Norway, Germany, Sweden, South Africa, United Arab Emirates, United Kingdom, India, South Korea, Australia, Japan"
+    },
+    {
+      "name": "salesforce.com, inc.",
+      "purpose": "Support and maintenance ticketing process",
+      "region": "USA"
+    },
+    {
+      "name": "Snowflake Computing, Inc.",
+      "purpose": "Data warehouse services",
+      "region": "Germany"
+    },
+    {
+      "name": "MongoDB, Inc.",
+      "purpose": "Managed database services",
+      "region": "The data center location corresponds to the region selected by Customer for hosting and cloud infrastructure (in AWS or Microsoft Azure)"
+    },
+    {
+      "name": "Aiven Ltd",
+      "purpose": "Managed database services",
+      "region": "The data center location corresponds to the region selected by Customer for hosting and cloud infrastructure (in AWS or Azure)"
+    },
+    {
+      "name": "SendGrid, Inc.",
+      "purpose": "Email notifications",
+      "region": "USA"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "SMS authenticator",
+      "region": "USA"
+    },
+    {
+      "name": "S.C. Computer Generated Solutions Romania S.R.L., a subsidiary of Computer Generated Solutions, Inc. (USA)",
+      "purpose": "24x7 customer support team",
+      "region": "No data centers; CGS may access the data center(s) Okta utilizes for Amazon Web Services, Azure, and salesforce.com while providing support.; Support team is located in Romania."
+    },
+    {
+      "name": "Cloudflare, Inc.",
+      "purpose": "Content delivery network and distributed-denial-of-service attack prevention services",
+      "region": "Global"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting and cloud infrastructure",
+      "region": "During deployment, Customer may select from the following regions:; Public Cloud: USA, European Union, Australia (with the witness region in New Zealand); Private Cloud: USA, *Canada, *Brazil, *Germany, *Ireland, *Italy, *United Kingdom, *France, *Sweden, *India, *Japan, *South Korea, *Singapore, *Australia; *Certain private cloud regions may require at least one data center in a different region."
+    },
+    {
+      "name": "DataDog, Inc.",
+      "purpose": "Business analytics",
+      "region": "USA"
+    },
+    {
+      "name": "Salesforce, Inc.",
+      "purpose": "Support and maintenance ticketing process",
+      "region": "USA"
+    },
+    {
+      "name": "Snowflake Computing, Inc.",
+      "purpose": "Data warehouse services",
+      "region": "Germany"
+    },
+    {
+      "name": "SendGrid, Inc.",
+      "purpose": "Email notifications",
+      "region": "USA"
+    },
+    {
+      "name": "Twilio, Inc.",
+      "purpose": "SMS authenticator",
+      "region": "USA"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Breached password comparison",
+      "region": "For Customers deployed on Azure, the data center location corresponds to the region selected by Customer for hosting and cloud infrastructure (in Azure): USA, Canada, United Kingdom, European Union, Japan, Australia"
+    },
+    {
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Non-training generative artificial intelligence services",
+      "region": "USA"
+    },
+    {
+      "name": "Okta International, LLC (Delaware)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta UK LTD (United Kingdom)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Australia PTY Limited (Australia)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Software Canada, Inc. (Canada)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta France SAS (France)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta GmbH (Germany)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Identity Netherlands BV (Netherlands)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Italy S.r.l.",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Poland sp. z o.o. (Poland)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Identity Spain, S.L.",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta SG Pte. Ltd. (Singapore)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Japan K.K. (Japan)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Identity Philippines Inc. (Philippines)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Switzerland GmbH (Switzerland)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Identity Korea Limited (South Korea)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Identity Ireland Limited",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Okta Identity India Private Limited (India)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "SaaSure Mexico, S. de R.L. de C.V. (Mexico)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "SaaSure Sweden AB (Sweden)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Auth0, LLC (Delaware)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Auth0 International LLC (Delaware)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Auth0 Argentina S.A. (Argentina)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Auth0 Ltd. (United Kingdom)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Auth0 Uruguay S.A. (Uruguay)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Spera Cybersecurity, Inc. (Delaware)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Spera Cybersecurity Ltd. (Israel)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    },
+    {
+      "name": "Axiom Security Ltd. (Israel)",
+      "purpose": "Okta Affiliate",
+      "region": ""
+    }
+  ]
+}
