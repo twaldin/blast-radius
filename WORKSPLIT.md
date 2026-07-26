@@ -1,93 +1,230 @@
 # Blast Radius — final work split
-**Written 16:00 PT. Demo 19:15 PT. 3h15m left.Tim → frontend · Snehil → deploy · David → search + discovery agent**
 
-This supersedes `PLAN.md`, `SPEC-V2.md`, `blast-radius-build-spec.md`, and `REVIEW.md` wherever they disagree. Those docs describe a product we did not build. Everything below was verified by running it in the last 40 minutes.
+**Demo 19:15 PT. Baseline commit `7f3e852` on `main`, verified green.**
 
-* * *
-## 1. Bottom line
-The backend is **done and genuinely good**. The frontend **serves a blank page**. The agent **had no model bound and could not run at all**. Two of those three facts were not known an hour ago, and neither was in any existing doc.
+**Tim → frontend · Snehil → deploy · David → search + discovery agent**
 
-Read §3 before you write code. Two of the four root causes are things people believe are working right now.
+Sections 3 and 4 are written to be **pasted directly into a coding agent**. Each is
+self-contained: exact files, exact line numbers, exact signatures, exact acceptance
+commands. Hand your section to your agent verbatim.
 
-* * *
-## 2. Verified state
-Run at 15:55 PT against `main` @ `66d742c`.
+---
 
-| Area | State | Evidence |
-| --- | --- | --- |
-| Graph backend | **GREEN** | `jac test main.test.jac` → **9/9 pass** |
-| Real data | **GREEN** | 293 companies, 555 edges, 19/20 filings readable |
-| `atlas`, `graph`, `search`, `dependents`, `chokepoints`, `blast_radius`, `industry_map` | **GREEN** | all return real payloads, verified in test output |
-| byLLM / all LLM calls | **FIXED 15:50** | was 100% dead; now verified live |
-| ReAct discovery agent | **RED** | exists, 0 callers, unreachable from any user path |
-| Frontend | **RED** | renders a blank page — no route resolves |
-| Cold-start seeding | **RED** | fresh deploy comes up empty |
-| Deploy | **RED** | never happened, no URL |
+## 1. Verified state — run at baseline `7f3e852`
 
-Real numbers you can say on stage — all from the passing test run, none invented:
+| Check | Result |
+|---|---|
+| `jac check main.jac` | **PASSED** |
+| `jac check extract.jac` | **PASSED** |
+| `jac test main.test.jac` | **9/9 OK** |
+| Live LLM through the real module | `canonicalize_with_llm("Amazon Web Services EMEA SARL") -> "AWS"` |
+| Graph | 293 companies, 555 edges, 19/20 filings readable |
+
+Real numbers, safe to say on stage — all from the passing test run, none invented:
 
 - Okta 89 disclosed subprocessors · Figma 54 · Intercom 43 · Stripe 40 · HubSpot 32 · Notion 32 · Linear 32 · Cloudflare 30 · GitHub 30
-  
 - Top chokepoint: **Microsoft Azure — 6 of 19 companies (30%)**, then Salesforce 15%, Cloudflare 15%
-  
 - `openrouter.ai` = the one we honestly could not read
-  
 
-* * *
-## 3. What actually went wrong — four root causes
-### 3.1 The frontend has never rendered. Not "shows wrong data" — blank.
-Jac file-based routing requires every page file to export `def:pub page()` and layouts `def:pub layout()` (`jac guide jac-cl-routing`). Ours export:
+**Do not narrate any number that is not in this table.**
 
-| File | Exports | Needs to be |
+---
+
+## 2. What just happened, so nobody repeats it
+
+Two regressions arrived with the `feat: add search and discovery pipeline` merge
+(`453dbfd`) and were fixed in `7f3e852`:
+
+1. **byLLM was imported as `jaclang.byllm.lib`.** That module does not exist. The type
+   checker resolves it anyway, so `jac check` passed while every runtime import of
+   `extract.jac` died with `No module named 'jaclang.byllm'`. **The correct path is
+   `byllm.lib`.** Do not "fix" it back.
+2. **`main.jac:368` dropped the `[0]` on `root ++> Company(...)`.** `++>` returns a
+   **list**. `main.jac` failed to type-check entirely.
+
+Also landed in `7f3e852`: the four page exports were renamed to the file-router
+convention. Jac file routing requires `def:pub page()` per page and `def:pub layout()`
+for layouts; ours were `Landing()` / `Atlas()` / `Brief()` / `Shell()`, so **zero routes
+registered and the app served a blank div.**
+
+What `453dbfd` did deliver, and it is genuinely useful:
+
+- `provider_evidence.jac` — 15 providers with SOC 2 status **and a source URL each**.
+  This is the first cited risk data in the project; it is what `compliance_fallout` needs
+  in order to stop returning `[]`.
+- `atlas_seed.jac` — seed parsing, validation and normalization hardening.
+
+What `453dbfd` did **not** deliver, despite the commit message: **search is still not
+wired to discovery.** `search` has no `allow_discovery` parameter and
+`discover_and_resolve` still has zero callers. That is §4.
+
+### Rules
+
+- Work on `main`. Push every 20 minutes even if unfinished.
+- `jac check` your own files before pushing.
+- If `jac test` says `readonly database`, kill your `jac start` processes. That is a
+  SQLite lock, not a bug.
+- `/Users/twaldin/blast-radius-swiss` is a stray agent's scratch checkout. **Do not merge it.**
+
+---
+
+## 3. SNEHIL — deploy. Paste everything below into your agent.
+
+> **Task: get Blast Radius deployed and keep the URL current.**
+>
+> Repo `/Users/twaldin/jackhacks-jul-26`, branch `main`, baseline `7f3e852`. It is green:
+> `jac check main.jac` passes and `jac test main.test.jac` is 9/9. You do not need to read
+> `main.jac` except for one task (S3). Do not touch `pages/`, `risk/`, or `extract.jac` —
+> other people are in those files right now.
+>
+> **S1 — one replica.** In `jac.toml`, `[scale.kubernetes]` sets `max_replicas = 4` with no
+> `[plugins.scale.database]` configured. Each replica gets its own SQLite, so users see a
+> different graph depending on which pod they hit. Set `max_replicas = 1`.
+> *Done when:* `jac.toml` shows `max_replicas = 1`.
+>
+> **S2 — deploy on what exists right now.** Do not wait for any feature. Entry point is
+> `main.jac`, `kind = "web-app"`.
+> *Done when:* a public URL answers
+> `curl -X POST <URL>/walker/atlas -H 'content-type: application/json' -d '{}'`
+> with a JSON body containing `"total": 19`.
+>
+> **S3 — cold-start seeding.** The `seed_atlas` walker in `main.jac` resolves its seed
+> directory with `Path("seed/atlas")`, which is relative to the **process working
+> directory**. In a container whose CWD differs, `base.exists()` is `False`, the walker
+> reports `seeded: 0` and *succeeds silently* — so a fresh deploy serves an empty graph and
+> nothing looks broken. Two changes:
+>   1. Resolve the path relative to the **module file** instead of CWD.
+>   2. Make it run automatically when the graph is empty, so no human has to remember to
+>      `curl` it after every deploy.
+>
+> This is the only task that edits `main.jac`. It is about 10 lines and confined to the
+> `seed_atlas` walker. Tell David in chat before you push — he is editing the `search`
+> walker in the same file.
+> *Done when:* a container started with a fresh database serves `"total": 19` from
+> `/walker/atlas` with no manual curl, and `jac test main.test.jac` is still 9/9.
+>
+> **S4 — check the toolchain pin.** `jac.toml` line 7 says `jac-version = "==0.34.7"` but
+> the installed CLI reports `0.16.7`. If the builder honors that pin, install fails.
+> Verify against the deploy build log and correct the pin if it breaks the build.
+>
+> **S5 — own redeploys.** Once a URL exists, keep it current as others push to `main`.
+>
+> **Order: S1, S2, then S3. Nothing else in the project matters until S2 is done.**
+> Do not run project-wide formatters or linters. Do not refactor anything you were not asked to.
+
+---
+
+## 4. DAVID — search + discovery. Paste everything below into your agent.
+
+> **Task: make search find companies that are not already in the graph.**
+>
+> Repo `/Users/twaldin/jackhacks-jul-26`, branch `main`, baseline `7f3e852`. You own
+> `extract.jac`, `browser_discovery.jac`, `registry.jac`, and **the `search` walker inside
+> `main.jac`** (starts at `main.jac:1016`). Do not touch `pages/`, `risk/`, or `jac.toml` —
+> other people are in those files right now.
+>
+> **Context you need before writing code.**
+>
+> The LLM works. It is bound in `extract.jac` as
+> `glob llm = Model(model_name=os.getenv("BLAST_RADIUS_MODEL", "gemini/gemini-2.5-flash"))`
+> and `GEMINI_API_KEY` is in the environment. Verified live:
+> `canonicalize_with_llm("Amazon Web Services EMEA SARL", [...])` returns `"AWS"`.
+> **The byLLM import path is `byllm.lib`. It is NOT `jaclang.byllm.lib` — that module does
+> not exist, it passes `jac check` and then dies at runtime. Do not change it.**
+>
+> A ReAct agent already exists and is correctly declared at `extract.jac:438`:
+> `find_dpa_sources(company_keyword, domain) -> list[str] by llm(tools=[search_web_tool,
+> read_page_tool, search_github_tool], temperature=0.0, max_tokens=1000,
+> max_react_iterations=6)`. Its call chain is
+> `find_dpa_sources <- discover_with_browser <- discover_and_resolve <- NOTHING`.
+> `discover_and_resolve` is at `extract.jac:608` and has **zero callers**. Everything below
+> is about giving it exactly one caller and making it safe.
+>
+> What `search` does today (`main.jac:1016`, params `q: str`, `limit: int = 20`): seven
+> tiers of deterministic string matching — exact, alias, despaced, slug, Levenshtein ≤ 2,
+> substring, then the 150-entry registry in `registry.jac`. No LLM, no browser, no
+> discovery. For a company that is not already in the graph it returns
+> `{"query": q, "resolved": null, "results": []}`. That is the gap.
+>
+> **D1 — prove the agent runs.** Call `find_dpa_sources("Vercel", "vercel.com")` directly
+> and watch it plan and call tools.
+> *Done when:* it returns real candidate URLs for a company outside the 150-entry registry.
+>
+> **D2 — harden `discover_and_resolve` (`extract.jac:608`).** Contract, frozen:
+> ```jac
+> async def discover_and_resolve(domain: str, company_keyword: str) -> str;
+> ```
+> It must **never raise**, must always return a status, and must return within **45
+> seconds**. Wrap the whole body; catch `ByLLMError` and everything else.
+> *Done when:* five junk inputs (`""`, `"   "`, `"!!!"`, a 500-char string, a domain that
+> does not resolve) all return cleanly and none throw.
+>
+> **D3 — wire it into `search`. This is the whole point of your lane.**
+> Add to the `search` walker:
+> ```jac
+> has allow_discovery: bool = False;
+> ```
+> Behavior: run the existing seven tiers unchanged. **Only if they all miss AND
+> `allow_discovery` is true**, call `discover_and_resolve`, persist whatever it finds
+> through the existing `_upsert_company` chokepoint in `main.jac`, and then return the
+> normal envelope with the newly created company in `resolved`. Add a `"discovered": bool`
+> field to the report so the frontend can label it. The response shape is otherwise
+> **unchanged** — the frontend is already built against it:
+> ```jsonc
+> {"query": "...",
+>  "resolved": {"id","domain","name","state","filing_count","dependent_count",
+>               "crawl_status","source_url","match"},
+>  "results": [ ...same shape... ],
+>  "discovered": false}
+> ```
+> Default `allow_discovery` to `False` so the fast path and the demo never block.
+> *Done when:*
+> `search{q: "vercel", allow_discovery: true}` resolves a company that was not in the graph
+> beforehand, `search{q: "okta"}` still returns instantly from the graph, and
+> `jac test main.test.jac` is still 9/9.
+>
+> **D4 — decide the no-browser story. This is what will break on stage.**
+> `browser_discovery.jac:118-165` shells out to a `browser-harness` binary driving Chrome
+> over CDP. **That binary and that browser will not exist in the deployed container.**
+> Pick one and implement it: either discovery degrades cleanly and fast to
+> `status: "unreadable"` when the harness is absent, or discovery runs LLM-only through
+> `search_web_tool` with no browser at all. Either is fine. Hanging for 45 seconds in front
+> of a judge is not.
+> *Done when:* with `browser-harness` unavailable, `discover_and_resolve` returns a clean
+> status in under 5 seconds.
+>
+> **D5 — you are the only person changing backend logic.** `jac test main.test.jac` must be
+> 9/9 before every push. If it reports `readonly database`, kill your `jac start`
+> processes — that is a SQLite lock, not a bug.
+>
+> **Order: D1, D2, D3, D4. D3 is the deliverable; if you run out of time, D3 with a
+> browser-less fallback beats D4 done perfectly.**
+> Do not run project-wide formatters or linters. Do not refactor anything you were not asked to.
+
+---
+
+## 5. TIM — frontend (`pages/`, `risk/`)
+
+| # | Task | Done when |
 |---|---|---|
-| `pages/index.jac:23` | `Landing()` | `page()` |
-| `pages/atlas.jac:16` | `Atlas()` | `page()` |
-| `pages/brief.jac:63` | `Brief()` | `page()` |
-| `pages/layout.jac:34` | `Shell()` | `layout()` |
+| T1 | ~~Rename the four route exports to `page()` / `layout()`~~ | **done in `7f3e852`** |
+| T2 | Fix the 6 `jac check` failures — `pages/index.jac`, `pages/atlas.jac`, `pages/brief.jac`, `risk/store.jac`, `risk/DependencyGraph.jac`, `risk/graph_core.cl.jac`. All are `any`-typing: `len(x as list)`, `as str` / `as float` casts | `jac check pages/*.jac risk/*.jac` clean |
+| T3 | **Landing = real data.** Delete the 8 hardcoded literals at `pages/index.jac:8-17`; drive the picker from `atlas {}` — 19 real companies with real counts and chokepoints. Add the project/problem copy | landing lists Okta/Figma/Stripe with real subprocessor counts |
+| T4 | **Kill the fixture path.** `risk/store.jac:123-134` calls `expand {}` with no domain, then falls back to `detect_vendors` → the fabricated 8-vendor stack. Replace: `atlas {}` on load, `graph {domain}` on select | `detect_vendors` / `DEMO_VENDORS` have no frontend callers; the apology line at `pages/atlas.jac:160` is deleted |
+| T5 | **Atlas search box.** Input → `search {q}` → hit list → select → `graph {domain}`. On an empty result, a "map it now" button that re-calls with `allow_discovery: true` plus a spinner | typing "okta" draws Okta's 89-dependency graph |
+| T6 | Keep the SVG radial renderer in `risk/DependencyGraph.jac` — it works and pulls no npm dependency | — |
 
-Zero routes register. `curl localhost:8010/` returns a shell that mounts `{"module":"main","function":"app"}` → `main.jac:1193`, which is `<>{children}</>` with no router and no children. **An empty div.**
+T5 needs David's D3 **only** for the discovery branch. Build the box against plain
+`search {q}` immediately — that works today and covers every seeded company.
 
-`REVIEW.md` §2 says the app "renders an 8-vendor fabricated fixture". That was inferred from reading `store.jac`, not from loading the page. It renders nothing at all. The fix is four renames.
+---
 
-On top of that, **6 of 9 frontend files fail** `jac check` (`pages/index.jac`, `pages/atlas.jac`, `pages/brief.jac`, `risk/store.jac`, `risk/DependencyGraph.jac`, `risk/graph_core.cl.jac`).
-### 3.2 Every LLM call in the repo was dead. — FIXED, committed as `66d742c`
-byLLM binds `by llm(...)` to a module-global named `llm`. **No** `Model(...)` **was declared anywhere in the repo.** byLLM silently fell back to OpenAI; there is no `OPENAI_API_KEY` on this machine. Every call — `extract_subprocessors`, `canonicalize_with_llm`, `find_dpa_sources` — failed at runtime with `litellm.InternalServerError: Missing credentials`.
+## 6. API contract — verified payloads, will not change
 
-So "backend with LLMs" was not partially done. It was 0%.
-
-Fixed in `extract.jac`: `glob llm = Model(model_name=os.getenv("BLAST_RADIUS_MODEL", "gemini/gemini-2.5-flash"))`. `GEMINI_API_KEY` is already in the environment. Verified live through the real module:
-
-```
-canonicalize_with_llm("Amazon Web Services EMEA SARL", [...])  ->  "AWS"
-```
-
-A tool-calling ReAct probe also completes its loop end to end. **B: your whole lane went from impossible to working. Re-test anything you concluded was broken.**
-### 3.3 The ReAct agent is unreachable, so the Atlas page's core promise has no implementation
-`find_dpa_sources` (`extract.jac:397-405`) is a correct byLLM ReAct declaration — 3 tools, `max_react_iterations=6`. Its call chain:
-
-```
-find_dpa_sources  <-  discover_with_browser  <-  discover_and_resolve  <-  NOTHING
-```
-
-`discover_and_resolve` has **zero callers**. `main.jac` does not import it.
-
-What the `search` walker actually does today: 7 tiers of deterministic string matching (exact → alias → despaced → slug → Levenshtein≤2 → substring → 150-entry registry). No LLM, no browser, no discovery. For a company not already in the graph it returns `{"resolved": null, "results": []}`. `map_company` is not an escape hatch either — it falls through to `resolve_url`, which is registry-only, and returns `"notfound"`.
-
-**"Search for an arbitrary company" — the entire point of the Atlas page — has no code path.** This is also the Agentic-AI track centrepiece.
-### 3.4 A fresh deploy comes up empty
-`seed_atlas` is idempotent, tested, and **called by nothing**. Worse, it resolves `Path("seed/atlas")` relative to process CWD; in a container that silently reports `seeded: 0` and succeeds. Plus `jac.toml:42` sets `max_replicas = 4` with no shared database → four pods, four different graphs.
-### Also worth knowing
-- The 9/9 test failure everyone saw was **a stale** `jac start` **on :8010 holding the SQLite WAL**, not a code fault. Killed it; suite is green. If tests say "readonly database", kill your servers.
-  
-- `/Users/twaldin/blast-radius-swiss` is **not** anyone's work — it's a scratch checkout from an agent running loose on Tim's machine. Do not merge it. It is 5 commits behind and pulls in a `react-force-graph-2d` npm dependency we already removed. It is useful as a **reference only**: it happens to contain a working search-input pattern (`pages/index.jac:129-142`) and a store `search` action (`store.jac:273`). Copy the pattern, not the files.
-  
-
-* * *
-## 4. Frozen API contract — read this, then never block on each other
-These payloads are **verified from the passing test run**. They will not change. Tim builds the pages against them without waiting for anyone; David owns both sides of the discovery path, so there is no cross-lane contract left to honor.
+Envelope for all of them: `{"data": {"reports": [ <payload> ]}}`.
 
 ```jsonc
-// POST /walker/atlas  {}                      -> the landing page's company list
+// POST /walker/atlas {}                        -> the landing page's company list
 {"total": 19, "companies": [{
   "id": "figma", "domain": "figma.com", "name": "Figma", "featured": true,
   "vendor_count": 51, "provider_count": 81,
@@ -95,19 +232,15 @@ These payloads are **verified from the passing test run**. They will not change.
   "top_share": 0.06, "vendors_affected": 3,
   "source_url": "https://www.figma.com/sub-processors/"}]}
 
-// POST /walker/graph  {"domain": "lindy.ai"}  -> one company's dependency graph
+// POST /walker/graph {"domain": "lindy.ai"}    -> one company's dependency graph
 {"nodes": [{"id","label","tier","inbound_degree","soc2","supply_chain_risk",
             "downtime_hours_ytd","domain","category","crawl_status",
             "source_url","risk_source_url"}],
  "edges": [{"source","target","kind","purpose","region","handles_pii"}]}
 // tier is "org" | "vendor" | "provider", computed as BFS distance from the viewed company
 
-// POST /walker/search {"q": "aws", "allow_discovery": false}
-{"query": "aws",
- "resolved": {"id","domain","name","state","filing_count","dependent_count",
-              "crawl_status","source_url","match"},
- "results": [ ...same shape... ],
- "discovered": false}                          // <- NEW, added by David in §5
+// POST /walker/search {"q": "aws", "allow_discovery": false}   // allow_discovery = David's D3
+{"query","resolved","results","discovered"}
 
 // POST /walker/chokepoints {}
 [{"provider","provider_id","vendors_affected","share","downtime_hours_ytd",
@@ -116,108 +249,50 @@ These payloads are **verified from the passing test run**. They will not change.
 // POST /walker/blast_radius {"failed_provider": "azure"}
 {"provider","provider_id","vendors_down","vendor_ids","features_down","status_post"}
 
-// POST /walker/dependents {"domain": "..."}   -> inbound: who depends on this
+// POST /walker/dependents {"domain": "..."}    -> inbound: who depends on this
 {"nodes","edges","root","root_domain","root_label","direction":"inbound","dependent_count"}
 
 // POST /walker/industry_map {"min_degree": 2}  -> the whole-map page (stretch)
 ```
 
-Envelope for all of them: `{"data": {"reports": [ <payload> ]}}`.
+---
 
-**The one piece that does not exist yet — David owns both sides of it, so it cannot desync:**
+## 7. Timeline and cut list
 
-```jac
-# extract.jac:570-593 -- already exists, needs hardening
-def discover_and_resolve(domain: str, keyword: str) -> BrowserDiscoveryResult;
-# never raises; status in {"ok","notfound","unreadable"}; returns in <=45s
-```
-
-The `search` walker calls it. Both sides live in David's lane now.
-
-* * *
-## 5. Lanes
-Each lane owns disjoint files. **Do not edit outside your lane** — cross-lane edits are what produced §3.1.
-
-Assignment changed at 16:10. Tim moves to frontend because it is now the only thing between us and a demo and it is the riskiest lane. Snehil takes deploy: bounded, binary, needs no context in a 1185-line file. David takes the entire search→discovery vertical so one person owns both sides of it and there is nothing to hand off.
-### SNEHIL · deploy + config — owns `jac.toml`, hosting
-**Do this first. Nothing else in this document matters without a URL.** You do not need to read `main.jac`.
-
-| #   | Task | Done when |
-| --- | --- | --- |
-| S1  | Set `max_replicas = 1` (`jac.toml:42`). Four replicas with no shared database means four different graphs depending on which pod a judge hits | one replica |
-| S2  | **Deploy on what exists right now.** Do not wait for anyone's feature | a URL answers `POST /walker/atlas` with 19 companies |
-| S3  | Check `jac-version = "==0.34.7"` (`jac.toml:7`) against the installed 0.16.7 toolchain. If the builder honors that pin, install fails | build log clean |
-| S4  | Cold-start seeding. `seed_atlas` resolves `Path("seed/atlas")` relative to **process CWD**, so in a container it reports `seeded: 0` and succeeds silently. Make it module-relative and auto-run when the graph is empty | fresh container serves 293 companies, no manual curl |
-| S5  | Once a URL exists, own redeploys. Everyone else pushes `main`; you keep the URL current | —   |
-
-S4 is the only item that touches `main.jac`. It is ~10 lines, localized to the `seed_atlas` walker — tell David before you push, he is in the same file.
-### DAVID · search + discovery — owns `extract.jac`, `browser_discovery.jac`, `registry.jac`, and the `search` walker in `main.jac`
-**Your lane was blocked by a dead LLM binding until 15:50 (§3.2). It works now. Start by re-running whatever you gave up on.** You own both sides of the discovery boundary, so there is no contract to negotiate with anyone.
-
-| # | Task | Done when |
-|---|---|---|
-| D1 | Verify the ReAct agent end to end: call `find_dpa_sources("Vercel", "vercel.com")` and watch it plan | returns real candidate URLs for a company outside the 150-entry registry |
-| D2 | Harden `discover_and_resolve` (`extract.jac:570-593`): never raises, always returns a status, hard 45s ceiling | fuzzed with 5 junk inputs, never throws |
-| D3 | **Wire it up.** `search` gains `allow_discovery: bool = False` and a `"discovered"` field. On graph+registry miss with the flag set, call `discover_and_resolve`, persist via `_upsert_company`, return the same envelope (§4) | `search{q:"vercel", allow_discovery:true}` resolves a company that was not in the graph before |
-| D4 | Decide the no-browser story. `browser_discovery.jac` shells out to a `browser-harness` binary + Chrome CDP that **will not exist in the deployed container** | either it degrades cleanly to `unreadable`, or discovery runs LLM-only via `search_web_tool` |
-| D5 | Keep `main.test.jac` at 9/9 — you are the only one changing backend logic | green before every push |
-
-D3 is the Agentic-AI track centrepiece and the Atlas page's entire promise. D4 is what bites on stage: if the deployed box has no browser, say so in the UI rather than hanging 45 seconds.
-### TIM · frontend — owns `pages/`, `risk/`
-Biggest lane and the critical path. **Do not merge the swiss checkout** (§3.4 note) — it is 5 commits behind and drags in an npm dependency we already removed. Read it for the search-input pattern only.
-
-| # | Task | Done when |
-|---|---|---|
-| T1 | **Rename the four exports** — `Landing`→`page`, `Atlas`→`page`, `Brief`→`page`, `Shell`→`layout` | `/` renders literally anything. ~2 minutes. Do it first |
-| T2 | Fix the 6 `jac check` failures (§3.1) | `jac check pages/*.jac risk/*.jac` clean |
-| T3 | **Landing = real data.** Delete the 8 hardcoded literals at `pages/index.jac:8-17`; drive the picker from `atlas {}` (19 real companies, real counts, real chokepoints). Add the project/problem copy | landing lists Okta/Figma/Stripe with real subprocessor counts |
-| T4 | **Kill the fixture path.** `risk/store.jac:123-134` calls `expand {}` with no domain and falls back to `detect_vendors` → the fabricated 8-vendor stack. Replace with `atlas {}` on load, `graph {domain}` on select | `detect_vendors`/`DEMO_VENDORS` have no frontend callers; the apology line at `pages/atlas.jac:160` is gone |
-| T5 | **Atlas search box** — the page's reason to exist. Input → `search {q}` → hit list → select → `graph {domain}`. On an empty result, a "map it now" button that re-calls with `allow_discovery: true`, plus a spinner | typing "okta" draws Okta's 89-dependency graph |
-| T6 | Keep the SVG radial renderer in `risk/DependencyGraph.jac` — it works and has no npm dependency | — |
-
-T5 depends on David's D3 only for the _discovery_ branch. Build the search box against plain `search {q}` immediately — that works today and covers every seeded company.
-
-* * *
-## 6. Timeline
 | Time | Gate |
-| --- | --- |
-| **16:20** | Snehil: URL is live. Tim: `/` renders something. David: agent confirmed running. **If S2 has not landed by 16:20, everyone stops and helps.** |
-| **17:30** | Tim: landing + atlas on real data, search box works for seeded companies. Snehil: S4 done. David: D1–D4 done. |
+|---|---|
+| **+20 min** | Snehil: URL live. Tim: `/` renders. David: D1 confirmed. **If the URL is not up, everyone stops and helps.** |
+| **17:30** | Tim: landing + atlas on real data, search box working for seeded companies. Snehil: S3 done. David: D2 + D3 done. |
 | **18:00** | Integration on the deployed URL. Discovery branch wired or explicitly cut. |
 | **18:15** | **Feature freeze.** Nothing merges after this. |
 | **18:15–19:00** | Rehearse twice, on the deployed URL, not localhost. |
-| **19:00** | Buffer. |
-## 7. Cut list — in this order, without discussion
-1. Whole-map page (`industry_map` — endpoint is real, no UI, cut the UI not the endpoint)
-  
-2. Brief page (closest to done of the three, but it is not one of the two pages that matter)
-  
-3. Compliance panel — `compliance_fallout` returns `[]` because no risk data is cited. An empty panel reads as broken. Cut it rather than ship it hollow.
-  
+
+Cut in this order, without discussion:
+
+1. Whole-map page (`industry_map` endpoint is real — cut the UI, keep the endpoint)
+2. Brief page
+3. Compliance panel — **unless** someone wires `provider_evidence.jac`'s 15 cited SOC 2
+   facts into `compliance_fallout`, it returns `[]` and the panel renders empty. An empty
+   panel reads as broken. Ship it cited or cut it.
 4. Diff-monitor UI, `root.shared`, auth
-  
 
 **Never cut:** the deployed URL, the landing page, the atlas search box, the two rehearsals.
-## 8. Merge protocol
-The root cause of §3.1 was work living somewhere nobody merged from.
 
-- Everyone works on `main`. Small commits. Push every 20 minutes even if unfinished.
-  
-- `jac check` your own files before pushing. `jac test main.test.jac` is David's gate.
-  
-- If tests report `readonly database`, kill your `jac start` processes — that is a lock, not a bug.
-  
-- Say it in the group chat when you touch a file outside your lane. Do not do it silently.
-  
-## 9. What to say on stage
+---
+
+## 8. What to say on stage
+
 Lead with provenance, not the graph:
 
-> "Nineteen companies, 555 disclosed dependencies, every one read out of a public Article 28 filing with the source URL attached. One of the twenty we could not read — it's a client-rendered trust center, and we report that instead of guessing."
+> "Nineteen companies, 555 disclosed dependencies, every one read out of a public Article 28
+> filing with the source URL attached. One of the twenty we could not read — it's a
+> client-rendered trust center, and we report that instead of guessing."
 
 Best Jac line:
 
-> "Reads are unbounded and free — full BFS over the whole reachable component in 729 milliseconds — because in Jac the graph _is_ the database. We put the budget on crawling, which costs money, not on depth, which doesn't."
+> "Reads are unbounded and free — full BFS over the whole reachable component in 729
+> milliseconds — because in Jac the graph *is* the database. We put the budget on crawling,
+> which costs money, not on depth, which doesn't."
 
-Then the agent, if David lands D3: _"this isn't a scraper with an if/elif chain — the agent decides where to look."_
-
-Do not narrate any number that is not in §2.
+Then the agent, if David lands D3: *"this isn't a scraper with an if/elif chain — the agent
+decides where to look."*
