@@ -20,7 +20,7 @@ def pct(share: any) -> str {
     return str(round((share as float) * 100));
 }
 
-def:pub Landing() -> JsxPage {
+def:pub page() -> JsxPage {
     risk: any = useRisk();
     nav: any = useNavigate();
     st: any = risk["state"];

@@ -13,7 +13,7 @@ def pct(x: any) -> str {
     return str(round((x as float) * 100));
 }
 
-def:pub Atlas() -> JsxPage {
+def:pub page() -> JsxPage {
     risk: any = useRisk();
     st: any = risk["state"];
     acts: any = risk["actions"];

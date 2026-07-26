@@ -31,7 +31,7 @@ def:pub Scope() -> JsxElement {
     </span>;
 }
 
-def:pub Shell() -> JsxLayout {
+def:pub layout() -> JsxLayout {
     return <RiskProvider>
         <div className="shell">
             <header className="chrome">

@@ -60,7 +60,7 @@ def:pub CopyButton() -> JsxElement {
     </button>;
 }
 
-def:pub Brief() -> JsxPage {
+def:pub page() -> JsxPage {
     risk: any = useRisk();
     st: any = risk["state"];
     h: any = st["headline"];
