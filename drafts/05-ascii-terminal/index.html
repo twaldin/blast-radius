@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLAST RADIUS — supply-chain risk mapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040804;
+  --bg2:#071207;
+  --grn:#4af87a;
+  --grn-hi:#a9ffc4;
+  --grn-dim:#1f6b3a;
+  --grn-faint:#123320;
+  --amb:#ffb000;
+  --amb-dim:#7a5600;
+  --ink:#031006;
+}
+*{margin:0;padding:0;box-sizing:border-box;border-radius:0 !important}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--grn);
+  font-family:'IBM Plex Mono','JetBrains Mono',ui-monospace,Menlo,monospace;
+  font-size:14px;
+  line-height:1.45;
+  padding-bottom:150px;
+  overflow-x:hidden;
+  text-shadow:0 0 6px rgba(74,248,122,.28);
+}
+::selection{background:var(--grn);color:var(--ink);text-shadow:none}
+/* ---- CRT layers ---- */
+body::after{ /* scanlines */
+  content:"";position:fixed;inset:0;z-index:90;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px);
+}
+.crt-vignette{position:fixed;inset:0;z-index:91;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%);}
+.crt-flicker{position:fixed;inset:0;z-index:89;pointer-events:none;background:rgba(74,248,122,.02);
+  animation:flick 4s steps(60) infinite}
+@keyframes flick{0%,94%,100%{opacity:.5}95%{opacity:.9}96%{opacity:.2}97%{opacity:.7}}
+/* ---- layout ---- */
+.wrap{max-width:1380px;margin:0 auto;padding:0 28px}
+section{margin:0 0 22px}
+.dim{color:var(--grn-dim)}
+.amb{color:var(--amb);text-shadow:0 0 8px rgba(255,176,0,.4)}
+.hi{color:var(--grn-hi)}
+pre{font:inherit;white-space:pre;overflow-x:auto}
+/* ---- hero ---- */
+#hero{min-height:760px;display:flex;flex-direction:column;justify-content:center;padding-top:34px}
+#boot{font-size:13.5px;line-height:1.6;min-height:190px;color:var(--grn)}
+#boot .out{color:var(--grn-dim)}
+#logo{font-weight:700;font-size:clamp(9px,1.55vw,20px);line-height:1.12;color:var(--grn-hi);
+  text-shadow:0 0 4px rgba(169,255,196,.7),0 0 22px rgba(74,248,122,.45);
+  margin:26px 0 6px;opacity:0;transform:translateY(10px);transition:opacity .6s ease-out,transform .6s ease-out}
+#logo.on{opacity:1;transform:none}
+.tagline{font-size:17px;color:var(--grn);margin:14px 0 4px;min-height:26px}
+.tagline .q{color:var(--amb)}
+.subline{color:var(--grn-dim);font-size:12.5px;margin-bottom:26px;opacity:0;transition:opacity .8s ease-out}
+.subline.on{opacity:1}
+.cta-row{display:flex;gap:18px;align-items:center;opacity:0;transform:translateY(8px);transition:opacity .5s ease-out,transform .5s ease-out}
+.cta-row.on{opacity:1;transform:none}
+button.ascii{
+  font:inherit;font-weight:600;background:none;border:1px solid var(--grn);color:var(--grn);
+  padding:9px 16px;cursor:pointer;letter-spacing:.06em;text-shadow:inherit;
+}
+button.ascii:hover,button.ascii:focus-visible{background:var(--grn);color:var(--ink);text-shadow:none;outline:none}
+button.ascii.ambb{border-color:var(--amb);color:var(--amb)}
+button.ascii.ambb:hover,button.ascii.ambb:focus-visible{background:var(--amb);color:var(--ink)}
+.scroll-hint{margin-top:44px;color:var(--grn-dim);font-size:12px;letter-spacing:.35em;animation:hint 2.4s ease-in-out infinite}
+@keyframes hint{0%,100%{opacity:.55}50%{opacity:1}}
+.cursor{display:inline-block;background:var(--grn);color:var(--ink);animation:blink 1s steps(1) infinite;text-shadow:none}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+/* ---- panels ---- */
+.panel{border:1px solid var(--grn-faint);background:linear-gradient(180deg,rgba(18,51,32,.16),rgba(4,8,4,.2));
+  opacity:0;transform:translateY(14px);transition:opacity .55s ease-out,transform .55s ease-out}
+.panel.vis{opacity:1;transform:none}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  border-bottom:1px solid var(--grn-faint);padding:8px 14px;font-weight:600;letter-spacing:.12em;font-size:12.5px}
+.ph .tag{color:var(--grn-dim);font-weight:400;letter-spacing:.05em}
+.ph .tag.amb{color:var(--amb)}
+.pb{padding:14px}
+.grid{display:grid;grid-template-columns:7fr 5fr;gap:22px;align-items:start}
+.col{display:flex;flex-direction:column;gap:22px}
+/* ---- tree ---- */
+#tree{font-size:13.5px;line-height:1.5}
+#tree .root{color:var(--grn-hi);font-weight:700}
+#tree .strike{text-decoration:line-through;text-decoration-color:var(--amb);color:#3d9960}
+#tree .bad{color:var(--amb);font-weight:600}
+#tree .provtag{color:var(--grn)}
+.choke{background:var(--grn);color:var(--ink);font-weight:700;text-shadow:none;padding:0 2px;cursor:pointer}
+.choke:hover{background:var(--grn-hi)}
+.choke.hit{background:var(--amb);animation:blink .8s steps(1) infinite}
+[data-p]{cursor:pointer}
+[data-p]:hover{text-decoration:underline;text-underline-offset:3px}
+.blink{animation:blink .7s steps(1) infinite}
+/* ---- choke bars ---- */
+#choke{font-size:13px;line-height:1.55}
+#choke .bar{color:var(--grn)}
+#choke .bar.aws{color:var(--amb);text-shadow:0 0 8px rgba(255,176,0,.45)}
+#conv{margin-top:12px;padding-top:12px;border-top:1px dashed var(--grn-faint);font-size:13px;line-height:1.5}
+/* ---- status post ---- */
+#statuspost{font-size:12.5px;line-height:1.55;min-height:120px;color:var(--grn)}
+#statuspost .out{color:var(--grn-dim)}
+/* ---- risk block ---- */
+#risk{border:1px solid var(--grn);box-shadow:0 0 24px rgba(74,248,122,.12) inset,0 0 18px rgba(74,248,122,.08)}
+#risk .ph{font-size:14px;justify-content:center;letter-spacing:.3em;color:var(--grn-hi)}
+#risk .pb{padding:22px 26px}
+.risk-head{font-size:clamp(16px,1.8vw,24px);font-weight:700;color:var(--grn-hi);line-height:1.4;margin-bottom:14px;min-height:34px}
+.risk-sugg{color:var(--grn);font-size:14px;margin-bottom:12px}
+.risk-sugg .lbl{color:var(--amb);font-weight:600}
+.risk-meta{color:var(--grn-dim);font-size:12.5px}
+#risk.live{border-color:var(--amb);box-shadow:0 0 24px rgba(255,176,0,.14) inset,0 0 18px rgba(255,176,0,.1)}
+#risk.live .ph{color:var(--amb)}
+/* ---- terminal bar ---- */
+#termbar{position:fixed;left:0;right:0;bottom:0;z-index:80;
+  background:rgba(4,10,5,.96);border-top:1px solid var(--grn-dim);
+  padding:8px 28px 10px;backdrop-filter:blur(2px)}
+#banner{display:none;font-weight:700;letter-spacing:.18em;color:var(--amb);
+  text-shadow:0 0 10px rgba(255,176,0,.6);font-size:13px;padding:2px 0 6px}
+#banner.on{display:block;animation:blink .7s steps(1) infinite}
+#tlog{font-size:12px;line-height:1.5;color:var(--grn-dim);min-height:36px;max-height:54px;overflow:hidden}
+#tlog .cmd{color:var(--grn)}
+#tlog .bad{color:var(--amb)}
+#promptrow{display:flex;align-items:center;gap:1ch;font-size:14px}
+#promptrow .ps1{color:var(--amb);font-weight:600;white-space:nowrap}
+#cmd{flex:1;background:none;border:none;outline:none;color:var(--grn-hi);font:inherit;
+  caret-color:var(--grn);text-shadow:inherit;padding:2px 0}
+#cmd::placeholder{color:var(--grn-faint)}
+/* ---- reveal helper ---- */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s !important;transition-duration:.001s !important}
+}
+footer{color:var(--grn-faint);font-size:11.5px;text-align:center;margin-top:44px;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="crt-vignette"></div>
+<div class="crt-flicker"></div>
+
+<div class="wrap">
+
+  <!-- ============ HERO / BOOT ============ -->
+  <section id="hero">
+    <pre id="boot" aria-label="boot log"></pre>
+    <pre id="logo" aria-label="BLAST RADIUS">██████╗ ██╗      █████╗ ███████╗████████╗    ██████╗  █████╗ ██████╗ ██╗██╗   ██╗███████╗
+██╔══██╗██║     ██╔══██╗██╔════╝╚══██╔══╝    ██╔══██╗██╔══██╗██╔══██╗██║██║   ██║██╔════╝
+██████╔╝██║     ███████║███████╗   ██║       ██████╔╝███████║██║  ██║██║██║   ██║███████╗
+██╔══██╗██║     ██╔══██║╚════██║   ██║       ██╔══██╗██╔══██║██║  ██║██║██║   ██║╚════██║
+██████╔╝███████╗██║  ██║███████║   ██║       ██║  ██║██║  ██║██████╔╝██║╚██████╔╝███████║
+╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝       ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝ ╚═════╝ ╚══════╝</pre>
+    <div class="tagline"><span id="tagtext"></span><span class="cursor" id="tagcursor">&nbsp;</span></div>
+    <div class="subline" id="subline">supply-chain risk mapper · second-layer SaaS dependencies from vendors' own legal filings · jackhacks jul 2026 · track: agentic ai + jac</div>
+    <div class="cta-row" id="ctarow">
+      <button class="ascii ambb" id="btn-detonate">[ DETONATE AWS ]</button>
+      <button class="ascii" id="btn-graph">[ VIEW GRAPH ▼ ]</button>
+    </div>
+    <div class="scroll-hint">▼▼▼ SCROLL ▼▼▼</div>
+  </section>
+
+  <!-- ============ MAIN GRID ============ -->
+  <div class="grid">
+    <div class="col">
+      <section class="panel" id="p-tree">
+        <div class="ph"><span>▚ DEPENDENCY TREE</span><span class="tag">subprocessor graph · live</span></div>
+        <div class="pb"><pre id="tree"></pre></div>
+      </section>
+      <section class="panel" id="p-status">
+        <div class="ph"><span>▚ STATUS_POST</span><span class="tag" id="status-tag">no active incidents</span></div>
+        <div class="pb"><pre id="statuspost"></pre></div>
+      </section>
+    </div>
+    <div class="col">
+      <section class="panel" id="p-choke">
+        <div class="ph"><span>▚ CHOKEPOINT ANALYSIS</span><span class="tag">exposure = share × downtime_ytd</span></div>
+        <div class="pb"><pre id="choke"></pre><pre id="conv"></pre></div>
+      </section>
+      <section class="panel" id="p-comp">
+        <div class="ph"><span>▚ COMPLIANCE FALLOUT</span><span class="tag">soc 2 inheritance</span></div>
+        <div class="pb"><pre id="comp" style="font-size:12.5px;line-height:1.6"></pre></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============ RISK ============ -->
+  <section class="panel" id="risk">
+    <div class="ph"><span id="risk-title">═══ RISK ASSESSMENT COMPLETE ═══</span></div>
+    <div class="pb">
+      <div class="risk-head" id="risk-head"></div>
+      <div class="risk-sugg"><span class="lbl">SUGGESTION ─▶</span> <span id="risk-sugg"></span></div>
+      <div class="risk-meta">EXPOSURE 5.75 = 0.62 share × 9.2h downtime_ytd · source: public subprocessor lists + status-page history · confidence HIGH</div>
+    </div>
+  </section>
+
+  <footer>blast-radius v0.9.2 ── built at jackhacks jul 2026 ── all data derived from public subprocessor filings ── no vendors were harmed</footer>
+</div>
+
+<!-- ============ FIXED TERMINAL ============ -->
+<div id="termbar">
+  <div id="banner">!! OUTAGE !! AWS DOWN — BLAST RADIUS ACTIVE !! OUTAGE !!</div>
+  <div id="tlog"></div>
+  <div id="promptrow">
+    <span class="ps1">operator@blast-radius:~$</span>
+    <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type 'help' — or 'detonate aws'" aria-label="terminal command input">
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= DEMO GRAPH (exact data) ================= */
+const GRAPH = {
+  nodes: [
+    {id:"jachammer.ai",label:"JacHammer",tier:"org",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"openai",label:"OpenAI",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"anthropic",label:"Anthropic",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"openrouter",label:"OpenRouter",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"github",label:"GitHub",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"stripe",label:"Stripe",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"datadog",label:"Datadog",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"vercel",label:"Vercel",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"sentry",label:"Sentry",tier:"vendor",inbound_degree:0,soc2:true,supply_chain_risk:"",downtime_hours_ytd:0.0},
+    {id:"aws",label:"AWS",tier:"provider",inbound_degree:5,soc2:true,supply_chain_risk:"",downtime_hours_ytd:9.2},
+    {id:"azure",label:"Microsoft Azure",tier:"provider",inbound_degree:2,soc2:true,supply_chain_risk:"",downtime_hours_ytd:5.1},
+    {id:"gcp",label:"Google Cloud",tier:"provider",inbound_degree:1,soc2:true,supply_chain_risk:"",downtime_hours_ytd:3.4},
+    {id:"cloudflare",label:"Cloudflare",tier:"provider",inbound_degree:2,soc2:true,supply_chain_risk:"",downtime_hours_ytd:7.7},
+    {id:"fastly",label:"Fastly",tier:"provider",inbound_degree:1,soc2:false,supply_chain_risk:"watchlist",downtime_hours_ytd:4.3}
+  ],
+  edges: [
+    {source:"jachammer.ai",target:"openai",kind:"uses"},
+    {source:"jachammer.ai",target:"anthropic",kind:"uses"},
+    {source:"jachammer.ai",target:"openrouter",kind:"uses"},
+    {source:"jachammer.ai",target:"github",kind:"uses"},
+    {source:"jachammer.ai",target:"stripe",kind:"uses"},
+    {source:"jachammer.ai",target:"datadog",kind:"uses"},
+    {source:"jachammer.ai",target:"vercel",kind:"uses"},
+    {source:"jachammer.ai",target:"sentry",kind:"uses"},
+    {source:"openai",target:"azure",kind:"subprocesses"},
+    {source:"github",target:"azure",kind:"subprocesses"},
+    {source:"anthropic",target:"aws",kind:"subprocesses"},
+    {source:"anthropic",target:"gcp",kind:"subprocesses"},
+    {source:"openrouter",target:"aws",kind:"subprocesses"},
+    {source:"openrouter",target:"cloudflare",kind:"subprocesses"},
+    {source:"stripe",target:"aws",kind:"subprocesses"},
+    {source:"datadog",target:"aws",kind:"subprocesses"},
+    {source:"vercel",target:"aws",kind:"subprocesses"},
+    {source:"vercel",target:"cloudflare",kind:"subprocesses"},
+    {source:"sentry",target:"fastly",kind:"subprocesses"}
+  ]
+};
+const byId = Object.fromEntries(GRAPH.nodes.map(n=>[n.id,n]));
+const ORG = "jachammer.ai";
+const VENDORS = GRAPH.edges.filter(e=>e.source===ORG).map(e=>e.target);
+const provOf = v => GRAPH.edges.filter(e=>e.source===v).map(e=>e.target);
+const FEATURE = {anthropic:"AI GENERATION",openrouter:"MODEL ROUTING",stripe:"PAYMENTS",
+  datadog:"ERROR MONITORING",vercel:"HOSTING / DEPLOYS",openai:"AI COMPLETIONS",
+  github:"SOURCE CONTROL",sentry:"CRASH REPORTS"};
+
+/* ================= STATE ================= */
+let downed = new Set();       // vendors currently down
+let blast  = null;            // provider id currently detonated
+let blastSettled = false;     // propagation finished
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = s => document.querySelector(s);
+
+/* ================= TREE RENDER ================= */
+function renderTree(){
+  const out = [];
+  out.push(`<span class="root">JACHAMMER.AI</span> <span class="dim">[org] 8 direct vendors · soc2 ✓</span>`);
+  let awsSeen = false;
+  VENDORS.forEach((v,i)=>{
+    const lastV = i===VENDORS.length-1;
+    const vb = lastV ? "└──" : "├──";
+    const cont = lastV ? "   " : "│  ";
+    const vn = byId[v], down = downed.has(v);
+    const vlabel = vn.label.padEnd(11," ");
+    out.push(
+      (down?`<span class="strike">${vb} ${vlabel}</span><span class="bad">✗ DOWN</span>`
+            :`<span>${vb} ${vlabel}</span><span class="dim">soc2 ✓</span>`)
+    );
+    provOf(v).forEach((p,j)=>{
+      const lastP = j===provOf(v).length-1;
+      const pb = lastP ? "└─▶" : "├─▶";
+      const pn = byId[p];
+      const pDown = blast===p;
+      const disp = p==="aws" ? "[AWS]" : pn.label;
+      const pad = " ".repeat(Math.max(0, 17 - disp.length));
+      let name;
+      if(p==="aws"){
+        name = `<span class="choke${pDown?" hit":""}" data-p="aws">[AWS]</span>`;
+      } else {
+        name = `<span class="provtag" data-p="${p}">${pn.label}</span>`;
+      }
+      let suffix = "";
+      if(p==="aws" && !awsSeen && !pDown){ suffix = ` <span class="hi">★</span> <span class="dim">CHOKEPOINT ◀ 5/8 vendors · 9.2h down YTD</span>`; }
+      if(p==="aws") awsSeen = true;
+      if(p==="fastly"){ suffix = ` <span class="amb">[!] WATCHLIST · no soc2 · PII path</span>`; }
+      if(pDown){ suffix = blastSettled ? ` <span class="bad blink">✗ DOWN</span>` : ` <span class="bad blink">✗ DOWN — propagating ▶</span>`; }
+      const line = `${cont}${pb} `;
+      out.push(
+        (down||pDown)
+          ? `<span class="strike">${line}</span>${name}<span class="strike">${pad}</span>${suffix}`
+          : `${line}${name}${pad}${suffix}`
+      );
+    });
+  });
+  $("#tree").innerHTML = out.join("\n");
+}
+
+/* ================= CHOKEPOINT BARS ================= */
+function renderChoke(){
+  const provs = GRAPH.nodes.filter(n=>n.tier==="provider")
+    .map(p=>({p, share:p.inbound_degree/VENDORS.length}))
+    .sort((a,b)=>b.p.inbound_degree-a.p.inbound_degree);
+  const BAR = 40;
+  const rows = provs.map(({p,share})=>{
+    const n = Math.round(share*BAR);
+    const bar = "█".repeat(n) + "░".repeat(BAR-n);
+    const pct = Math.floor(share*100); // 62.5 -> 62: match the one-look headline
+    const expo = (share*p.downtime_hours_ytd).toFixed(2);
+    const name = p.label.padEnd(16," ");
+    const isAws = p.id==="aws";
+    const flag = isAws ? " ◀ SPOF" : (p.supply_chain_risk ? " [!]" : "");
+    return `<span class="dim">${name}</span><span class="${isAws?"amb":""}">${String(pct).padStart(2," ")}%</span> <span class="bar${isAws?" aws":""}">${bar}</span> <span class="dim">${p.downtime_hours_ytd.toFixed(1)}h</span> <span class="${isAws?"amb":"dim"}">${expo}</span><span class="${isAws?"amb":"dim"}">${flag}</span>`;
+  });
+  const header = `<span class="dim">${"PROVIDER".padEnd(16," ")}${"SHARE".padStart(3," ")}  ${"LOAD".padEnd(BAR," ")} DT-YTD EXPOSE</span>`;
+  $("#choke").innerHTML = header + "\n" + rows.join("\n");
+  $("#conv").innerHTML =
+`<span class="dim">CONVERGENCE — who rides the chokepoint:</span>
+ Anthropic ──┐
+ OpenRouter ─┤
+ Stripe ─────┼─▶ <span class="choke" data-p="aws">[AWS]</span> <span class="dim">5 of 8 vendors · one region bites, five teams page</span>
+ Datadog ────┤
+ Vercel ─────┘`;
+}
+
+/* ================= COMPLIANCE ================= */
+function renderComp(){
+  $("#comp").innerHTML =
+`<span class="hi">Sentry</span> ingests error payloads <span class="dim">(may contain PII)</span>
+through <span class="amb">Fastly</span> — <span class="amb">no valid SOC 2 · supply-chain watchlist</span>.
+
+<span class="dim">impact chain:</span>  sentry ─▶ fastly ─▶ <span class="amb">your audit</span>
+<span class="amb">=&gt; your SOC 2 inherits the gap.</span>`;
+}
+
+/* ================= STATUS POST ================= */
+const STATUS_PLACEHOLDER =
+`<span class="out">— no active incidents —</span>
+<span class="out">type 'detonate aws' or click a provider node to simulate an outage.</span>`;
+function statusPlaceholder(){ $("#statuspost").innerHTML = STATUS_PLACEHOLDER; $("#status-tag").textContent="no active incidents"; $("#status-tag").classList.remove("amb"); }
+
+function typeInto(el, text, speed){
+  return new Promise(res=>{
+    if(reduced){ el.textContent = text; return res(); }
+    let i=0;
+    (function step(){
+      el.textContent = text.slice(0,++i);
+      if(i<text.length) setTimeout(step, speed); else res();
+    })();
+  });
+}
+
+/* ================= TERMINAL LOG ================= */
+const tlog = $("#tlog");
+function log(html, cls){
+  const d = document.createElement("div");
+  if(cls) d.className = cls;
+  d.innerHTML = html;
+  tlog.appendChild(d);
+  while(tlog.children.length>3) tlog.removeChild(tlog.firstChild);
+}
+
+/* ================= BLAST ================= */
+let blasting = false;
+async function detonate(pid){
+  if(blasting) return;
+  if(blast) resetState(true);
+  const pn = byId[pid];
+  if(!pn || pn.tier!=="provider"){ log(`detonate: unknown provider '${pid}' — try: aws azure gcp cloudflare fastly`,"bad"); return; }
+  blasting = true;
+  blast = pid;
+  blastSettled = false;
+  const affected = VENDORS.filter(v=>provOf(v).includes(pid));
+  log(`detonate ${pid} — simulating total ${pn.label} outage`,"cmd");
+  $("#banner").textContent = `!! OUTAGE !! ${pn.label.toUpperCase()} DOWN — BLAST RADIUS ACTIVE !! OUTAGE !!`;
+  $("#banner").classList.add("on");
+  const convChoke = document.querySelector("#conv .choke");
+  if(convChoke) convChoke.classList.toggle("hit", pid==="aws");
+  $("#risk").classList.add("live");
+  $("#risk-title").textContent = "═══ RISK ASSESSMENT COMPLETE — SCENARIO ACTIVE ═══";
+  renderTree();
+  for(const v of affected){
+    await new Promise(r=>setTimeout(r, reduced?0:480));
+    downed.add(v);
+    renderTree();
+    log(`propagate: ${pid} ─▶ ${v} … <span class="bad">DOWN</span> · feature lost: ${FEATURE[v]||"CORE SERVICE"}`);
+  }
+  $("#status-tag").textContent = `incident #4471 — ${pn.label} · ${affected.length} vendor${affected.length===1?"":"s"} impacted`;
+  $("#status-tag").classList.add("amb");
+  const featLines = affected.map(v=>`  ✗ ${(FEATURE[v]||"CORE SERVICE").padEnd(20,".")} ${v}`).join("\n");
+  const post =
+`[STATUS_POST] incident #4471 — ${pn.label} us-east-1
+11:42 UTC — investigating elevated error rates; full regional outage confirmed.
+11:47 UTC — BLAST RADIUS: ${affected.length} of 8 jachammer.ai vendors impacted.
+${featLines}
+11:52 UTC — exposure event realized: score 5.75 (62% share × 9.2h YTD).
+RECOMMENDATION: sever shared paths — see RISK ASSESSMENT below.`;
+  blastSettled = true;
+  renderTree();
+  await typeInto($("#statuspost"), post, 7);
+  blasting = false;
+}
+function resetState(quiet){
+  downed = new Set(); blast = null; blasting = false; blastSettled = false;
+  $("#banner").classList.remove("on");
+  const cc = document.querySelector("#conv .choke");
+  if(cc) cc.classList.remove("hit");
+  $("#risk").classList.remove("live");
+  $("#risk-title").textContent = "═══ RISK ASSESSMENT COMPLETE ═══";
+  statusPlaceholder();
+  renderTree();
+  if(!quiet) log("state reset — all vendors nominal","cmd");
+}
+
+/* ================= COMMAND LINE ================= */
+$("#cmd").addEventListener("keydown", e=>{
+  if(e.key!=="Enter") return;
+  const raw = e.target.value.trim(); e.target.value="";
+  if(!raw) return;
+  log(`operator@blast-radius:~$ ${raw}`,"cmd");
+  const [c,...rest] = raw.toLowerCase().split(/\s+/);
+  const arg = rest.join(" ");
+  if(c==="detonate"){ detonate(arg||"aws"); }
+  else if(c==="reset"){ resetState(); }
+  else if(c==="clear"){ tlog.innerHTML=""; }
+  else if(c==="help"){ log("commands: scan · detonate &lt;provider&gt; · reset · clear — providers: aws azure gcp cloudflare fastly"); }
+  else if(c==="scan"){ log("rescan complete: 14 nodes · 19 edges · 1 chokepoint (aws 62%) · 0 changes"); }
+  else log(`command not found: ${c} — type 'help'`,"bad");
+});
+
+/* ================= CLICKS ================= */
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-p]");
+  if(t) detonate(t.dataset.p);
+});
+$("#btn-detonate").addEventListener("click", ()=>detonate("aws"));
+$("#btn-graph").addEventListener("click", ()=>$("#p-tree").scrollIntoView({behavior:"smooth"}));
+
+/* ================= SCROLL REVEAL ================= */
+const io = new IntersectionObserver(es=>{
+  es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("vis"); io.unobserve(en.target);} });
+},{threshold:.08});
+const panels = document.querySelectorAll(".panel");
+panels.forEach(p=>io.observe(p));
+// safety: never leave a panel stuck invisible if IO is throttled (hidden tab / headless)
+setTimeout(()=>panels.forEach(p=>p.classList.add("vis")), 1800);
+
+/* ================= BOOT SEQUENCE ================= */
+const BOOT = [
+  {t:"$ blast-radius scan jachammer.ai", type:true},
+  {t:"  resolving subprocessor graph from vendor legal filings ...", out:true},
+  {t:"  fetched: openai.txt anthropic.txt openrouter.txt github.txt stripe.txt datadog.txt vercel.txt sentry.txt", out:true},
+  {t:"  parsed 14 nodes / 19 edges across 3 tiers", out:true},
+  {t:"  detecting convergence ... 1 chokepoint found: aws (5/8 vendors, 62%)", out:true},
+  {t:"  scoring exposure ... aws=5.75  cloudflare=1.93  azure=1.28  fastly=0.54  gcp=0.43", out:true},
+  {t:"  graph ready. press [ DETONATE AWS ] to run the outage simulation.", out:true},
+];
+async function boot(){
+  const el = $("#boot");
+  for(const line of BOOT){
+    const div = document.createElement("div");
+    if(line.out) div.className="out";
+    el.appendChild(div);
+    if(line.type){
+      await typeInto(div, line.t, 34);
+    } else {
+      div.textContent = line.t;
+      await new Promise(r=>setTimeout(r, reduced?0:150));
+    }
+  }
+  $("#logo").classList.add("on");
+  await typeInto($("#tagtext"), "", 0);
+  const tag = "» your vendors have vendors. «";
+  if(reduced){ $("#tagtext").textContent = tag; }
+  else await typeInto($("#tagtext"), tag, 45);
+  $("#tagtext").classList.add("q");
+  $("#subline").classList.add("on");
+  $("#ctarow").classList.add("on");
+  // risk block: type on scroll-in for flourish, but GUARANTEE it fills (one-look deliverable)
+  const rh = "AWS carries 62% of your stack (5 of 8 vendors) and logged 9.2h of downtime last year.";
+  const rs = "Move error monitoring + one CDN path off AWS-bound vendors: a single migration severs 2 of the 5 shared AWS paths.";
+  let riskTyped = false;
+  async function typeRisk(){
+    if(riskTyped) return; riskTyped = true;
+    await typeInto($("#risk-head"), rh, 16);
+    typeInto($("#risk-sugg"), rs, 8);
+  }
+  const rio = new IntersectionObserver(es=>{
+    es.forEach(en=>{ if(en.isIntersecting) typeRisk(); });
+  },{threshold:0});
+  rio.observe($("#risk"));
+  // fallback in case IO is throttled: fill within a couple seconds regardless
+  setTimeout(typeRisk, 2600);
+}
+
+/* ================= INIT ================= */
+renderTree();
+renderChoke();
+renderComp();
+statusPlaceholder();
+boot();
+</script>
+</body>
+</html>
