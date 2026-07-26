@@ -59,14 +59,19 @@ def build_graph(raw_nodes: any, raw_edges: any) -> any {
     }
 
     out_links = [];
+    # Keys are captured here, before the force renderer gets the array.
+    # react-force-graph rewrites link.source/target from ids into node objects
+    # in place, so any consumer reading them afterwards sees objects, not ids.
+    edge_keys: dict = {};
     for e in raw_edges {
         src = e["source"];
         tgt = e["target"] if kept[e["target"]] else "__other";
         if not kept[src] { continue; }
         out_links = out_links + [{"source": src, "target": tgt, "kind": e["kind"], "handles_pii": e["handles_pii"]}];
+        edge_keys[(src as str) + ">" + (tgt as str)] = True;
     }
 
-    return {"nodes": out_nodes, "links": out_links};
+    return {"nodes": out_nodes, "links": out_links, "edge_keys": edge_keys};
 }
 
 def choke_for(rows: any, provider_id: str) -> any {
@@ -85,6 +90,7 @@ def empty_coverage() -> any {
 def:pub RiskProvider(children: any = None) -> JsxElement {
     has nodes: list[any] = [];
     has links: list[any] = [];
+    has edge_keys: any = {};
     has chokes: list[any] = [];
     has fallout: list[any] = [];
     has coverage: any = empty_coverage();
@@ -130,6 +136,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             built = build_graph(graph["nodes"], graph["edges"]);
             nodes = built["nodes"];
             links = built["links"];
+            edge_keys = built["edge_keys"];
             org_label = "";
             for n in graph["nodes"] {
                 if n["tier"] == "org" { org_label = n["label"] as str; }
@@ -224,6 +231,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         "state": {
             "nodes": nodes,
             "links": links,
+            "edge_keys": edge_keys,
             "vendors": vendors,
             "providers": providers,
             "chokes": chokes,
