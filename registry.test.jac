@@ -1,5 +1,5 @@
-test "registry contains 150 verified companies" {
-    assert registry_size() == 150;
+test "registry contains 152 verified companies" {
+    assert registry_size() == 152;
 }
 
 

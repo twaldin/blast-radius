@@ -2,48 +2,19 @@
   "domain": "anthropic.com",
   "name": "Anthropic",
   "subprocessor_url": "https://trust.anthropic.com/subprocessors",
+  "fetched_at": "2026-07-26T14:23:18-07:00",
+  "raw_text_sha": "ff294d9037a634b7c1eb6fea822bc40ac480a06a1aa72430148b8efe86f60a1d",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:23:18",
   "subprocessors": [
-    {
-      "name": "Google Cloud Platform",
-      "purpose": "Cloud infrastructure",
-      "region": "Worldwide"
-    },
     {
       "name": "Amazon Web Services",
       "purpose": "Cloud Infrastructure",
       "region": "Worldwide"
     },
     {
-      "name": "Microsoft Azure",
-      "purpose": "Cloud Infrastructure",
-      "region": "Worldwide"
-    },
-    {
-      "name": "Cloudflare",
-      "purpose": "Traffic Routing (CDN)",
-      "region": "Worldwide (Local to Customer)"
-    },
-    {
-      "name": "Stripe",
-      "purpose": "Billing",
+      "name": "Arkose Labs",
+      "purpose": "Fraud and abuse detection",
       "region": "United States"
-    },
-    {
-      "name": "WorkOS",
-      "purpose": "Security, Single Sign-On",
-      "region": "United States"
-    },
-    {
-      "name": "Intercom",
-      "purpose": "User support",
-      "region": "United States"
-    },
-    {
-      "name": "Nutun",
-      "purpose": "User support",
-      "region": "South Africa"
     },
     {
       "name": "Boldr",
@@ -51,13 +22,18 @@
       "region": "Canada"
     },
     {
-      "name": "Twilio",
-      "purpose": "Analytics, email/SMS communications",
+      "name": "Brave Search",
+      "purpose": "Web Search",
       "region": "United States"
     },
     {
-      "name": "Iterable",
-      "purpose": "Email communications",
+      "name": "Cloudflare",
+      "purpose": "Traffic Routing (CDN)",
+      "region": "Worldwide (Local to Customer)"
+    },
+    {
+      "name": "ElevenLabs",
+      "purpose": "Text to speech",
       "region": "United States"
     },
     {
@@ -66,28 +42,48 @@
       "region": "United States"
     },
     {
+      "name": "Google Cloud Platform",
+      "purpose": "Cloud infrastructure",
+      "region": "Worldwide"
+    },
+    {
+      "name": "Intercom",
+      "purpose": "User support",
+      "region": "United States"
+    },
+    {
+      "name": "Iterable",
+      "purpose": "Email communications",
+      "region": "United States"
+    },
+    {
+      "name": "Microsoft Azure",
+      "purpose": "Cloud Infrastructure",
+      "region": "Worldwide"
+    },
+    {
+      "name": "Nutun",
+      "purpose": "User support",
+      "region": "South Africa"
+    },
+    {
+      "name": "Palantir Federal Cloud Service (PFCS)",
+      "purpose": "FedRAMP Cloud",
+      "region": "United States"
+    },
+    {
+      "name": "Persona",
+      "purpose": "Fraud and abuse detection, identity verification",
+      "region": "United States"
+    },
+    {
       "name": "Sift",
       "purpose": "Fraud and abuse detection",
       "region": "United States"
     },
     {
-      "name": "Arkose Labs",
-      "purpose": "Fraud and abuse detection",
-      "region": "United States"
-    },
-    {
-      "name": "Brave Search",
-      "purpose": "Web Search",
-      "region": "United States"
-    },
-    {
-      "name": "ElevenLabs",
-      "purpose": "Text to speech",
-      "region": "United States"
-    },
-    {
-      "name": "Palantir Federal Cloud Service (PFCS)",
-      "purpose": "FedRAMP Cloud",
+      "name": "Stripe",
+      "purpose": "Billing",
       "region": "United States"
     },
     {
@@ -96,8 +92,13 @@
       "region": "United States"
     },
     {
-      "name": "Persona",
-      "purpose": "Fraud and abuse detection, identity verification",
+      "name": "Twilio",
+      "purpose": "Analytics, email/SMS communications",
+      "region": "United States"
+    },
+    {
+      "name": "WorkOS",
+      "purpose": "Security, Single Sign-On",
       "region": "United States"
     },
     {

@@ -2,33 +2,14 @@
   "domain": "openai.com",
   "name": "OpenAI",
   "subprocessor_url": "https://openai.com/policies/sub-processor-list/",
+  "fetched_at": "2026-07-26T14:23:25-07:00",
+  "raw_text_sha": "abb5d7252efaf167cf891adcca1d373c69fc99e9a6d234f5e7f00f537767e625",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:23:25",
   "subprocessors": [
     {
-      "name": "Cloudflare, Ltd.",
-      "purpose": "Content delivery network provider; Web Hosting",
-      "region": "Processing is performed at the data center that is closest to the End User"
-    },
-    {
-      "name": "Microsoft Corporation",
-      "purpose": "Cloud infrastructure",
-      "region": "Australia, Brazil, Canada, France, Germany, India, Indonesia, Ireland, Italy, Japan, Mexico, Netherlands, Norway, Poland, Singapore, South Africa, South Korea, Spain, Sweden, Switzerland, United Arab Emirates, United Kingdom, United States"
-    },
-    {
-      "name": "CoreWeave, Inc.",
-      "purpose": "Cloud infrastructure",
-      "region": "Norway, Spain, Sweden, United Kingdom, United States"
-    },
-    {
-      "name": "Oracle Cloud Infrastructure",
-      "purpose": "Cloud infrastructure",
-      "region": "Brazil, Japan, Malaysia, Netherlands, United Kingdom, United States"
-    },
-    {
-      "name": "Google Cloud Platform",
-      "purpose": "Cloud infrastructure",
-      "region": "Finland, Japan, Netherlands, Norway, United Kingdom, United States"
+      "name": "Accenture International Limited",
+      "purpose": "Customer support; moderation of content",
+      "region": "United States, Canada, Philippines"
     },
     {
       "name": "Amazon Web Services, Inc.",
@@ -41,6 +22,71 @@
       "region": "United States, Canada"
     },
     {
+      "name": "Cinder Technologies, Inc.",
+      "purpose": "Platform for content moderation; platform for moderation of GPTs",
+      "region": "United States"
+    },
+    {
+      "name": "Cloudflare, Ltd.",
+      "purpose": "Content delivery network provider; Web Hosting",
+      "region": "Processing is performed at the data center that is closest to the End User"
+    },
+    {
+      "name": "Confluent",
+      "purpose": "Infrastructure management",
+      "region": "United States"
+    },
+    {
+      "name": "CoreWeave, Inc.",
+      "purpose": "Cloud infrastructure",
+      "region": "Norway, Spain, Sweden, United Kingdom, United States"
+    },
+    {
+      "name": "Fivetran, Inc.",
+      "purpose": "ETL provider",
+      "region": "United States"
+    },
+    {
+      "name": "Google Cloud Platform",
+      "purpose": "Cloud infrastructure",
+      "region": "Finland, Japan, Netherlands, Norway, United Kingdom, United States"
+    },
+    {
+      "name": "Intercom, Inc.",
+      "purpose": "Customer support",
+      "region": "United States"
+    },
+    {
+      "name": "Merge API, Inc.",
+      "purpose": "Infrastructure management",
+      "region": "Australia, Canada, France, India, Ireland, Japan, Singapore, South Korea, Sweden, United Kingdom, United States"
+    },
+    {
+      "name": "Microsoft Corporation",
+      "purpose": "Cloud infrastructure",
+      "region": "Australia, Brazil, Canada, France, Germany, India, Indonesia, Ireland, Italy, Japan, Mexico, Netherlands, Norway, Poland, Singapore, South Africa, South Korea, Spain, Sweden, Switzerland, United Arab Emirates, United Kingdom, United States"
+    },
+    {
+      "name": "Okta, Inc.",
+      "purpose": "User authentication services (via Auth0)",
+      "region": "United States"
+    },
+    {
+      "name": "Oracle Cloud Infrastructure",
+      "purpose": "Cloud infrastructure",
+      "region": "Brazil, Japan, Malaysia, Netherlands, United Kingdom, United States"
+    },
+    {
+      "name": "Pylon Labs",
+      "purpose": "Customer support",
+      "region": "United States"
+    },
+    {
+      "name": "Salesforce",
+      "purpose": "Customer support",
+      "region": "Australia, Brazil, Canada, France, Germany, India, Indonesia, Ireland, Italy, Japan, Singapore, South Africa, South Korea, Sweden, Switzerland, The Netherlands, United Arab Emirates, United Kingdom, United States"
+    },
+    {
       "name": "Snowflake, Inc.",
       "purpose": "Data warehousing",
       "region": "United States"
@@ -51,79 +97,9 @@
       "region": "Philippines"
     },
     {
-      "name": "Intercom, Inc.",
-      "purpose": "Customer support",
-      "region": "United States"
-    },
-    {
-      "name": "Salesforce",
-      "purpose": "Customer support",
-      "region": "Australia, Brazil, Canada, France, Germany, India, Indonesia, Ireland, Italy, Japan, Singapore, South Africa, South Korea, Sweden, Switzerland, The Netherlands, United Arab Emirates, United Kingdom, United States"
-    },
-    {
-      "name": "Pylon Labs",
-      "purpose": "Customer support",
-      "region": "United States"
-    },
-    {
-      "name": "Accenture International Limited",
-      "purpose": "Customer support; moderation of content",
-      "region": "United States, Canada, Philippines"
-    },
-    {
-      "name": "Fivetran, Inc.",
-      "purpose": "ETL provider",
-      "region": "United States"
-    },
-    {
-      "name": "Confluent",
-      "purpose": "Infrastructure management",
-      "region": "United States"
-    },
-    {
-      "name": "Cinder Technologies, Inc.",
-      "purpose": "Platform for content moderation; platform for moderation of GPTs",
-      "region": "United States"
-    },
-    {
       "name": "WorkOS, Inc.",
       "purpose": "Cross-domain identity management",
       "region": "United States"
-    },
-    {
-      "name": "Okta, Inc.",
-      "purpose": "User authentication services (via Auth0)",
-      "region": "United States"
-    },
-    {
-      "name": "Merge API, Inc.",
-      "purpose": "Infrastructure management",
-      "region": "Australia, Canada, France, India, Ireland, Japan, Singapore, South Korea, Sweden, United Kingdom, United States"
-    },
-    {
-      "name": "OpenAI, OpCo, LLC",
-      "purpose": "OpenAI affiliate: technical and operational support for the Services",
-      "region": "United States"
-    },
-    {
-      "name": "OpenAI, LLC",
-      "purpose": "OpenAI affiliate: technical and operational support for the Services",
-      "region": "United States"
-    },
-    {
-      "name": "OpenAI Ireland Ltd.",
-      "purpose": "OpenAI affiliate: technical and operational support for the Services",
-      "region": "Ireland"
-    },
-    {
-      "name": "OpenAI UK Ltd.",
-      "purpose": "OpenAI affiliate: technical and operational support for the Services",
-      "region": "United Kingdom"
-    },
-    {
-      "name": "OpenAI Japan Ltd.",
-      "purpose": "OpenAI affiliate: technical and operational support for the Services",
-      "region": "Japan"
     }
   ]
 }

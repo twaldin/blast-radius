@@ -2,23 +2,14 @@
   "domain": "slack.com",
   "name": "Slack",
   "subprocessor_url": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/misc/salesforce-infrastructure-and-subprocessors.pdf?bc=OTH",
+  "fetched_at": "2026-07-26T21:26:08-07:00",
+  "raw_text_sha": "82ce748c023f6df0b0c0d3d4d538d48544b55280a7ba9e4ab3c641df70f9f057",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T21:26:08",
   "subprocessors": [
-    {
-      "name": "Amazon Web Services, Inc.",
-      "purpose": "Hosting provider for all functionality and for Availability zones/Edge servers, for Slack services including Slack AI and for GovSlack",
-      "region": "United States, Australia, Brazil, Canada, France, Germany, India, Ireland, Japan, Singapore, South Africa, South Korea, Sweden, Switzerland, United Arab Emirates, United Kingdom"
-    },
     {
       "name": "Amazon Chime (by Amazon Web Services, Inc.)",
       "purpose": "Slack Huddles functionality: audio and video streams",
       "region": "United States, Australia, Brazil, Canada, France, Germany, India, Ireland, Italy, Japan, Singapore, South Africa, South Korea, Sweden, United Kingdom, Switzerland, United Arab Emirates"
-    },
-    {
-      "name": "Amazon Web Services, Inc. Elemental MediaConvert",
-      "purpose": "Slack Clips functionality: conversion of source video for improved playback",
-      "region": "United States, Australia, Canada, France, Germany, India, Japan, South Korea, United Kingdom, Brazil, Sweden, Switzerland"
     },
     {
       "name": "Amazon Transcribe (by Amazon Web Services, Inc.)",
@@ -26,9 +17,14 @@
       "region": "United States, Australia, Canada, France, Germany, India, Japan, South Korea, United Kingdom, Brazil, Sweden, Switzerland"
     },
     {
-      "name": "Google LLC",
-      "purpose": "Hosting Provider for email notifications (e.g., workspace invitations); Provider of generative artificial intelligence services",
-      "region": "United States"
+      "name": "Amazon Web Services, Inc.",
+      "purpose": "Hosting provider for all functionality and for Availability zones/Edge servers, for Slack services including Slack AI and for GovSlack",
+      "region": "United States, Australia, Brazil, Canada, France, Germany, India, Ireland, Japan, Singapore, South Africa, South Korea, Sweden, Switzerland, United Arab Emirates, United Kingdom"
+    },
+    {
+      "name": "Amazon Web Services, Inc. Elemental MediaConvert",
+      "purpose": "Slack Clips functionality: conversion of source video for improved playback",
+      "region": "United States, Australia, Canada, France, Germany, India, Japan, South Korea, United Kingdom, Brazil, Sweden, Switzerland"
     },
     {
       "name": "Cloudfront (on Amazon Web Services, Inc.)",
@@ -36,8 +32,8 @@
       "region": "Global"
     },
     {
-      "name": "Zendesk, Inc.",
-      "purpose": "Service provider of customer support tools",
+      "name": "Google LLC",
+      "purpose": "Hosting Provider for email notifications (e.g., workspace invitations); Provider of generative artificial intelligence services",
       "region": "United States"
     },
     {
@@ -48,6 +44,11 @@
     {
       "name": "SuSea, Inc. (doing business as You.com)",
       "purpose": "Provider of web search results for Slackbot",
+      "region": "United States"
+    },
+    {
+      "name": "Zendesk, Inc.",
+      "purpose": "Service provider of customer support tools",
       "region": "United States"
     }
   ]

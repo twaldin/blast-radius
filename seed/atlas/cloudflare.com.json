@@ -2,38 +2,74 @@
   "domain": "cloudflare.com",
   "name": "Cloudflare",
   "subprocessor_url": "https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/",
+  "fetched_at": "2026-07-26T21:23:16-07:00",
+  "raw_text_sha": "f1a14c0ea9b520e5469e81b717304cde1285f7c65f999e4f8623d2c48128ffd9",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T21:23:16",
   "subprocessors": [
-    {"name": "Slack Technologies, Inc.", "purpose": "Customer support communications", "region": "United States"},
-    {"name": "Zendesk, Inc.", "purpose": "Customer support and account management", "region": "Zendesk operates servers globally using Amazon Web Services (AWS) as described here. Current hosting locations are the United States, the European Economic Area, Japan, and Australia"},
-    {"name": "Salesforce, Inc.", "purpose": "Customer support and account management", "region": "United States"},
-    {"name": "Google LLC", "purpose": "Cloudflare Developer Platform, Cloudflare Zero Trust and AI Gateway", "region": "European Economic Area, United States, Australia, India"},
-    {"name": "Oracle America, Inc.", "purpose": "Cloudflare Developer Platform and Cache Reserve", "region": "United States, European Economic Area, UK, Japan, Australia, Canada, Singapore"},
-    {"name": "Amazon Web Services (AWS)", "purpose": "Cloudflare Email Security (formerly Area 1)", "region": "United States, European Economic Area"},
-    {"name": "CoreWeave, Inc.", "purpose": "Workers AI", "region": "United States"},
-    {"name": "Nebius BV", "purpose": "Workers AI", "region": "England"},
-    {"name": "Anthropic PBC", "purpose": "AI Gateway", "region": "United States"},
-    {"name": "OpenAI, Inc.", "purpose": "AI Gateway", "region": "OpenAI operates servers globally using the cloud infrastructure providers as described here."},
-    {"name": "X.AI Corp.", "purpose": "AI Gateway", "region": "United States"},
-    {"name": "Groq, Inc.", "purpose": "AI Gateway", "region": "United States"},
-    {"name": "Cloudflare Ltd.", "purpose": "", "region": "United Kingdom"},
-    {"name": "Cloudflare Pte. Ltd.", "purpose": "", "region": "Singapore"},
-    {"name": "Cloudflare Australia Pty Ltd", "purpose": "", "region": "Australia"},
-    {"name": "Cloudflare Germany GmbH", "purpose": "", "region": "Germany"},
-    {"name": "Cloudflare Portugal, Unipessoal Lda.", "purpose": "", "region": "Portugal"},
-    {"name": "Cloudflare France SAS", "purpose": "", "region": "France"},
-    {"name": "Cloudflare Japan K.K.", "purpose": "", "region": "Japan"},
-    {"name": "Cloudflare (Canada) Information Technology Co., Ltd.", "purpose": "", "region": "Canada"},
-    {"name": "Cloudflare Netherlands B.V.", "purpose": "", "region": "Netherlands"},
-    {"name": "Cloudflare Middle East FZ-LLC", "purpose": "", "region": "Dubai, U.A.E."},
-    {"name": "Cloudflare India Private Limited (for India customers only)", "purpose": "", "region": "India"},
-    {"name": "Area 1 Security, LLC", "purpose": "", "region": "United States"},
-    {"name": "Cloudflare Korea LLC", "purpose": "", "region": "South Korea"},
-    {"name": "Cloudflare Mexico S. de R.L de C.V.", "purpose": "", "region": "Mexico"},
-    {"name": "Cloudflare Malaysia Sdn. Bhd.", "purpose": "", "region": "Malaysia"},
-    {"name": "Cloudflare Capability Center (India) Private Limited", "purpose": "", "region": "India"},
-    {"name": "Cloudflare Sweden AB", "purpose": "", "region": "Sweden"},
-    {"name": "Cloudflare Switzerland GmbH", "purpose": "", "region": "Switzerland"}
+    {
+      "name": "Amazon Web Services (AWS)",
+      "purpose": "Cloudflare Email Security (formerly Area 1)",
+      "region": "United States, European Economic Area"
+    },
+    {
+      "name": "Anthropic PBC",
+      "purpose": "AI Gateway",
+      "region": "United States"
+    },
+    {
+      "name": "Area 1 Security, LLC",
+      "purpose": "",
+      "region": "United States"
+    },
+    {
+      "name": "CoreWeave, Inc.",
+      "purpose": "Workers AI",
+      "region": "United States"
+    },
+    {
+      "name": "Google LLC",
+      "purpose": "Cloudflare Developer Platform, Cloudflare Zero Trust and AI Gateway",
+      "region": "European Economic Area, United States, Australia, India"
+    },
+    {
+      "name": "Groq, Inc.",
+      "purpose": "AI Gateway",
+      "region": "United States"
+    },
+    {
+      "name": "Nebius BV",
+      "purpose": "Workers AI",
+      "region": "England"
+    },
+    {
+      "name": "OpenAI, Inc.",
+      "purpose": "AI Gateway",
+      "region": "OpenAI operates servers globally using the cloud infrastructure providers as described here."
+    },
+    {
+      "name": "Oracle America, Inc.",
+      "purpose": "Cloudflare Developer Platform and Cache Reserve",
+      "region": "United States, European Economic Area, UK, Japan, Australia, Canada, Singapore"
+    },
+    {
+      "name": "Salesforce, Inc.",
+      "purpose": "Customer support and account management",
+      "region": "United States"
+    },
+    {
+      "name": "Slack Technologies, Inc.",
+      "purpose": "Customer support communications",
+      "region": "United States"
+    },
+    {
+      "name": "X.AI Corp.",
+      "purpose": "AI Gateway",
+      "region": "United States"
+    },
+    {
+      "name": "Zendesk, Inc.",
+      "purpose": "Customer support and account management",
+      "region": "Zendesk operates servers globally using Amazon Web Services (AWS) as described here. Current hosting locations are the United States, the European Economic Area, Japan, and Australia"
+    }
   ]
 }

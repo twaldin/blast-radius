@@ -64,7 +64,7 @@ def parse_args -> argparse.Namespace {
     _ = parser.add_argument(
         "--expected-count",
         `type=lambda (value: str) -> int { return int(value); },
-        `default=150,
+        `default=152,
         help="Require this many unique registry entries."
     );
     _ = parser.add_argument(

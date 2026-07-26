@@ -31,7 +31,7 @@ Files already in the repo:
 | `.gitignore` | — | ignores `.jac/`, venvs, `node_modules`. |
 | `extract.jac`, `registry.jac` | **B** | real typed extraction/resolution plus 150-company registry. |
 | `demo_data.jac` | **B** | explicit offline demo fixture; no longer mixed into `extract.jac`. |
-| `browser_discovery.jac`, `browser_worker.py` | **B** | bounded Browser Harness escalation adapter; deferred off the demo path. |
+| `browser_discovery.jac`, `browser_worker.py` | **B** | bounded Browser Harness acquisition adapter for offline registry precompute; not a runtime registry-miss fallback. |
 | `app.jac` | **C** | not created yet — C owns the `cl def` frontend. |
 
 ---
@@ -93,9 +93,9 @@ Everything from "a domain" to "clean canonical records." **Returns values, never
    `resolve_url` = exact curated/learned registry lookup first. Only on a true
    miss, the Jac ReAct agent gets narrow Firecrawl `search` and `scrape` tools.
    Search locates official company or verified GitHub candidates; scrape
-   renders/extracts a known candidate. A separate bounded Browser Harness
-   escalation handles trust-center click-throughs or pages Firecrawl cannot
-   extract. Do not hand unrestricted CDP control to the ReAct agent.
+   renders/extracts a known candidate. Browser Harness is not part of this
+   fallback. If Firecrawl cannot extract an authoritative complete disclosure,
+   return `notfound`.
    Deterministic validation rejects snippets, aggregators, login walls, and
    change notices without a complete current named list. B returns typed
    evidence and updates only the learned registry; A alone upserts graph nodes.

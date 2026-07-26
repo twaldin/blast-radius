@@ -2,19 +2,54 @@
   "domain": "segment.com",
   "name": "Segment",
   "subprocessor_url": "https://www.twilio.com/en-us/legal/sub-processors",
+  "fetched_at": "2026-07-26T21:22:08-07:00",
+  "raw_text_sha": "5edefd5790b4b6dae87c7d23a25a3ec2aa5cd237f19bc1190adfd2679389ef1b",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T21:22:08",
   "subprocessors": [
-    {"name": "AWS", "purpose": "Infrastructure Provider providing hosting services and storage.", "region": "USA*"},
-    {"name": "AWS", "purpose": "Infrastructure Provider providing hosting services and storage.", "region": "USA or EU (Dublin) as selected by customers"},
-    {"name": "Anthropic", "purpose": "Vendor for AI functionality in product", "region": "USA"},
-    {"name": "Amazon Bedrock", "purpose": "Vendor for AI functionality in product", "region": "USA"},
-    {"name": "Clickhouse", "purpose": "Infrastructure Provider providing hosting services and storage.", "region": "USA, EU"},
-    {"name": "Datadog", "purpose": "Operational monitoring", "region": "USA"},
-    {"name": "Google", "purpose": "Data storage compute and queries", "region": "USA or EU (Zurich & London) as selected by Customers"},
-    {"name": "Lakera", "purpose": "AI security monitoring, data leakage prevention, and real-time threat detection within automated workflows.", "region": "USA"},
-    {"name": "Microsoft Azure", "purpose": "Vendor for AI functionality in product", "region": "USA"},
-    {"name": "OpenAI", "purpose": "Vendor for AI functionality in product", "region": "USA"},
-    {"name": "Twilio Inc.", "purpose": "Provision of the Twilio Services", "region": "USA*"}
+    {
+      "name": "Amazon Bedrock",
+      "purpose": "Infrastructure Provider providing hosting services and storage. | Vendor for AI functionality in product",
+      "region": "USA* | USA or EU (Dublin) as selected by customers | USA"
+    },
+    {
+      "name": "Anthropic",
+      "purpose": "Vendor for AI functionality in product",
+      "region": "USA"
+    },
+    {
+      "name": "Clickhouse",
+      "purpose": "Infrastructure Provider providing hosting services and storage.",
+      "region": "USA, EU"
+    },
+    {
+      "name": "Datadog",
+      "purpose": "Operational monitoring",
+      "region": "USA"
+    },
+    {
+      "name": "Google",
+      "purpose": "Data storage compute and queries",
+      "region": "USA or EU (Zurich & London) as selected by Customers"
+    },
+    {
+      "name": "Lakera",
+      "purpose": "AI security monitoring, data leakage prevention, and real-time threat detection within automated workflows.",
+      "region": "USA"
+    },
+    {
+      "name": "Microsoft Azure",
+      "purpose": "Vendor for AI functionality in product",
+      "region": "USA"
+    },
+    {
+      "name": "OpenAI",
+      "purpose": "Vendor for AI functionality in product",
+      "region": "USA"
+    },
+    {
+      "name": "Twilio Inc.",
+      "purpose": "Provision of the Twilio Services",
+      "region": "USA*"
+    }
   ]
 }

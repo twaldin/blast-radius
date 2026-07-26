@@ -2,38 +2,124 @@
   "domain": "github.com",
   "name": "GitHub",
   "subprocessor_url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+  "fetched_at": "2026-07-26T21:21:07-07:00",
+  "raw_text_sha": "0018f5ce0bb16b45f8e0a1d175e3c4230fbe715c6ca8c4e3c6737d9df30c670f",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T21:21:07",
   "subprocessors": [
-    {"name": "Amazon Web Services Inc (AWS)", "purpose": "Cloud Hosted Infrastructure, Data Hosting, AI Inference and AI Services", "region": "United States"},
-    {"name": "Anthropic PBC", "purpose": "AI Inference and AI Services", "region": "United States"},
-    {"name": "Cloudflare", "purpose": "Content delivery service", "region": "United States"},
-    {"name": "Elasticsearch, Inc.", "purpose": "Cloud Hosted Infrastructure", "region": "United States"},
-    {"name": "Fastly", "purpose": "Content delivery service", "region": "United States"},
-    {"name": "Fireworks AI", "purpose": "AI Inference and AI Services", "region": "United States, Germany, Iceland"},
-    {"name": "FullStory, Inc.", "purpose": "Customer support ticketing analysis", "region": "United States"},
-    {"name": "Google Cloud Platform (GCP)", "purpose": "Cloud Hosted Infrastructure, AI Inference and AI Services", "region": "United States, Belgium, Singapore"},
-    {"name": "Hewlett-Packard Limited", "purpose": "Cloud Hosted Infrastructure", "region": "United States"},
-    {"name": "LambdaTest", "purpose": "Cloud Hosted Infrastructure", "region": "United States"},
-    {"name": "Microsoft (Azure)", "purpose": "Cloud Hosted Infrastructure, Data Hosting, AI Inference and AI Services", "region": "United States, Canada, Chile, Mexico"},
-    {"name": "Microsoft (Azure)", "purpose": "Cognitive Services and customer support ticketing analysis", "region": "United States"},
-    {"name": "Microsoft", "purpose": "Technical Services", "region": "United States, Australia, Brazil, Canada, France, Japan, Norway, Spain, Sweden, Switzerland, United Kingdom"},
-    {"name": "Moveworks", "purpose": "Customer support ticketing analysis", "region": "United States"},
-    {"name": "NexMo Inc (aka Vonage)", "purpose": "SMS notification provider for 2 Factor Authentication", "region": "United States"},
-    {"name": "Obsidian Security", "purpose": "Security management", "region": "United States"},
-    {"name": "OpenAI", "purpose": "AI Inference and AI Services", "region": "United States"},
-    {"name": "Oracle America, Inc.", "purpose": "Cloud Hosted Infrastructure", "region": "United States"},
-    {"name": "Pusher", "purpose": "Building and managing real-time infrastructure for web and mobile applications", "region": "United States"},
-    {"name": "Tines Automation Inc.", "purpose": "Security management", "region": "United States"},
-    {"name": "Twilio (SendGrid)", "purpose": "SMS notification provider for 2 Factor Authentication", "region": "United States"},
-    {"name": "xAI", "purpose": "AI Inference and AI Services", "region": "United States"},
-    {"name": "Zendesk", "purpose": "Customer support ticketing system", "region": "United States"},
-    {"name": "GitHub Australia Pty Ltd", "purpose": "GitHub Subsidiary", "region": "Australia"},
-    {"name": "GitHub BV", "purpose": "GitHub Subsidiary", "region": "Netherlands"},
-    {"name": "GitHub Canada ULC", "purpose": "GitHub Subsidiary", "region": "Canada"},
-    {"name": "GitHub Germany GmbH", "purpose": "GitHub Subsidiary", "region": "Germany"},
-    {"name": "GitHub India Pty Ltd", "purpose": "GitHub Subsidiary", "region": "India"},
-    {"name": "npm Inc", "purpose": "GitHub Subsidiary", "region": "United States"},
-    {"name": "Semmle Inc", "purpose": "GitHub Subsidiary", "region": "United States"}
+    {
+      "name": "Amazon Web Services Inc (AWS)",
+      "purpose": "Cloud Hosted Infrastructure, Data Hosting, AI Inference and AI Services",
+      "region": "United States"
+    },
+    {
+      "name": "Anthropic PBC",
+      "purpose": "AI Inference and AI Services",
+      "region": "United States"
+    },
+    {
+      "name": "Cloudflare",
+      "purpose": "Content delivery service",
+      "region": "United States"
+    },
+    {
+      "name": "Elasticsearch, Inc.",
+      "purpose": "Cloud Hosted Infrastructure",
+      "region": "United States"
+    },
+    {
+      "name": "Fastly",
+      "purpose": "Content delivery service",
+      "region": "United States"
+    },
+    {
+      "name": "Fireworks AI",
+      "purpose": "AI Inference and AI Services",
+      "region": "United States, Germany, Iceland"
+    },
+    {
+      "name": "FullStory, Inc.",
+      "purpose": "Customer support ticketing analysis",
+      "region": "United States"
+    },
+    {
+      "name": "Google Cloud Platform (GCP)",
+      "purpose": "Cloud Hosted Infrastructure, AI Inference and AI Services",
+      "region": "United States, Belgium, Singapore"
+    },
+    {
+      "name": "Hewlett-Packard Limited",
+      "purpose": "Cloud Hosted Infrastructure",
+      "region": "United States"
+    },
+    {
+      "name": "LambdaTest",
+      "purpose": "Cloud Hosted Infrastructure",
+      "region": "United States"
+    },
+    {
+      "name": "Microsoft",
+      "purpose": "Cloud Hosted Infrastructure, Data Hosting, AI Inference and AI Services | Cognitive Services and customer support ticketing analysis | Technical Services",
+      "region": "United States, Canada, Chile, Mexico | United States | United States, Australia, Brazil, Canada, France, Japan, Norway, Spain, Sweden, Switzerland, United Kingdom"
+    },
+    {
+      "name": "Moveworks",
+      "purpose": "Customer support ticketing analysis",
+      "region": "United States"
+    },
+    {
+      "name": "NexMo Inc (aka Vonage)",
+      "purpose": "SMS notification provider for 2 Factor Authentication",
+      "region": "United States"
+    },
+    {
+      "name": "npm Inc",
+      "purpose": "GitHub Subsidiary",
+      "region": "United States"
+    },
+    {
+      "name": "Obsidian Security",
+      "purpose": "Security management",
+      "region": "United States"
+    },
+    {
+      "name": "OpenAI",
+      "purpose": "AI Inference and AI Services",
+      "region": "United States"
+    },
+    {
+      "name": "Oracle America, Inc.",
+      "purpose": "Cloud Hosted Infrastructure",
+      "region": "United States"
+    },
+    {
+      "name": "Pusher",
+      "purpose": "Building and managing real-time infrastructure for web and mobile applications",
+      "region": "United States"
+    },
+    {
+      "name": "Semmle Inc",
+      "purpose": "GitHub Subsidiary",
+      "region": "United States"
+    },
+    {
+      "name": "Tines Automation Inc.",
+      "purpose": "Security management",
+      "region": "United States"
+    },
+    {
+      "name": "Twilio (SendGrid)",
+      "purpose": "SMS notification provider for 2 Factor Authentication",
+      "region": "United States"
+    },
+    {
+      "name": "xAI",
+      "purpose": "AI Inference and AI Services",
+      "region": "United States"
+    },
+    {
+      "name": "Zendesk",
+      "purpose": "Customer support ticketing system",
+      "region": "United States"
+    }
   ]
 }

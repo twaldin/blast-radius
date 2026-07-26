@@ -2,42 +2,18 @@
   "domain": "linear.app",
   "name": "Linear",
   "subprocessor_url": "https://linear.app/dpa",
+  "fetched_at": "2026-07-26T14:30:00-07:00",
+  "raw_text_sha": "d982c78b6542aab1cd9aed08b8fd1322a6796c4b658365c91662a7bcf727aab3",
   "crawl_status": "ok",
-  "fetched_at": "2026-07-26T14:30:00",
   "subprocessors": [
     {
-      "name": "Google LLC",
-      "purpose": "Cloud provider, artificial intelligence, collaboration / productivity",
-      "region": "United States, European Union"
-    },
-    {
-      "name": "Cloudflare, Inc.",
-      "purpose": "Cloud provider",
-      "region": "Global"
-    },
-    {
-      "name": "Datadog, Inc.",
-      "purpose": "Cloud monitoring",
+      "name": "AC PM, LLC (Postmark)",
+      "purpose": "Email delivery",
       "region": "United States"
-    },
-    {
-      "name": "Functional Software Inc. (Sentry)",
-      "purpose": "Cloud monitoring",
-      "region": "United States"
-    },
-    {
-      "name": "PlanetScale, Inc.",
-      "purpose": "Managed database services",
-      "region": "United States, European Union"
     },
     {
       "name": "Amazon Web Services, Inc",
       "purpose": "Cloud provider, artificial intelligence",
-      "region": "United States, European Union"
-    },
-    {
-      "name": "turbopuffer Inc.",
-      "purpose": "Search",
       "region": "United States, European Union"
     },
     {
@@ -46,24 +22,9 @@
       "region": "United States, European Union"
     },
     {
-      "name": "OpenAI OpCo, LLC",
-      "purpose": "Artificial intelligence",
-      "region": "United States, European Union"
-    },
-    {
-      "name": "Fireworks AI, Inc",
-      "purpose": "Artificial intelligence",
+      "name": "Astrodon Corp (Loops)",
+      "purpose": "Marketing",
       "region": "United States"
-    },
-    {
-      "name": "Modal Labs, Inc.",
-      "purpose": "Cloud provider",
-      "region": "United States, European Union"
-    },
-    {
-      "name": "Cohere Inc",
-      "purpose": "Artificial intelligence",
-      "region": "United States, European Union"
     },
     {
       "name": "Braintrust Data Inc.",
@@ -71,28 +32,28 @@
       "region": "United States"
     },
     {
-      "name": "Retool Inc.",
-      "purpose": "Product analytics and management",
+      "name": "Clay Labs Inc",
+      "purpose": "Marketing",
       "region": "United States"
     },
     {
-      "name": "PostHog, Inc",
-      "purpose": "Product analytics",
+      "name": "Cloudflare, Inc.",
+      "purpose": "Cloud provider",
+      "region": "Global"
+    },
+    {
+      "name": "Cohere Inc",
+      "purpose": "Artificial intelligence",
+      "region": "United States, European Union"
+    },
+    {
+      "name": "Common Room, Inc",
+      "purpose": "Sales",
       "region": "United States"
     },
     {
-      "name": "Intercom, Inc.",
-      "purpose": "Customer support",
-      "region": "United States"
-    },
-    {
-      "name": "Pylon Labs, Inc.",
-      "purpose": "Customer support",
-      "region": "United States"
-    },
-    {
-      "name": "HubSpot, Inc.",
-      "purpose": "Customer relationship management",
+      "name": "Datadog, Inc.",
+      "purpose": "Cloud monitoring",
       "region": "United States"
     },
     {
@@ -101,8 +62,83 @@
       "region": "United States"
     },
     {
-      "name": "Stripe, LLC",
-      "purpose": "Payments",
+      "name": "Fireworks AI, Inc",
+      "purpose": "Artificial intelligence",
+      "region": "United States"
+    },
+    {
+      "name": "Fivetran Inc.",
+      "purpose": "Data storage and processing",
+      "region": "United States"
+    },
+    {
+      "name": "Functional Software Inc. (Sentry)",
+      "purpose": "Cloud monitoring",
+      "region": "United States"
+    },
+    {
+      "name": "Gong.io Ltd",
+      "purpose": "Sales",
+      "region": "United States"
+    },
+    {
+      "name": "Google LLC",
+      "purpose": "Cloud provider, artificial intelligence, collaboration / productivity",
+      "region": "United States, European Union"
+    },
+    {
+      "name": "Hevo Data, Inc",
+      "purpose": "Data storage and processing",
+      "region": "United States"
+    },
+    {
+      "name": "Hex Technologies Inc.",
+      "purpose": "Data analytics",
+      "region": "United States"
+    },
+    {
+      "name": "HubSpot, Inc.",
+      "purpose": "Customer relationship management",
+      "region": "United States"
+    },
+    {
+      "name": "Intercom, Inc.",
+      "purpose": "Customer support",
+      "region": "United States"
+    },
+    {
+      "name": "Modal Labs, Inc.",
+      "purpose": "Cloud provider",
+      "region": "United States, European Union"
+    },
+    {
+      "name": "OpenAI OpCo, LLC",
+      "purpose": "Artificial intelligence",
+      "region": "United States, European Union"
+    },
+    {
+      "name": "Outreach Corporation",
+      "purpose": "Sales",
+      "region": "United States"
+    },
+    {
+      "name": "PlanetScale, Inc.",
+      "purpose": "Managed database services",
+      "region": "United States, European Union"
+    },
+    {
+      "name": "PostHog, Inc",
+      "purpose": "Product analytics",
+      "region": "United States"
+    },
+    {
+      "name": "Pylon Labs, Inc.",
+      "purpose": "Customer support",
+      "region": "United States"
+    },
+    {
+      "name": "Retool Inc.",
+      "purpose": "Product analytics and management",
       "region": "United States"
     },
     {
@@ -116,53 +152,18 @@
       "region": "United States"
     },
     {
-      "name": "Fivetran Inc.",
-      "purpose": "Data storage and processing",
+      "name": "Stripe, LLC",
+      "purpose": "Payments",
       "region": "United States"
     },
     {
-      "name": "Hevo Data, Inc",
-      "purpose": "Data storage and processing",
-      "region": "United States"
-    },
-    {
-      "name": "Hex Technologies Inc.",
-      "purpose": "Data analytics",
-      "region": "United States"
-    },
-    {
-      "name": "AC PM, LLC (Postmark)",
-      "purpose": "Email delivery",
-      "region": "United States"
+      "name": "turbopuffer Inc.",
+      "purpose": "Search",
+      "region": "United States, European Union"
     },
     {
       "name": "ZenLeads Inc (Pocus)",
       "purpose": "Sales",
-      "region": "United States"
-    },
-    {
-      "name": "Outreach Corporation",
-      "purpose": "Sales",
-      "region": "United States"
-    },
-    {
-      "name": "Gong.io Ltd",
-      "purpose": "Sales",
-      "region": "United States"
-    },
-    {
-      "name": "Common Room, Inc",
-      "purpose": "Sales",
-      "region": "United States"
-    },
-    {
-      "name": "Astrodon Corp (Loops)",
-      "purpose": "Marketing",
-      "region": "United States"
-    },
-    {
-      "name": "Clay Labs Inc",
-      "purpose": "Marketing",
       "region": "United States"
     }
   ]
