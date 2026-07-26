@@ -15,18 +15,21 @@ watchdog = ">=3.0.0"
 [serve]
 base_route_app = "app"
 
-[dependencies.npm.dev]
-vite = "latest"
-"@vitejs/plugin-react" = "latest"
-
+# Pinned, not "latest": the JacHammer builder reported
+# `bun install ... No packages! Deleted empty lockfile`, and a lockfile-less
+# install of floating ranges is the least reproducible thing we can ship.
+# vite + the react plugin sit in the regular table on purpose -- the builder
+# runs the client in dev mode, so a production install that skips devDeps
+# leaves it with no bundler.
 [dependencies.npm]
-react = "latest"
-react-dom = "latest"
-react-router-dom = "latest"
-react-error-boundary = "latest"
-zod = "latest"
-"@tanstack/react-form" = "latest"
-react-force-graph-2d = "latest"
+react = "19.2.8"
+react-dom = "19.2.8"
+react-router-dom = "7.18.1"
+react-error-boundary = "6.1.2"
+zod = "4.4.3"
+"@tanstack/react-form" = "1.33.2"
+vite = "8.1.5"
+"@vitejs/plugin-react" = "6.0.4"
 
 [scale.server]
 docs_enabled = true
