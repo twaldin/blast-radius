@@ -16,7 +16,7 @@ each other so the field pinches at the shared provider.
 
 cl {
 import from .store { useRisk }
-import from .graph_core { burst_layout, node_radius, place_x, place_y, label_side, trace_path }
+import from .graph_core { burst_layout, node_radius, place_x, place_y, label_side, trace_path, ring_radii }
 
 glob VB_W: float = 1000.0;
 glob VB_H: float = 720.0;
@@ -106,8 +106,9 @@ def:pub DependencyGraph() -> JsxElement {
         <svg className="fig" viewBox={"0 0 " + str(VB_W) + " " + str(VB_H)} preserveAspectRatio="xMidYMid meet">
             {#* ------------------------------------------- ring furniture *#}
             <g className="fig-furniture">
-                <ellipse className="ring" cx={500} cy={360} rx={178} ry={164} />
-                <ellipse className="ring" cx={500} cy={360} rx={292} ry={269} />
+                {for rr in ring_radii(placed) {
+                    <ellipse key={"ring-" + str(rr)} className="ring" cx={500} cy={360} rx={rr} ry={rr * 0.92} />
+                }}
             </g>
 
             {#* ------------------------------- affected wedges during a blast *#}
