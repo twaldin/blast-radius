@@ -7,7 +7,7 @@ import os;
 import from datetime { datetime, timezone }
 import from hashlib { sha256 }
 import from pathlib { Path }
-import from byllm.lib { ByLLMError }
+import from jaclang.byllm.lib { ByLLMError }
 import from atlas_seed {
     canonical_identity_key,
     load_seed_directory

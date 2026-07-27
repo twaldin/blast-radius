@@ -1,6 +1,6 @@
 """Offline contract test for the typed byLLM extraction boundary."""
 
-import from byllm.lib { MockLLM }
+import from jaclang.byllm.lib { MockLLM }
 import from extract {
     ExtractionRecord,
     normalize_extraction_records

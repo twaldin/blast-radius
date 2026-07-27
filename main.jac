@@ -26,7 +26,7 @@ Envelope: data.reports[0] is the payload.
 """
 
 import from pathlib { Path }
-import from datetime { datetime }
+import from datetime { datetime, timezone }
 import from hashlib { sha256 }
 import from atlas_seed {
     canonical_domain_for_name,
@@ -276,7 +276,7 @@ def _region_node(code: str) -> Region {
     for r in [root -->[?:Region]] {
         if r.code == code { return r; }
     }
-    return (root ++> Region(code=code))[0];
+    return (root ++> Region(code=code));
 }
 
 # Wire a company to every Region its filing discloses. Idempotent on both the
@@ -295,6 +295,10 @@ def _name_from_domain(dom: str) -> str {
     return bare.split(".")[0].capitalize();
 }
 
+# Seed filings carry an offset (`...-07:00`), while `_now()` writes a naive stamp.
+# Subtracting one from the other raises TypeError, so every `expand` used to die
+# with "can't subtract offset-naive and offset-aware datetimes". The offset is
+# dropped below rather than converted: a 7-day TTL does not care about hours.
 def _is_stale(iso: str, ttl_days: int) -> bool {
     if not iso { return True; }
     try {
@@ -555,10 +559,10 @@ def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bo
         }
     }
     prof = provider_profile(label);
-    made: Company = (root ++> Company(
+    made = (root ++> Company(
         domain=dom, name=label, slug=prof.slug or _slugify(label) or _slugify(dom),
         category=prof.category, is_sink=prof.is_sink
-    ))[0];
+    ));
     idx[key] = made;
     return made;
 }

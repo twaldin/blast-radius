@@ -5,7 +5,7 @@ import json;
 import os;
 import re;
 import from datetime { datetime, timezone }
-import from byllm.lib { ByLLMError, Model }
+import from jaclang.byllm.lib { ByLLMError, Model }
 import from browser_discovery {
     BrowserPageResult,
     browser_harness_available,
