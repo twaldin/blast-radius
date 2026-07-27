@@ -750,3 +750,10 @@
 .gap-tag {
   margin-bottom: 2px;
 }
+
+/* ------------------------------------------------------------ live walk */
+
+.walk-btn {
+  margin-top: 8px;
+  width: 100%;
+}

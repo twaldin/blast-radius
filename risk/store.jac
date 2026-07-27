@@ -156,6 +156,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
     has companies: list[any] = [];
     has atlas_total: int = 0;
     has region: str = "";
+    has walking: bool = False;
 
     async def refresh_insights(domain: str = "") -> None {
         ranked = await call_walker("chokepoints", {"domain": domain});
@@ -174,10 +175,48 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         if prog { coverage = prog; }
     }
 
+    async def refresh_graph_snapshot(domain: str) -> None {
+        g = await call_walker("graph", {"domain": domain});
+        if g and len(g["nodes"] as list) > 0 {
+            built = build_graph(g["nodes"], g["edges"]);
+            links = (built["links"] as list);
+            nodes = annotate_depth((built["nodes"] as list), links, ((g["root"] or "") as str));
+            edge_keys = built["edge_keys"];
+        }
+    }
+
+    # "Watch it walk": crawl the pending frontier in the background while the
+    # canvas redraws every tick — new squares appear as filings are read.
+    # Reads stay free; the budget is on the crawl (max_new), never on depth.
+    async def walk_tick(domain: str) -> None {
+        await poll_progress(domain);
+        await refresh_graph_snapshot(domain);
+    }
+
+    async def walk() -> None {
+        if walking or not org_domain { return; }
+        dom: str = org_domain;
+        walking = True;
+        crawling = True;
+        ticker: any = setInterval(lambda { walk_tick(dom); }, 1600);
+        try {
+            await call_walker("expand", {"domain": dom, "max_new": 25});
+        } except Exception as e {
+            console.error("[blast-radius] walk failed", e);
+        } finally {
+            clearInterval(ticker as float);
+            walking = False;
+            crawling = False;
+        }
+        await refresh_graph_snapshot(dom);
+        await poll_progress(dom);
+        await refresh_insights(dom);
+        await refresh_atlas_list();
+    }
+
     async def load_graph(domain: str = "") -> None {
         crawling = True;
         loaded_domain: str = domain;
-        timer: any = setInterval(lambda { poll_progress(domain); }, 700);
         try {
             # `graph` is a pure unbounded BFS READ — instant on the seeded
             # atlas. Crawling only ever happens through the explicit walkers
@@ -202,9 +241,6 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
                 if n["tier"] == "org" { org_label = n["label"] as str; }
             }
         } finally {
-            # the poll must die even when expand rejects, or it hammers the
-            # server at 700ms behind a failed screen
-            clearInterval(timer as float);
             crawling = False;
         }
         await poll_progress(loaded_domain);
@@ -416,7 +452,8 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             "top": chokes[0] if chokes and len(chokes as list) > 0 else None,
             "outage": outage,
             "outage_hop": outage_hop,
-            "down_ids": outage["vendor_ids"] if outage else []
+            "down_ids": outage["vendor_ids"] if outage else [],
+            "walking": walking
         },
         "actions": {
             "select": select,
@@ -427,7 +464,8 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             "search": search_company,
             "openCompany": open_company,
             "view": open_company,
-            "setRegion": set_region
+            "setRegion": set_region,
+            "walk": walk
         },
         "meta": {
             "loading": loading,

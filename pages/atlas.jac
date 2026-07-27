@@ -281,6 +281,14 @@ def:pub page() -> JsxPage {
                             <p className="cov-note">{str(pending_n) + " discovered sub-processors not yet crawled."}</p>
                             skip;
                         }}
+                        {if pending_n > 0 or st["walking"] {
+                            <button
+                                className="btn walk-btn"
+                                onClick={acts["walk"]}
+                                disabled={st["walking"]}
+                            >{("Walking… " + str(counts["ok"]) + " filings read") if st["walking"] else ("Walk " + str(pending_n) + " uncrawled →")}</button>
+                            skip;
+                        }}
                         <p className="cov-note">Read from each vendor's own subprocessor filing. Unreadable pages are reported, not guessed.</p>
                     </div>
                 </section>
