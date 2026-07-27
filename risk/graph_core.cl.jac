@@ -79,8 +79,14 @@ placed on the circular mean of the providers it depends on, so a shared
 provider visibly gathers its dependents into one wedge. Ties are fanned apart
 so nothing stacks.
 
-Returns nodes carrying __a (bearing, radians) and __band (0 org, 1 vendor,
-2 provider).
+Rings are dynamic: vendors fill the inner ring(s), providers the outer. When
+a band holds more members than a ring can space legibly, node i spills onto
+sub-ring i % m (m rings for that band), up to MAX_RINGS total. With one ring
+per band the radii are exactly the classic 178/292 pair, so small graphs
+render identically to before.
+
+Returns nodes carrying __a (bearing, radians), __band (0 org, 1 vendor,
+2 provider) and __r (ring radius, px).
 """
 def:pub burst_layout(nodes: any, links: any, ranked_ids: any) -> list[any] {
     providers: any = [n for n in nodes if n["tier"] == "provider"];
@@ -96,12 +102,28 @@ def:pub burst_layout(nodes: any, links: any, ranked_ids: any) -> list[any] {
         if p not in ordered { ordered.append(p); }
     }
 
-    # start the heaviest provider on the right-hand axis and walk round
-    count = len(ordered);
+    # ring budget: vendors get the inner rings, providers the outer ones
+    nv = len(vendors as list);
+    np = len(ordered);
+    mv = _rings_needed(nv, R_VENDOR, MAX_RINGS - 1);
+    mp = _rings_needed(np, R_PROVIDER, MAX_RINGS - mv);
+    radii = _radii(mv + mp);
+    vend_radii = radii[0:mv];
+    prov_radii = radii[mv:];
+
+    # providers: heaviest starts on the right-hand axis and the band walks
+    # round; overflow spills onto outer sub-rings, each re-spaced evenly
+    pcounts = _bucket_counts(np, mp);
+    pseen = _zeros(mp);
     prov_a: dict = {};
+    prov_r: dict = {};
     i = 0;
     for p in ordered {
-        prov_a[p["id"]] = 0.0 - 0.42 + (i / (count or 1)) * TAU;
+        ridx = i % mp;
+        cnt = (pcounts[ridx] as int) or 1;
+        prov_a[p["id"]] = 0.0 - 0.42 + ((pseen[ridx] as int) / cnt) * TAU;
+        prov_r[p["id"]] = prov_radii[ridx];
+        pseen[ridx] = (pseen[ridx] as int) + 1;
         i = i + 1;
     }
 
@@ -138,17 +160,26 @@ def:pub burst_layout(nodes: any, links: any, ranked_ids: any) -> list[any] {
     keyed = sorted(keyed, key=_by_k);
 
     placed: list[any] = [];
-    total = len(keyed) or 1;
+    vcounts = _bucket_counts(len(keyed), mv);
+    vseen = _zeros(mv);
     i2 = 0;
     for row in keyed {
-        placed.append({**row["node"], "__a": 0.0 - 0.42 + (i2 / total) * TAU, "__band": 1});
+        vridx = i2 % mv;
+        vcnt = (vcounts[vridx] as int) or 1;
+        placed.append({
+            **row["node"],
+            "__a": 0.0 - 0.42 + ((vseen[vridx] as int) / vcnt) * TAU,
+            "__band": 1,
+            "__r": vend_radii[vridx]
+        });
+        vseen[vridx] = (vseen[vridx] as int) + 1;
         i2 = i2 + 1;
     }
     for p in ordered {
-        placed.append({**p, "__a": prov_a[p["id"]], "__band": 2});
+        placed.append({**p, "__a": prov_a[p["id"]], "__band": 2, "__r": prov_r[p["id"]]});
     }
     for n in nodes {
-        if n["tier"] == "org" { placed.append({**n, "__a": 0.0, "__band": 0}); }
+        if n["tier"] == "org" { placed.append({**n, "__a": 0.0, "__band": 0, "__r": 0.0}); }
     }
     return placed;
 }
@@ -159,20 +190,85 @@ def:pub burst_layout(nodes: any, links: any, ranked_ids: any) -> list[any] {
 
 glob CX: float = 500.0;
 glob CY: float = 360.0;
-glob R_VENDOR: float = 178.0;
-glob R_PROVIDER: float = 292.0;
+glob R_VENDOR: float = 178.0;    # classic inner ring — kept when one ring per band
+glob R_PROVIDER: float = 292.0;  # classic outer ring
+glob R_INNER: float = 150.0;     # ladder bounds once rings multiply
+glob R_OUTER: float = 330.0;
+glob MAX_RINGS: int = 4;         # hard cap on total rings across both bands
+glob ARC_MIN: float = 46.0;      # min arc length per node before spilling over
+
+def _zeros(k: int) -> list[int] {
+    out: list[int] = [];
+    i = 0;
+    while i < k { out.append(0); i = i + 1; }
+    return out;
+}
+
+"""Node i of `count` lands in bucket i % m; returns per-bucket totals."""
+def _bucket_counts(count: int, m: int) -> list[int] {
+    out = _zeros(m);
+    i = 0;
+    while i < count {
+        out[i % m] = (out[i % m] as int) + 1;
+        i = i + 1;
+    }
+    return out;
+}
+
+def _ring_capacity(r: float) -> int {
+    c = Math.floor(TAU * r / ARC_MIN) as int;
+    return c if c > 4 else 4;
+}
+
+"""Sub-rings a band of `count` nodes needs at roughly radius r0, never more
+than the ring budget left."""
+def _rings_needed(count: int, r0: float, budget: int) -> int {
+    m = 1;
+    while m < budget and count > _ring_capacity(r0) * m { m = m + 1; }
+    return m;
+}
+
+"""Radii for k rings. Two rings — the common case — reproduce the exact
+classic geometry; beyond that the ladder spreads evenly to R_OUTER."""
+def _radii(k: int) -> list[float] {
+    if k <= 1 { return [R_PROVIDER]; }
+    if k == 2 { return [R_VENDOR, R_PROVIDER]; }
+    out: list[float] = [];
+    i = 0;
+    while i < k {
+        out.append(R_INNER + (i / (k - 1)) * (R_OUTER - R_INNER));
+        i = i + 1;
+    }
+    return out;
+}
+
+"""Distinct ring radii actually in use, inner first — the ring furniture."""
+def:pub ring_radii(placed: any) -> list[float] {
+    seen: dict = {};
+    out: list[float] = [];
+    for n in placed {
+        if ((n["__band"] or 0) as int) == 0 { continue; }
+        r = ((n["__r"] or 0.0) as float);
+        key = str(r);
+        if r > 0.0 and key not in seen {
+            seen[key] = True;
+            out.append(r);
+        }
+    }
+    return sorted(out);
+}
 
 def:pub place_x(n: any) -> float {
     band = (n["__band"] or 0) as int;
     if band == 0 { return CX; }
-    r = R_VENDOR if band == 1 else R_PROVIDER;
+    r = ((n["__r"] or (R_VENDOR if band == 1 else R_PROVIDER)) as float);
     return CX + Math.cos((n["__a"] or 0.0) as float) * r;
 }
 
 def:pub place_y(n: any) -> float {
     band = (n["__band"] or 0) as int;
     if band == 0 { return CY; }
-    r = R_VENDOR if band == 1 else R_PROVIDER;
+    r = ((n["__r"] or (R_VENDOR if band == 1 else R_PROVIDER)) as float);
     return CY + Math.sin((n["__a"] or 0.0) as float) * r * 0.92;
 }
 

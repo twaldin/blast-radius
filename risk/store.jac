@@ -137,6 +137,29 @@ def empty_coverage() -> any {
             "vendors": []};
 }
 
+# Boot snapshot cache: the last good boot payload, hydrated synchronously on
+# the next visit so the graph paints immediately; the network then revalidates
+# in the background and overwrites. Version the key when the shape changes.
+glob BOOT_CACHE_KEY: str = "br-boot-v2";
+
+def cache_read(key: str) -> any {
+    try {
+        raw: any = localStorage.getItem(key);
+        if raw { return JSON.parse(raw as str); }
+        return None;
+    } except Exception as e {
+        return None;
+    }
+}
+
+def cache_write(key: str, value: any) -> None {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } except Exception as e {
+        return;
+    }
+}
+
 def:pub RiskProvider(children: any = None) -> JsxElement {
     has nodes: list[any] = [];
     has links: list[any] = [];
@@ -260,6 +283,23 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
     }
 
     async can with entry {
+        # Paint instantly from the last good boot, then revalidate.
+        snap: any = cache_read(BOOT_CACHE_KEY);
+        if snap {
+            nodes = ((snap["nodes"] or []) as list);
+            links = ((snap["links"] or []) as list);
+            edge_keys = snap["edge_keys"] or {};
+            chokes = ((snap["chokes"] or []) as list);
+            fallout = ((snap["fallout"] or []) as list);
+            headline = snap["headline"];
+            coverage = snap["coverage"] or empty_coverage();
+            companies = ((snap["companies"] or []) as list);
+            atlas_total = ((snap["atlas_total"] or 0) as int);
+            org_label = ((snap["org_label"] or "") as str);
+            org_domain = ((snap["org_domain"] or "") as str);
+            if not selected { selected = ((snap["selected"] or "") as str); }
+            loading = False;
+        }
         try {
             seeded: any = await call_walker("ensure_atlas", {});
             if not seeded or not seeded["ready"] {
@@ -268,10 +308,18 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             await refresh_atlas_list();
             await load_graph();
             loading = False;
+            cache_write(BOOT_CACHE_KEY, {
+                "nodes": nodes, "links": links, "edge_keys": edge_keys,
+                "chokes": chokes, "fallout": fallout, "headline": headline,
+                "coverage": coverage, "companies": companies,
+                "atlas_total": atlas_total, "org_label": org_label,
+                "org_domain": org_domain, "selected": selected
+            });
         } except Exception as e {
             console.error("[blast-radius] load failed", e);
             crawling = False;
-            failed = True;
+            # A hydrated snapshot is still a working view; only fail blank boots.
+            if not snap { failed = True; }
             loading = False;
         }
     }

@@ -586,10 +586,10 @@ def _resolve_root(domain: str) -> Company | None {
 }
 
 # ------------------------------------------------------------------ the traversal
-# BFS over a visited set. `max_hops = 0` means UNBOUNDED — each company appears exactly
-# once, so it terminates on the number of distinct companies, not on a hop budget.
-# A bound is passed only where the caller genuinely needs less (an atlas card shows
-# "vendors and their vendors", so it asks for 2). It is never a cap on the real graph.
+# BFS over a visited set. `max_hops = 0` means UNBOUNDED, but every serving
+# surface now caps at MAX_DEPTH: the graph read, the crawl frontier, and the
+# inbound view all stop at hop 2 (org -> vendors -> providers).
+glob MAX_DEPTH: int = 2;
 def _view(start: Company, max_hops: int) -> GraphView {
     dist: dict[str, int] = {start.slug: 0};
     order: list[Company] = [start];
@@ -655,7 +655,7 @@ def _node_payload(c: Company, tier: str, indeg: int) -> dict {
 }
 
 def _graph_payload(start: Company) -> dict {
-    view = _view(start, 0);
+    view = _view(start, MAX_DEPTH);
     inview: dict[str, bool] = {};
     for c in view.order { inview[c.slug] = True; }
 
@@ -1149,7 +1149,8 @@ walker:pub graph {
 }
 
 # POST /walker/expand {"domain": ..., "max_new": 40}
-# Budget-bounded crawl. The cap is on NEW companies fetched, never on depth.
+# Budget-bounded crawl. Capped on NEW companies fetched (max_new) AND on depth
+# (MAX_DEPTH): companies at hop >= 2 stay as leaves and are never crawled.
 async walker:pub expand {
     has domain: str = "";
     has max_new: int = 40;
@@ -1164,16 +1165,23 @@ async walker:pub expand {
             disengage;
         }
         queue: list[Company] = [start];
+        qdepth: list[int] = [0];
         while queue and self.spent < self.max_new {
             head = queue[0];
+            d = qdepth[0];
             queue = queue[1:];
+            qdepth = qdepth[1:];
             if head.slug in self.seen { continue; }
             self.seen.append(head.slug);
             if head.is_sink { continue; }
+            if d >= MAX_DEPTH { continue; }
             status = await _crawl_company(head, self.ttl_days, self.force);
             if status == "ok" or status == "unchanged" { self.spent += 1; }
             for t in [head ->:Subprocesses:->] {
-                if t.slug not in self.seen { queue.append(t); }
+                if t.slug not in self.seen {
+                    queue.append(t);
+                    qdepth.append(d + 1);
+                }
             }
         }
         report _graph_payload(start);
@@ -1207,7 +1215,7 @@ walker:pub crawl_progress {
     can run with Root entry {
         _ensure_seeded();
         start = _resolve_root(self.domain);
-        members: list[Company] = _view(start, 0).order if start else [];
+        members: list[Company] = _view(start, MAX_DEPTH).order if start else [];
         counts: dict[str, int] = {"pending": 0, "ok": 0, "unreadable": 0, "notfound": 0};
         rows: list[dict] = [];
         for c in members {
@@ -1551,8 +1559,10 @@ walker:pub dependents {
     can run with Root entry {
         _ensure_seeded();
         target = _find_company(self.domain);
+        hops = self.max_hops;
+        if hops <= 0 or hops > MAX_DEPTH { hops = MAX_DEPTH; }
         if target {
-            report _inbound_payload(target, self.max_hops);
+            report _inbound_payload(target, hops);
         } else {
             report {"nodes": [], "edges": [], "root": "", "root_domain": "",
                     "root_label": "", "direction": "inbound", "dependent_count": 0};
