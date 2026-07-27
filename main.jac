@@ -781,12 +781,39 @@ def _seed_one(seed: AtlasSeedRecord, idx: dict[str, Company]) -> dict {
 }
 
 # ------------------------------------------------------------------ walkers = endpoints
+# Resolve the seed directory next to THIS module first, falling back to the
+# process working directory. `Path("seed/atlas")` alone is relative to wherever
+# the server happens to be started from, and when it misses, load_seed_directory
+# returns nothing and the caller reports `seeded: 0` without an error -- an empty
+# graph that looks perfectly healthy.
+def _seed_dir(rel: str) -> Path {
+    beside = Path(str(__file__)).parent / rel;
+    return beside if beside.exists() else Path(rel);
+}
+
+"""Load the committed filings if, and only if, the graph is empty.
+
+`seed_atlas` is idempotent and safe to call by hand, but nothing ever called it,
+so a container with a fresh database served an empty atlas until a human
+remembered the curl. This is the missing caller. It is a no-op the moment any
+company exists, so a crawled or already-seeded graph is never touched.
+"""
+def _ensure_seeded() -> None {
+    if _all_companies() { return; }
+    (seeds, validation_errors) = load_seed_directory(_seed_dir("seed/atlas"));
+    if validation_errors { return; }
+    idx: dict[str, Company] = _index();
+    for seed in seeds {
+        _seed_one(seed, idx);
+    }
+}
+
 # POST /walker/seed_atlas {}  -> import committed seed/atlas/*.json. Idempotent.
 walker:pub seed_atlas {
     has directory: str = "seed/atlas";
     can run with Root entry {
         (seeds, validation_errors) = load_seed_directory(
-            Path(self.directory)
+            _seed_dir(self.directory)
         );
         if validation_errors {
             report {
@@ -827,6 +854,7 @@ walker:pub seed_atlas {
 walker:pub atlas {
     has limit: int = 60;
     can run with Root entry {
+        _ensure_seeded();
         out: list[dict] = [];
         for c in _all_companies() {
             direct = [c ->:Subprocesses:->];
@@ -856,6 +884,7 @@ walker:pub atlas {
 walker:pub graph {
     has domain: str = "";
     can run with Root entry {
+        _ensure_seeded();
         start = _resolve_root(self.domain);
         if start { report _graph_payload(start); }
         else { report {"nodes": [], "edges": [], "root": "", "root_domain": "", "root_label": ""}; }
@@ -919,6 +948,7 @@ async walker:pub expand_one {
 walker:pub crawl_progress {
     has domain: str = "";
     can run with Root entry {
+        _ensure_seeded();
         start = _resolve_root(self.domain);
         members: list[Company] = _view(start, 0).order if start else [];
         counts: dict[str, int] = {"pending": 0, "ok": 0, "unreadable": 0, "notfound": 0};
@@ -942,6 +972,7 @@ walker:pub crawl_progress {
 walker:pub chokepoints {
     has domain: str = "";
     can run with Root entry {
+        _ensure_seeded();
         start = _resolve_root(self.domain);
         report _chokepoints_for(start) if start else [];
     }
@@ -991,6 +1022,7 @@ walker:pub blast_radius {
 walker:pub compliance_fallout {
     has domain: str = "";
     can run with Root entry {
+        _ensure_seeded();
         start = _resolve_root(self.domain);
         report _fallout_for(start) if start else [];
     }
@@ -1000,6 +1032,7 @@ walker:pub compliance_fallout {
 walker:pub one_look {
     has domain: str = "";
     can run with Root entry {
+        _ensure_seeded();
         start = _resolve_root(self.domain);
         if start {
             report _one_look_for(_chokepoints_for(start), _fallout_for(start),
@@ -1017,6 +1050,7 @@ walker:pub search {
     has q: str = "";
     has limit: int = 20;
     can run with Root entry {
+        _ensure_seeded();
         ql = self.q.lower().strip();
         if not ql {
             report {"query": self.q, "resolved": None, "results": []};
@@ -1132,6 +1166,7 @@ walker:pub search {
 walker:pub industry_map {
     has min_degree: int = 0;
     can run with Root entry {
+        _ensure_seeded();
         indeg: dict[str, int] = {};
         raw: list[dict] = [];
         for c in _all_companies() {
@@ -1206,6 +1241,7 @@ walker:pub dependents {
     has domain: str = "";
     has max_hops: int = 2;
     can run with Root entry {
+        _ensure_seeded();
         target = _find_company(self.domain);
         if target {
             report _inbound_payload(target, self.max_hops);
