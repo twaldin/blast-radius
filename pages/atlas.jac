@@ -23,6 +23,86 @@ def:pub page() -> JsxPage {
 
     has domain_in: str = "";
     has manual_in: str = "";
+    has search_in: str = "";
+    has search_results: list[any] = [];
+    has search_loading: bool = False;
+    has search_complete: bool = False;
+    has search_used_ai: bool = False;
+    has search_discovered: bool = False;
+    has search_error: str = "";
+
+    async def run_search(allow_discovery: bool) -> None {
+        query: str = search_in.strip();
+        if not query or search_loading { return; }
+        search_loading = True;
+        search_complete = False;
+        search_used_ai = allow_discovery;
+        search_discovered = False;
+        search_error = "";
+        try {
+            payload: any = await acts["search"](
+                query,
+                allow_discovery
+            );
+            search_results = (
+                payload["results"] as list[any]
+                if payload and payload["results"]
+                else []
+            );
+            search_discovered = (
+                payload["discovered"] as bool
+                if payload
+                else False
+            );
+            search_complete = True;
+        } except Exception as e {
+            console.error("[blast-radius] search failed", e);
+            search_results = [];
+            search_error = "Search failed. Check the server and try again.";
+            search_complete = True;
+        } finally {
+            search_loading = False;
+        }
+    }
+
+    async def submit_registry(e: FormEvent) -> None {
+        e.preventDefault();
+        await run_search(False);
+    }
+
+    async def search_with_ai() -> None {
+        await run_search(True);
+    }
+
+    async def choose_result(result: any) -> None {
+        domain: str = result["domain"] as str;
+        if not domain { return; }
+        search_loading = True;
+        try {
+            # Registry rows are read-only offers. A URL-shaped discovery query
+            # deliberately misses the seven text tiers, resolves the trusted
+            # registry URL, and persists through `_upsert_company`.
+            if result["state"] == "registry" {
+                mapped: any = await acts["search"](
+                    "https://" + domain + "/",
+                    True
+                );
+                search_discovered = (
+                    mapped["discovered"] as bool
+                    if mapped
+                    else False
+                );
+            }
+            await acts["openCompany"](domain);
+            search_results = [];
+            search_complete = False;
+        } except Exception as e {
+            console.error("[blast-radius] result load failed", e);
+            search_error = "The company was found, but its graph could not be opened.";
+        } finally {
+            search_loading = False;
+        }
+    }
 
     a: any = st["active"];
     o: any = st["outage"];
@@ -70,6 +150,72 @@ def:pub page() -> JsxPage {
                 <p className="hdr-fix">{h["biggest_suggestion"] if h else "—"}</p>
             </div>
         </header>
+
+        <section className="finder" aria-label="Company search">
+            <div className="finder-copy">
+                <span className="finder-k">Search atlas</span>
+                <span className="finder-note">Registry first · AI only after a miss</span>
+            </div>
+            <form className="finder-form" onSubmit={submit_registry}>
+                <input
+                    className="finder-in"
+                    value={search_in}
+                    placeholder="Company or domain — e.g. Airbyte"
+                    aria-label="Company or domain"
+                    onChange={lambda (e: ChangeEvent) {
+                        search_in = e.target.value;
+                        search_complete = False;
+                        search_error = "";
+                    }}
+                />
+                <button
+                    className="btn"
+                    type="submit"
+                    disabled={search_loading or not search_in.strip()}
+                >{("Searching…" if search_loading and not search_used_ai else "Search registry")}</button>
+                <button
+                    className="btn btn-quiet"
+                    type="button"
+                    onClick={search_with_ai}
+                    disabled={search_loading or not search_in.strip()}
+                >{("AI searching…" if search_loading and search_used_ai else "Search with AI")}</button>
+            </form>
+            <div className="finder-status" aria-live="polite">
+                {if search_loading {
+                    <span>{"Agent checking first-party sources…" if search_used_ai else "Checking graph and registry…"}</span>
+                }}
+                {if search_error {
+                    <span className="finder-bad">{search_error}</span>
+                }}
+                {if search_complete and not search_loading and len(search_results) == 0 and not search_error {
+                    <span>{"No authoritative source found." if search_used_ai else "No registry match. Try Search with AI."}</span>
+                }}
+                {if search_discovered and not search_loading {
+                    <span className="finder-good">New company mapped by discovery.</span>
+                }}
+            </div>
+            {if len(search_results) > 0 {
+                <div className="finder-results" role="listbox">
+                    {for result in search_results {
+                        <button
+                            key={(result["id"] as str) + (result["domain"] as str)}
+                            className="finder-hit"
+                            type="button"
+                            onClick={lambda { choose_result(result); }}
+                        >
+                            <span>
+                                <b>{result["name"]}</b>
+                                <small>{result["domain"]}</small>
+                            </span>
+                            <span className="finder-source">
+                                <em>{result["match"]}</em>
+                                <span>{"Map from registry →" if result["state"] == "registry" else "Open graph →"}</span>
+                            </span>
+                        </button>
+                    }}
+                </div>
+            }}
+        </section>
 
         <div className="board">
             {#* ------------------------------------------------------ left rail *#}

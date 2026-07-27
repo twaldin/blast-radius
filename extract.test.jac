@@ -1,4 +1,5 @@
 import asyncio;
+import from time { monotonic }
 
 
 test "resolves a registry URL without network access" {
@@ -85,4 +86,39 @@ test "requires a complete named disclosure signal" {
     assert not is_complete_disclosure(
         "We may use subprocessors from time to time."
     );
+}
+
+
+test "discovery rejects junk inputs without raising" {
+    junk: list[tuple[str, str]] = [
+        ("", ""),
+        ("   ", "   "),
+        ("!!!", "!!!"),
+        ("x" * 500, "x" * 500)
+    ];
+    for (domain, keyword) in junk {
+        assert asyncio.run(discover_and_resolve(domain, keyword)) == "";
+    }
+}
+
+
+test "discovery fails fast when Browser Harness is unavailable" {
+    original_binary: str = os.environ.get(
+        "BLAST_RADIUS_BROWSER_HARNESS",
+        "browser-harness"
+    );
+    os.environ["BLAST_RADIUS_BROWSER_HARNESS"] = (
+        "blast-radius-browser-harness-does-not-exist"
+    );
+    started: float = monotonic();
+    result: str = asyncio.run(
+        discover_and_resolve(
+            "does-not-resolve.invalid",
+            "Does Not Resolve"
+        )
+    );
+    elapsed: float = monotonic() - started;
+    os.environ["BLAST_RADIUS_BROWSER_HARNESS"] = original_binary;
+    assert result == "";
+    assert elapsed < 5.0;
 }

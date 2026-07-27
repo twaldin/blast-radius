@@ -96,6 +96,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
     has coverage: any = empty_coverage();
     has headline: any = None;
     has org_label: str = "";
+    has org_domain: str = "";
     has selected: str = "";
     has outage: any = None;
     has outage_hop: int = -1;
@@ -103,10 +104,10 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
     has crawling: bool = False;
     has failed: bool = False;
 
-    async def refresh_insights() -> None {
-        ranked = await call_walker("chokepoints", {});
-        gaps = await call_walker("compliance_fallout", {});
-        one = await call_walker("one_look", {});
+    async def refresh_insights(domain: str = "") -> None {
+        ranked = await call_walker("chokepoints", {"domain": domain});
+        gaps = await call_walker("compliance_fallout", {"domain": domain});
+        one = await call_walker("one_look", {"domain": domain});
         chokes = ranked or [];
         fallout = gaps or [];
         headline = one;
@@ -115,28 +116,34 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         }
     }
 
-    async def poll_progress() -> None {
-        prog = await call_walker("crawl_progress", {});
+    async def poll_progress(domain: str = "") -> None {
+        prog = await call_walker("crawl_progress", {"domain": domain});
         if prog { coverage = prog; }
     }
 
-    async def load_graph() -> None {
+    async def load_graph(domain: str = "") -> None {
         crawling = True;
-        timer: any = setInterval(lambda { poll_progress(); }, 700);
+        loaded_domain: str = domain;
+        timer: any = setInterval(lambda { poll_progress(domain); }, 700);
         try {
-            graph = await call_walker("expand", {});
+            graph = await call_walker("expand", {"domain": domain});
             # `expand` only crawls vendors that already exist. On a cold graph
             # detection has to run first, otherwise every view renders empty.
             # jachammer.ai resolves through the pre-warmed cache, so the
             # scripted path never touches the network (spec 10, PLAN B4).
-            if len(graph["nodes"] as list) == 0 {
+            if len(graph["nodes"] as list) == 0 and not domain {
                 await call_walker("detect_vendors", {"domain": SEED_DOMAIN});
-                graph = await call_walker("expand", {});
+                graph = await call_walker(
+                    "expand",
+                    {"domain": SEED_DOMAIN}
+                );
             }
             built = build_graph(graph["nodes"], graph["edges"]);
             nodes = built["nodes"];
             links = built["links"];
             edge_keys = built["edge_keys"];
+            loaded_domain = (graph["root_domain"] or domain) as str;
+            org_domain = loaded_domain;
             org_label = "";
             for n in graph["nodes"] {
                 if n["tier"] == "org" { org_label = n["label"] as str; }
@@ -147,12 +154,16 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             clearInterval(timer);
             crawling = False;
         }
-        await poll_progress();
-        await refresh_insights();
+        await poll_progress(loaded_domain);
+        await refresh_insights(loaded_domain);
     }
 
     async can with entry {
         try {
+            seeded: any = await call_walker("ensure_atlas", {});
+            if not seeded or not seeded["ready"] {
+                raise Exception("Committed atlas seed could not be loaded");
+            }
             await load_graph();
             loading = False;
         } except Exception as e {
@@ -172,7 +183,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             failed = False;
             selected = "";
             await call_walker("detect_vendors", {"domain": domain});
-            await load_graph();
+            await load_graph(domain);
             loading = False;
         } except Exception as e {
             console.error("[blast-radius] detect failed", e);
@@ -193,11 +204,56 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         try {
             loading = True;
             await call_walker("add_vendors", {"domains": parts});
-            await load_graph();
+            await load_graph(org_domain);
             loading = False;
         } except Exception as e {
             console.error("[blast-radius] add failed", e);
             crawling = False;
+            failed = True;
+            loading = False;
+        }
+    }
+
+    async def search_company(
+        q: str,
+        allow_discovery: bool
+    ) -> any {
+        if not q.strip() { return None; }
+        return await call_walker("search", {
+            "q": q,
+            "allow_discovery": allow_discovery
+        });
+    }
+
+    async def open_company(domain: str) -> None {
+        if not domain { return; }
+        try {
+            loading = True;
+            failed = False;
+            selected = "";
+            graph = await call_walker("graph", {"domain": domain});
+            if not graph or len(graph["nodes"] as list) == 0 {
+                failed = True;
+                loading = False;
+                return;
+            }
+            built = build_graph(graph["nodes"], graph["edges"]);
+            nodes = built["nodes"];
+            links = built["links"];
+            edge_keys = built["edge_keys"];
+            loaded_domain: str = (
+                graph["root_domain"] or domain
+            ) as str;
+            org_domain = loaded_domain;
+            org_label = (graph["root_label"] or domain) as str;
+            coverage = await call_walker(
+                "crawl_progress",
+                {"domain": loaded_domain}
+            ) or empty_coverage();
+            await refresh_insights(loaded_domain);
+            loading = False;
+        } except Exception as e {
+            console.error("[blast-radius] company load failed", e);
             failed = True;
             loading = False;
         }
@@ -211,7 +267,10 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
     async def simulate() -> None {
         active = choke_for(chokes, selected);
         if not active { return; }
-        res = await call_walker("blast_radius", {"failed_provider": active["provider"]});
+        res = await call_walker("blast_radius", {
+            "domain": org_domain,
+            "failed_provider": active["provider"]
+        });
         if not res { return; }
         outage = res;
         outage_hop = 0;
@@ -239,6 +298,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             "coverage": coverage,
             "headline": headline,
             "org_label": org_label,
+            "org_domain": org_domain,
             "vendor_total": len(vendors),
             "provider_total": len(providers),
             "selected": selected,
@@ -253,7 +313,9 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             "simulate": simulate,
             "clear": clear,
             "ingest": ingest,
-            "addManual": add_manual
+            "addManual": add_manual,
+            "search": search_company,
+            "openCompany": open_company
         },
         "meta": {
             "loading": loading,

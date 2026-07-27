@@ -47,3 +47,22 @@ test "parses a typed Browser Harness result" {
     assert result.final_url == "https://linear.app/dpa";
     assert len(result.source_urls) == 1;
 }
+
+
+test "reports a missing Browser Harness without spawning it" {
+    original_binary: str = os.environ.get(
+        "BLAST_RADIUS_BROWSER_HARNESS",
+        "browser-harness"
+    );
+    os.environ["BLAST_RADIUS_BROWSER_HARNESS"] = (
+        "blast-radius-browser-harness-does-not-exist"
+    );
+    assert not browser_harness_available();
+    result = _run_browser_worker(
+        {"action": "search", "query": "Vercel subprocessors"},
+        45
+    );
+    os.environ["BLAST_RADIUS_BROWSER_HARNESS"] = original_binary;
+    assert result.status == "error";
+    assert result.error == "Browser Harness is unavailable";
+}

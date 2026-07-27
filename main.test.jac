@@ -5,6 +5,22 @@ will grow. These defend the INVARIANTS that break the product if they regress â€
 entity-resolution convergence above all, since without it the chokepoint never appears.
 """
 
+import asyncio;
+
+
+async def _search_for_test(
+    q: str,
+    allow_discovery: bool = False
+) -> search {
+    return await (
+        root spawn search(
+            q=q,
+            allow_discovery=allow_discovery
+        )
+    );
+}
+
+
 test "seeding imports the committed filings and is idempotent" {
     first = root spawn seed_atlas();
     a = first.reports[0];
@@ -17,6 +33,18 @@ test "seeding imports the committed filings and is idempotent" {
     # Re-running must not duplicate companies or edges.
     assert (b["companies"] as int) == companies_after_first;
     assert (b["edges"] as int) == (a["edges"] as int);
+}
+
+test "the boot hook ensures the committed atlas before the first graph read" {
+    boot = root spawn ensure_atlas();
+    summary = boot.reports[0];
+    assert summary["ready"];
+    assert (summary["ok"] as int) >= 10;
+
+    lindy = root spawn graph(domain="lindy.ai");
+    payload = lindy.reports[0];
+    assert len(payload["nodes"] as list) > 1;
+    assert len(payload["edges"] as list) >= 20;
 }
 
 test "entity resolution converges alias spellings onto one company" {
@@ -128,7 +156,8 @@ test "uncited risk data is never reported" {
 test "search resolves aliases and typos onto the canonical company" {
     _ = root spawn seed_atlas();
 
-    found = root spawn search(q="snowflake");
+    found: search = asyncio.run(_search_for_test("snowflake"));
+    assert not found.reports[0]["discovered"];
     results = found.reports[0]["results"] as list;
     assert len(results) > 0;
     hits = [r for r in results if (r["state"] as str) == "mapped"];
@@ -136,7 +165,7 @@ test "search resolves aliases and typos onto the canonical company" {
 
     # The alias table must carry "aws" onto the canonical node. This query returned
     # nothing before the resolution ladder landed, and it is the product's key lookup.
-    aws = root spawn search(q="aws");
+    aws: search = asyncio.run(_search_for_test("aws"));
     resolved = aws.reports[0]["resolved"];
     assert resolved is not None;
     assert (resolved["id"] as str) == "amazon-web-services";
@@ -146,16 +175,45 @@ test "search resolves aliases and typos onto the canonical company" {
 
     # Legal-suffix, spacing, and single-character-transposition variants all converge.
     for variant in ["OpenAI, L.L.C.", "open ai", "openAI"] {
-        v = root spawn search(q=variant);
+        v: search = asyncio.run(_search_for_test(variant));
         vr = v.reports[0]["resolved"];
         assert vr is not None;
         assert (vr["id"] as str) == "openai";
     }
 
     # An empty query must not scan the registry.
-    empty = root spawn search(q="");
+    empty: search = asyncio.run(_search_for_test(""));
     assert len(empty.reports[0]["results"] as list) == 0;
     assert empty.reports[0]["resolved"] is None;
+    assert not empty.reports[0]["discovered"];
+
+    # A URL-shaped query misses all seven text-match tiers, then exercises the
+    # discovery-to-graph write through deterministic registry resolution.
+    fixture_domain: str = "airbyte.com";
+    fixture_url: str = "https://trust.airbyte.com/subprocessors";
+    assert _find_company(fixture_domain) is None;
+
+    discovered: search = asyncio.run(
+        _search_for_test(
+            "https://airbyte.com/legal/subprocessors",
+            True
+        )
+    );
+    discovery_payload = discovered.reports[0];
+    assert discovery_payload["discovered"];
+    assert len(discovery_payload["results"] as list) == 1;
+    discovery_resolved = discovery_payload["resolved"];
+    assert discovery_resolved is not None;
+    assert (discovery_resolved["domain"] as str) == fixture_domain;
+    assert (discovery_resolved["source_url"] as str) == fixture_url;
+    assert (discovery_resolved["match"] as str) == "discovery";
+    assert _find_company(fixture_domain) is not None;
+
+    fast_again: search = asyncio.run(
+        _search_for_test("Airbyte")
+    );
+    assert not fast_again.reports[0]["discovered"];
+    assert fast_again.reports[0]["resolved"] is not None;
 }
 
 test "the inbound view answers who depends on this" {

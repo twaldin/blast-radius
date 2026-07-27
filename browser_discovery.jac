@@ -4,6 +4,7 @@ import asyncio;
 import json;
 import os;
 import re;
+import shutil;
 import subprocess;
 import from pathlib { Path }
 import from urllib.parse { urlparse }
@@ -20,6 +21,18 @@ obj BrowserPageResult {
 
 glob BROWSER_RESULT_PREFIX: str = "BLAST_RADIUS_BROWSER_RESULT:";
 glob BROWSER_WORKER_PATH: Path = Path("browser_worker.py");
+
+
+def browser_harness_available() -> bool {
+    binary: str = os.getenv(
+        "BLAST_RADIUS_BROWSER_HARNESS",
+        "browser-harness"
+    );
+    return (
+        BROWSER_WORKER_PATH.exists()
+        and shutil.which(binary) is not None
+    );
+}
 
 
 def normalize_identity(value: str) -> str {
@@ -135,17 +148,21 @@ def _run_browser_worker(
     task: dict[str, str],
     timeout_seconds: int
 ) -> BrowserPageResult {
-    if not BROWSER_WORKER_PATH.exists() {
+    if not browser_harness_available() {
         return BrowserPageResult(
             status="error",
-            error=f"Missing Browser Harness worker: {BROWSER_WORKER_PATH}"
+            error="Browser Harness is unavailable"
         );
     }
+    binary: str = os.getenv(
+        "BLAST_RADIUS_BROWSER_HARNESS",
+        "browser-harness"
+    );
     worker_env = os.environ.copy();
     worker_env["BLAST_RADIUS_BROWSER_TASK"] = json.dumps(task);
     try {
         completed = subprocess.run(
-            ["browser-harness"],
+            [binary],
             input=BROWSER_WORKER_PATH.read_text(),
             capture_output=True,
             text=True,

@@ -1,12 +1,14 @@
 """Registry resolution, typed extraction, canonicalization, and browser fallback."""
 
 import asyncio;
+import json;
 import os;
 import re;
 import from datetime { datetime, timezone }
-import from byllm.lib { ByLLMError, Model }
+import from jaclang.byllm.lib { ByLLMError, Model }
 import from browser_discovery {
     BrowserPageResult,
+    browser_harness_available,
     browser_read,
     browser_read_url,
     browser_search,
@@ -27,7 +29,12 @@ import from registry {
 # runtime falls back to OpenAI and every call in this file dies with
 # "Missing credentials" -- which is exactly what it did until now. Bind the
 # provider explicitly; override per-environment with BLAST_RADIUS_MODEL.
-glob llm = Model(model_name=os.getenv("BLAST_RADIUS_MODEL", "gemini/gemini-2.5-flash"));
+# LiteLLM reads OPENROUTER_API_KEY for the OpenRouter provider.
+glob llm = Model(model_name=os.getenv(
+    "BLAST_RADIUS_MODEL"
+) or os.getenv(
+    "BYLLM_DEFAULT_MODEL"
+) or "openrouter/openai/gpt-4.1-mini");
 
 
 obj BrowserDiscoveryResult {
@@ -516,6 +523,9 @@ async def discover_with_browser(
     ) {
         return BrowserDiscoveryResult(status="notfound");
     }
+    if not browser_harness_available() {
+        return BrowserDiscoveryResult(status="unreadable");
+    }
 
     source_urls: list[str] = [];
     try {
@@ -602,29 +612,67 @@ async def discover_with_browser(
 }
 
 
-"""Resolve a domain to a subprocessor source URL, escalating to the agentic
-browser discovery path only when the deterministic registry lookups miss.
-Never raises: any agent failure degrades to "" (notfound)."""
-async def discover_and_resolve(domain: str, company_keyword: str) -> str {
+async def _discover_and_resolve(
+    domain: str,
+    company_keyword: str
+) -> str {
     normalized: str = normalize_company_domain(domain);
+    keyword: str = company_keyword.strip();
+    if (
+        (not normalized and not keyword)
+        or len(normalized) > 253
+        or len(keyword) > 200
+        or not re.search(r"[a-zA-Z0-9]", normalized + keyword)
+    ) {
+        return "";
+    }
     existing: str = await resolve_url(normalized);
     if existing {
         return existing;
     }
-    try {
-        result: BrowserDiscoveryResult = await discover_with_browser(
-            company_keyword or normalized,
-            normalized,
-            []
+    result: BrowserDiscoveryResult = await discover_with_browser(
+        keyword or normalized,
+        normalized,
+        []
+    );
+    if result.status == "found" and result.primary_source_url {
+        _ = remember_discovery(
+            result.company_name,
+            result.company_domain or normalized,
+            result.source_urls
         );
-        if result.status == "found" and result.primary_source_url {
-            _ = remember_discovery(
-                result.company_name,
-                result.company_domain or normalized,
-                result.source_urls
-            );
-            return result.primary_source_url;
-        }
-    } except Exception {}
+        return result.primary_source_url;
+    }
     return "";
+}
+
+
+"""Resolve a domain to a source URL within 45 seconds. Never raises: invalid
+input, unavailable tooling, model failures, and timeouts all degrade to ""."""
+async def discover_and_resolve(domain: str, company_keyword: str) -> str {
+    try {
+        return await asyncio.wait_for(
+            _discover_and_resolve(domain, company_keyword),
+            timeout=45.0
+        );
+    } except ByLLMError {
+        return "";
+    } except Exception {
+        return "";
+    }
+}
+
+
+"""CLI entry point for sending one live byLLM DPA/subprocessor search.
+
+Usage:
+    jac run extract.jac --entry search_dpa_sources "Vercel" "vercel.com"
+"""
+def search_dpa_sources(
+    company_keyword: str,
+    domain: str
+) -> list[str] {
+    urls: list[str] = find_dpa_sources(company_keyword, domain);
+    print(json.dumps(urls));
+    return urls;
 }
