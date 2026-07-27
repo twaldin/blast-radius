@@ -16,7 +16,7 @@ glob PRUNE_ABOVE: int = 10;
 glob SEED_DOMAIN: str = "jachammer.ai";
 
 async def call_walker(name: str, payload: any) -> any {
-    resp = await fetch("/walker/" + name, {
+    resp: any = await fetch("/walker/" + name, {
         "method": "POST",
         "headers": {"content-type": "application/json"},
         "body": JSON.stringify(payload)
@@ -67,11 +67,61 @@ def build_graph(raw_nodes: any, raw_edges: any) -> any {
         src = e["source"];
         tgt = e["target"] if kept[e["target"]] else "__other";
         if not kept[src] { continue; }
-        out_links = out_links + [{"source": src, "target": tgt, "kind": e["kind"], "handles_pii": e["handles_pii"]}];
+        out_links = out_links + [{"source": src, "target": tgt, "kind": e["kind"],
+            "purpose": e["purpose"] if "purpose" in (e as dict) else "",
+            "region": e["region"] if "region" in (e as dict) else "",
+            "region_codes": e["region_codes"] if "region_codes" in (e as dict) else [],
+            "handles_pii": e["handles_pii"]}];
         edge_keys[(src as str) + ">" + (tgt as str)] = True;
     }
 
     return {"nodes": out_nodes, "links": out_links, "edge_keys": edge_keys};
+}
+
+"""BFS depth from the viewed company over the BUILT links, attached to every
+node as `depth`. The server's `tier` collapses distance >= 2 into "provider";
+the circuit renderer wants real columns, so keep the exact hop count."""
+def annotate_depth(raw_nodes: any, raw_edges: any, root_id: str) -> list[any] {
+    adj: dict = {};
+    for e in raw_edges {
+        src: str = e["source"] as str;
+        prev: any = adj[src] if src in adj else [];
+        adj[src] = (prev as list) + [e["target"]];
+    }
+    depth: dict = {};
+    frontier: list[str] = [];
+    if root_id {
+        depth[root_id] = 0;
+        frontier = [root_id];
+    }
+    hop = 0;
+    while len(frontier) > 0 {
+        hop = hop + 1;
+        nxt: list[str] = [];
+        for s in frontier {
+            if s not in adj { continue; }
+            for t in (adj[s] as list) {
+                tid: str = t as str;
+                if tid in depth { continue; }
+                depth[tid] = hop;
+                nxt.append(tid);
+            }
+        }
+        frontier = nxt;
+    }
+    out: list[any] = [];
+    for n in raw_nodes {
+        nid: str = n["id"] as str;
+        fallback: int = 0 if n["tier"] == "org" else (1 if n["tier"] == "vendor" else 2);
+        d: int = (depth[nid] as int) if nid in depth else fallback;
+        out = out + [{**n, "depth": d}];
+    }
+    return out;
+}
+
+def edge_region_codes(l: any) -> list[any] {
+    codes: any = l["region_codes"] if "region_codes" in (l as dict) else [];
+    return (codes or []) as list;
 }
 
 def choke_for(rows: any, provider_id: str) -> any {
@@ -103,13 +153,16 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
     has loading: bool = True;
     has crawling: bool = False;
     has failed: bool = False;
+    has companies: list[any] = [];
+    has atlas_total: int = 0;
+    has region: str = "";
 
     async def refresh_insights(domain: str = "") -> None {
         ranked = await call_walker("chokepoints", {"domain": domain});
         gaps = await call_walker("compliance_fallout", {"domain": domain});
         one = await call_walker("one_look", {"domain": domain});
-        chokes = ranked or [];
-        fallout = gaps or [];
+        chokes = ((ranked or []) as list);
+        fallout = ((gaps or []) as list);
         headline = one;
         if ranked and len(ranked as list) > 0 and not selected {
             selected = ranked[0]["provider_id"] as str;
@@ -139,8 +192,8 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
                 );
             }
             built = build_graph(graph["nodes"], graph["edges"]);
-            nodes = built["nodes"];
-            links = built["links"];
+            links = (built["links"] as list);
+            nodes = annotate_depth((built["nodes"] as list), links, ((graph["root"] or "") as str));
             edge_keys = built["edge_keys"];
             loaded_domain = (graph["root_domain"] or domain) as str;
             org_domain = loaded_domain;
@@ -151,11 +204,23 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         } finally {
             # the poll must die even when expand rejects, or it hammers the
             # server at 700ms behind a failed screen
-            clearInterval(timer);
+            clearInterval(timer as float);
             crawling = False;
         }
         await poll_progress(loaded_domain);
         await refresh_insights(loaded_domain);
+    }
+
+    async def refresh_atlas_list() -> None {
+        try {
+            res = await call_walker("atlas", {});
+            if res {
+                companies = ((res["companies"] or []) as list);
+                atlas_total = ((res["total"] or 0) as int);
+            }
+        } except Exception as e {
+            console.error("[blast-radius] atlas list failed", e);
+        }
     }
 
     async can with entry {
@@ -164,6 +229,7 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             if not seeded or not seeded["ready"] {
                 raise Exception("Committed atlas seed could not be loaded");
             }
+            await refresh_atlas_list();
             await load_graph();
             loading = False;
         } except Exception as e {
@@ -238,8 +304,8 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
                 return;
             }
             built = build_graph(graph["nodes"], graph["edges"]);
-            nodes = built["nodes"];
-            links = built["links"];
+            links = (built["links"] as list);
+            nodes = annotate_depth((built["nodes"] as list), links, ((graph["root"] or "") as str));
             edge_keys = built["edge_keys"];
             loaded_domain: str = (
                 graph["root_domain"] or domain
@@ -283,14 +349,52 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         outage_hop = -1;
     }
 
-    vendors: any = [n for n in nodes if n["tier"] == "vendor"];
-    providers: any = [n for n in nodes if n["tier"] == "provider"];
+    def set_region(code: str) -> None {
+        region = code or "";
+    }
+
+    # ------------------------------------------------- derived, per render
+    root_id: str = "";
+    for n in nodes {
+        if n["tier"] == "org" { root_id = n["id"] as str; }
+    }
+    links_f: list[any] = links if not region
+        else [l for l in links if region in edge_region_codes(l)];
+    kept_f: dict = {};
+    if region {
+        if root_id { kept_f[root_id] = True; }
+        for l in links_f {
+            kept_f[l["source"] as str] = True;
+            kept_f[l["target"] as str] = True;
+        }
+    }
+    nodes_f: list[any] = nodes if not region
+        else [n for n in nodes if (n["id"] as str) in kept_f];
+    keys_f: dict = {};
+    for l in links_f {
+        keys_f[(l["source"] as str) + ">" + (l["target"] as str)] = True;
+    }
+    region_seen: dict = {};
+    regions: list[str] = [];
+    for l in links {
+        for rc in edge_region_codes(l) {
+            code: str = rc as str;
+            if code and code not in region_seen {
+                region_seen[code] = True;
+                regions = regions + [code];
+            }
+        }
+    }
+    regions = sorted(regions);
+
+    vendors: any = [n for n in nodes_f if n["tier"] == "vendor"];
+    providers: any = [n for n in nodes_f if n["tier"] == "provider"];
 
     value: any = {
         "state": {
-            "nodes": nodes,
-            "links": links,
-            "edge_keys": edge_keys,
+            "nodes": nodes_f,
+            "links": links_f,
+            "edge_keys": keys_f,
             "vendors": vendors,
             "providers": providers,
             "chokes": chokes,
@@ -299,8 +403,14 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             "headline": headline,
             "org_label": org_label,
             "org_domain": org_domain,
-            "vendor_total": len(vendors),
-            "provider_total": len(providers),
+            "company_domain": org_domain,
+            "root_id": root_id,
+            "companies": companies,
+            "atlas_total": atlas_total,
+            "regions": regions,
+            "region": region,
+            "vendor_total": len(vendors as list),
+            "provider_total": len(providers as list),
             "selected": selected,
             "active": choke_for(chokes, selected),
             "top": chokes[0] if chokes and len(chokes as list) > 0 else None,
@@ -315,7 +425,9 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
             "ingest": ingest,
             "addManual": add_manual,
             "search": search_company,
-            "openCompany": open_company
+            "openCompany": open_company,
+            "view": open_company,
+            "setRegion": set_region
         },
         "meta": {
             "loading": loading,

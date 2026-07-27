@@ -1,25 +1,18 @@
-"""The dependency figure, drawn as SVG.
+"""The dependency figure, drawn as a circuit schematic.
 
-This used to run on react-force-graph. That was the wrong tool: every position
-here is computed exactly, so a physics engine bought us nothing and cost a
-great deal -- it re-seeded the simulation on every render, swallowed wheel
-events, and repainted the whole canvas per frame, which is what produced the
-flashing and the clipped animation.
-
-Plain SVG instead. Deterministic geometry, real DOM nodes for hover and click,
-and CSS transitions for the outage choreography.
-
-Flow and massing follow the data-maximalist draft; the orthogonal traces,
-squares and blast treatment follow the Swiss memo. The two bands bow toward
-each other so the field pinches at the shared provider.
+Columns of squares left -> right — org bar, vendors, providers, regions —
+with orthogonal PCB traces between them. Geometry is a pure function of the
+payload (see graph_core); this file is rendering and interaction only:
+hover/selection classes, keyboard-operable providers, and the staged outage
+cascade, all driven by CSS classes so the blast is a transition, not a
+per-frame repaint.
 """
+
+cl import "./circuit.css";
 
 cl {
 import from .store { useRisk }
-import from .graph_core { burst_layout, node_radius, place_x, place_y, label_side, trace_path }
-
-glob VB_W: float = 1000.0;
-glob VB_H: float = 720.0;
+import from .graph_core { circuit_layout, circuit_channels, trace_path }
 
 def:pub DependencyGraph() -> JsxElement {
     risk: any = useRisk();
@@ -34,25 +27,57 @@ def:pub DependencyGraph() -> JsxElement {
     selected: str = st["selected"] as str;
     outage: any = st["outage"];
     hop: int = st["outage_hop"] as int;
-    down_ids: any = st["down_ids"];
     failed_id: str = (outage["provider_id"] as str) if outage else "";
     active: any = st["active"];
 
+    down_set: dict = {};
+    for did in (st["down_ids"] as list) { down_set[(did as str)] = True; }
+
     ranked_ids: list[str] = [c["provider_id"] as str for c in st["chokes"]];
-    placed: any = burst_layout(nodes, links, ranked_ids);
+
+    # ---- region column synthesis: strict dedupe, node lists first, then
+    # edge region_codes; nothing anywhere -> no region column at all
+    region_codes: list[str] = [];
+    for n in nodes {
+        if "regions" in (n as dict) and n["regions"] {
+            for r in (n["regions"] as list) {
+                rc = (r.toUpperCase() as str);
+                if rc and rc not in region_codes { region_codes.append(rc); }
+            }
+        }
+    }
+    if len(region_codes) == 0 {
+        for l in links {
+            if "region_codes" in (l as dict) and l["region_codes"] {
+                for r in (l["region_codes"] as list) {
+                    rc = (r.toUpperCase() as str);
+                    if rc and rc not in region_codes { region_codes.append(rc); }
+                }
+            }
+        }
+    }
+    region_codes = sorted(region_codes);
+
+    model: any = circuit_layout(nodes, links, ranked_ids, region_codes);
+    placed: any = model["nodes"];
+    vb_w: float = (model["w"] as float);
+    vb_h: float = (model["h"] as float);
 
     pos: dict = {};
     for n in placed {
-        pos[n["id"]] = {"x": place_x(n), "y": place_y(n), "n": n};
+        pos[(n["id"] as str)] = {
+            "x": n["__x"], "y": n["__y"], "h": n["__h"],
+            "col": n["__col"], "bh": n["__bh"], "n": n
+        };
     }
 
-    vendor_n: int = len([n for n in nodes if n["tier"] == "vendor"]);
-    provider_n: int = len([n for n in nodes if n["tier"] == "provider"]);
+    all_links: list = [l for l in links] + [r for r in (model["rlinks"] as list)];
+    chans: any = circuit_channels(all_links, pos);
 
     def down_now(n: any) -> bool {
         if not outage { return False; }
         if n["id"] == failed_id { return hop >= 0; }
-        if n["tier"] == "vendor" { return hop >= 1 and down_ids.includes(n["id"]); }
+        if n["tier"] == "vendor" { return hop >= 1 and (n["id"] as str) in down_set; }
         if n["tier"] == "org" { return hop >= 2; }
         return False;
     }
@@ -64,8 +89,8 @@ def:pub DependencyGraph() -> JsxElement {
     if focus_id {
         lit[focus_id] = True;
         for l in links {
-            s = l["source"] as str;
-            t = l["target"] as str;
+            s = (l["source"] as str);
+            t = (l["target"] as str);
             if s == focus_id { lit[t] = True; }
             if t == focus_id { lit[s] = True; }
         }
@@ -77,63 +102,98 @@ def:pub DependencyGraph() -> JsxElement {
     }
 
     def cls_for(n: any) -> str {
-        c = "gnode gnode-" + (n["tier"] as str);
+        c = "cir-node cir-node-" + (n["tier"] as str);
         if n["id"] == core_id { c = c + " is-core"; }
         if n["id"] == selected { c = c + " is-sel"; }
         if n["id"] == hovered { c = c + " is-hov"; }
         if down_now(n) { c = c + " is-down"; }
         if outage and not down_now(n) { c = c + " is-mute"; }
         # only the pointer dims the field; a selection stays legible in context
-        if hovered and not (n["id"] in lit) { c = c + " is-dim"; }
-        if n["supply_chain_risk"] or (not n["soc2"]) { c = c + " is-flag"; }
+        if hovered and not ((n["id"] as str) in lit) { c = c + " is-dim"; }
+        if n["supply_chain_risk"] or n["soc2"] == False { c = c + " is-flag"; }
         return c;
     }
 
     def trace_cls(l: any) -> str {
-        if outage {
-            if (l["target"] as str) == failed_id and hop >= 1 { return "trace is-hot"; }
-            return "trace is-mute";
+        if (l["kind"] as str) == "region" {
+            if outage { return "cir-trace is-region is-mute"; }
+            if touches(l) { return "cir-trace is-region is-lit"; }
+            if hovered { return "cir-trace is-region is-dim"; }
+            return "cir-trace is-region";
         }
-        if touches(l) { return "trace is-lit"; }
-        if hovered { return "trace is-dim"; }
-        return "trace";
+        if outage {
+            if (l["target"] as str) == failed_id and hop >= 1 { return "cir-trace is-hot"; }
+            return "cir-trace is-mute";
+        }
+        if touches(l) { return "cir-trace is-lit"; }
+        if hovered { return "cir-trace is-dim"; }
+        return "cir-trace";
     }
 
-    def pick(n: any) -> None {
-        if n["tier"] == "provider" { acts["select"](n["id"] as str); }
+    def pick(n: any) {
+        if n["tier"] == "provider" { acts["select"]((n["id"] as str)); }
     }
-    return <div className="graph-surface">
-        <svg className="fig" viewBox={"0 0 " + str(VB_W) + " " + str(VB_H)} preserveAspectRatio="xMidYMid meet">
-            {#* ------------------------------------------- ring furniture *#}
-            <g className="fig-furniture">
-                <ellipse className="ring" cx={500} cy={360} rx={178} ry={164} />
-                <ellipse className="ring" cx={500} cy={360} rx={292} ry={269} />
+
+    def meta_line(n: any) -> str {
+        m = "IN-DEGREE " + str(n["inbound_degree"] or 0);
+        dt = n["downtime_hours_ytd"] or 0;
+        if dt > 0 { m = m + " · " + str(dt) + "H YTD"; }
+        if n["soc2"] == False { m = m + " · NO SOC 2"; }
+        return m;
+    }
+
+    choke_txt = "";
+    if st["top"] and "share" in (st["top"] as dict) {
+        choke_txt = "← CHOKEPOINT — CARRIES "
+            + str(round((st["top"]["share"] as float) * 100)) + "% OF STACK";
+    }
+
+    stamp_pct = "";
+    if outage {
+        src: any = active if active else st["top"];
+        if src and "share" in (src as dict) {
+            stamp_pct = str(round((src["share"] as float) * 100)) + "%";
+        }
+    }
+
+    # precompute trace rows so every drawn link has a channel and a path
+    trace_rows: list = [];
+    for l in all_links {
+        k = (l["source"] as str) + ">" + (l["target"] as str);
+        if k in (chans as dict) {
+            dpath = trace_path(pos, l["source"] as str, l["target"] as str, chans[k]);
+            if dpath { trace_rows.append({"k": k, "d": dpath, "cls": trace_cls(l)}); }
+        }
+    }
+
+    return <div className="circuit-surface">
+        <svg
+            className="circuit"
+            viewBox={"0 0 " + str(vb_w) + " " + str(vb_h)}
+            preserveAspectRatio="xMidYMin meet"
+            role="img"
+            aria-label="Supply-chain dependency diagram"
+        >
+            {#* ------------------------------------- column guides + headers *#}
+            <g className="cir-grid">
+                {for c in (model["cols"] as list) {
+                    <line key={"g-" + (c["title"] as str)} x1={c["x"]} y1={44} x2={c["x"]} y2={vb_h - 14} />
+                }}
             </g>
-
-            {#* ------------------------------- affected wedges during a blast *#}
-            {if outage and hop >= 1 {
-                <g className="fig-wash">
-                    {for n in placed {
-                        if n["tier"] == "vendor" and down_ids.includes(n["id"]) {
-                            <circle key={n["id"]} cx={place_x(n)} cy={place_y(n)} r={26} />
-                        }
-                    }}
-                </g>
-                skip;
+            {for c in (model["cols"] as list) {
+                <text key={"h-" + (c["title"] as str)} className="cir-head" x={c["x"]} y={30} textAnchor={"middle"}>
+                    {c["title"]}
+                </text>
             }}
 
-            {#* ---------------------------------------------- orthogonal traces *#}
-            <g className="fig-traces">
-                {for l in links {
-                    <path
-                        key={(l["source"] as str) + ">" + (l["target"] as str)}
-                        className={trace_cls(l)}
-                        d={trace_path(pos, l["source"] as str, l["target"] as str, core_id, l["kind"] as str)}
-                    />
+            {#* ------------------------------------------------------ traces *#}
+            <g className="cir-traces">
+                {for t in trace_rows {
+                    <path key={t["k"]} className={t["cls"]} d={t["d"]} />
                 }}
             </g>
 
-            {#* ---------------------------------------------- nodes *#}
+            {#* -------------------------------------------------------- nodes *#}
             {for n in placed {
                 <g
                     key={n["id"]}
@@ -150,84 +210,149 @@ def:pub DependencyGraph() -> JsxElement {
                 >
                     {#* a generous invisible target: the glyphs are far too
                         small to be a reliable click area on a projector *#}
-                    <circle
+                    <rect
                         className="hit"
-                        cx={place_x(n)}
-                        cy={place_y(n)}
-                        r={node_radius(n, core_id, 1.0) + 16}
+                        x={(n["__x"] as float) - (n["__h"] as float) - 10}
+                        y={(n["__y"] as float) - (n["__h"] as float) - 10}
+                        width={((n["__h"] as float) + 10) * 2}
+                        height={((n["__h"] as float) + 10) * 2}
                     />
-                    {if n["tier"] == "provider" {
-                        <circle cx={place_x(n)} cy={place_y(n)} r={node_radius(n, core_id, 1.0)} />
+
+                    {if n["tier"] == "org" {
+                        <rect
+                            className="shape"
+                            x={(n["__x"] as float) - 7}
+                            y={(n["__y"] as float) - (n["__bh"] as float) / 2}
+                            width={14}
+                            height={n["__bh"]}
+                        />
+                        <text
+                            className="cir-lbl-org"
+                            x={(n["__x"] as float) - 16}
+                            y={(n["__y"] as float) - (n["__bh"] as float) / 2 - 8}
+                            textAnchor={"end"}
+                        >
+                            {(n["label"] as any).toUpperCase()}
+                        </text>
+                        <text
+                            className="cir-lbl-orgsub"
+                            x={(n["__x"] as float) - 16}
+                            y={(n["__y"] as float) - (n["__bh"] as float) / 2 + 6}
+                            textAnchor={"end"}
+                        >ROOT ORG</text>
                         skip;
                     }}
-                    {if n["tier"] != "provider" {
+
+                    {if n["tier"] == "vendor" {
                         <rect
-                            x={place_x(n) - node_radius(n, core_id, 1.0)}
-                            y={place_y(n) - node_radius(n, core_id, 1.0)}
-                            width={node_radius(n, core_id, 1.0) * 2}
-                            height={node_radius(n, core_id, 1.0) * 2}
+                            className="shape"
+                            x={(n["__x"] as float) - (n["__h"] as float)}
+                            y={(n["__y"] as float) - (n["__h"] as float)}
+                            width={(n["__h"] as float) * 2}
+                            height={(n["__h"] as float) * 2}
                         />
+                        <text
+                            className="cir-lbl-vend"
+                            x={(n["__x"] as float) - 16}
+                            y={(n["__y"] as float) - 11}
+                            textAnchor={"end"}
+                        >
+                            {(n["label"] as any).toUpperCase()}
+                        </text>
+                        if n["__meta"] {
+                            <text
+                                className="cir-lbl-vmeta"
+                                x={(n["__x"] as float) - 16}
+                                y={(n["__y"] as float) - 22}
+                                textAnchor={"end"}
+                            >
+                                {meta_line(n)}
+                            </text>
+                            skip;
+                        }
+                        if down_now(n) {
+                            <text
+                                className="cir-x"
+                                x={(n["__x"] as float) - (n["__h"] as float) - 5}
+                                y={(n["__y"] as float) + 4}
+                                textAnchor={"end"}
+                            >✕</text>
+                            skip;
+                        }
                         skip;
                     }}
 
                     {if n["tier"] == "provider" {
-                        <text
-                            className={"lbl-name" + (" lbl-end" if label_side(n) < 0 else "")}
-                            x={place_x(n) + (node_radius(n, core_id, 1.0) + 12) * label_side(n)}
-                            y={place_y(n) - 1}
-                        >
-                            {(n["label"] as any).toUpperCase()}
-                        </text>
-                        <text
-                            className={"lbl-meta" + (" lbl-end" if label_side(n) < 0 else "")}
-                            x={place_x(n) + (node_radius(n, core_id, 1.0) + 12) * label_side(n)}
-                            y={place_y(n) + 13}
-                        >
-                            {"IN-DEGREE " + str(n["inbound_degree"] or 0)}
-                        </text>
-                        if n["id"] == core_id and not outage {
+                        <rect
+                            className="shape"
+                            x={(n["__x"] as float) - (n["__h"] as float)}
+                            y={(n["__y"] as float) - (n["__h"] as float)}
+                            width={(n["__h"] as float) * 2}
+                            height={(n["__h"] as float) * 2}
+                        />
+                        if n["id"] == core_id and choke_txt and not outage {
                             <text
-                                className={"lbl-choke" + (" lbl-end" if label_side(n) < 0 else "")}
-                                x={place_x(n) + (node_radius(n, core_id, 1.0) + 12) * label_side(n)}
-                                y={place_y(n) + 26}
-                            >CHOKEPOINT</text>
+                                className="cir-lbl-choke"
+                                x={(n["__x"] as float) + (n["__h"] as float) + 14}
+                                y={(n["__y"] as float) - 14}
+                            >
+                                {choke_txt}
+                            </text>
                             skip;
                         }
-                        skip;
-                    }}
-                    {if n["tier"] == "org" {
-                        <text className="lbl-org" x={place_x(n)} y={place_y(n) + node_radius(n, core_id, 1.0) + 18}>
-                            {(n["label"] as any).toUpperCase()}
-                        </text>
-                        skip;
-                    }}
-                    {if n["tier"] == "vendor" {
                         <text
-                            className={"lbl-vend" + (" lbl-end" if label_side(n) < 0 else "")}
-                            x={place_x(n) + (node_radius(n, core_id, 1.0) + 9) * label_side(n)}
-                            y={place_y(n) + 3}
+                            className="cir-lbl-name"
+                            x={(n["__x"] as float) + (n["__h"] as float) + 14}
+                            y={(n["__y"] as float) + (4 if n["__meta"] else 3)}
                         >
                             {(n["label"] as any).toUpperCase()}
                         </text>
-                        if down_now(n) {
-                            <text className="lbl-x" x={place_x(n)} y={place_y(n) - node_radius(n, core_id, 1.0) - 7}>✕</text>
+                        if n["__meta"] {
+                            <text
+                                className="cir-lbl-meta"
+                                x={(n["__x"] as float) + (n["__h"] as float) + 14}
+                                y={(n["__y"] as float) + 18}
+                            >
+                                {meta_line(n)}
+                            </text>
                             skip;
                         }
+                        skip;
+                    }}
+
+                    {if n["tier"] == "region" {
+                        <rect
+                            className="shape"
+                            x={(n["__x"] as float) - (n["__h"] as float)}
+                            y={(n["__y"] as float) - (n["__h"] as float)}
+                            width={(n["__h"] as float) * 2}
+                            height={(n["__h"] as float) * 2}
+                        />
+                        <text
+                            className="cir-lbl-region"
+                            x={(n["__x"] as float) + (n["__h"] as float) + 10}
+                            y={(n["__y"] as float) + 3}
+                        >
+                            {(n["label"] as any).toUpperCase()}
+                        </text>
                         skip;
                     }}
                 </g>
             }}
 
-            {#* ---------------------------------------------- blast stamp *#}
-            {if outage and active and failed_id in pos {
-                fx: float = pos[failed_id]["x"] as float;
-                fy: float = pos[failed_id]["y"] as float;
-                <g className="fig-stamp">
-                    <rect x={fx - 168.0} y={fy - 26.0} width={116} height={52} />
-                    <text className="stamp-pct" x={fx - 110.0} y={fy + 2.0}>
-                        {str(round((active["share"] as float) * 100)) + "%"}
+            {#* -------------------------------------------------- blast stamp *#}
+            {if outage and failed_id in (pos as dict) {
+                fx: float = ((pos[failed_id])["x"] as float);
+                fy: float = ((pos[failed_id])["y"] as float);
+                fh: float = ((pos[failed_id])["h"] as float);
+                <g className="cir-stamp">
+                    <rect x={fx - fh - 14 - 118} y={fy - 26} width={118} height={52} />
+                    <text className="cir-stamp-pct" x={fx - fh - 14 - 59} y={fy + 4} textAnchor={"middle"}>
+                        {stamp_pct}
                     </text>
-                    <text className="stamp-cap" x={fx - 110.0} y={fy + 17.0}>OF STACK DOWN</text>
+                    <text className="cir-stamp-cap" x={fx - fh - 14 - 59} y={fy + 18} textAnchor={"middle"}>
+                        OF STACK DOWN
+                    </text>
                 </g>
                 skip;
             }}

@@ -551,10 +551,10 @@ def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bo
         }
     }
     prof = provider_profile(label);
-    made: Company = root ++> Company(
+    made: Company = (root ++> Company(
         domain=dom, name=label, slug=prof.slug or _slugify(label) or _slugify(dom),
         category=prof.category, is_sink=prof.is_sink
-    );
+    ))[0];
     idx[key] = made;
     return made;
 }

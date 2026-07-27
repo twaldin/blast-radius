@@ -5,7 +5,7 @@ import json;
 import os;
 import re;
 import from datetime { datetime, timezone }
-import from jaclang.byllm.lib { ByLLMError, Model }
+import from byllm.lib { ByLLMError, Model }
 import from browser_discovery {
     BrowserPageResult,
     browser_harness_available,
@@ -651,10 +651,11 @@ async def _discover_and_resolve(
 input, unavailable tooling, model failures, and timeouts all degrade to ""."""
 async def discover_and_resolve(domain: str, company_keyword: str) -> str {
     try {
-        return await asyncio.wait_for(
+        got: any = await asyncio.wait_for(
             _discover_and_resolve(domain, company_keyword),
             timeout=45.0
         );
+        return (got or "") as str;
     } except ByLLMError {
         return "";
     } except Exception {

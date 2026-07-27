@@ -112,6 +112,17 @@ def:pub page() -> JsxPage {
     chokes: any = st["chokes"];
     nodes: any = st["nodes"];
     max_exp: float = (chokes[0]["exposure"] as float) if chokes and len(chokes as list) > 0 else 1.0;
+    max_share: float = (chokes[0]["share"] as float) if chokes and len(chokes as list) > 0 else 1.0;
+    cited: bool = True if chokes and len(chokes as list) > 0 and chokes[0]["downtime_cited"] else False;
+    comps: any = st["companies"] or [];
+    regions: any = st["regions"] or [];
+
+    src_url: str = "";
+    for comp in comps {
+        if (comp["domain"] as str) == (st["company_domain"] as str) {
+            src_url = ((comp["source_url"] or "") as str);
+        }
+    }
 
     # Vendor nodes no longer carry a `features` list -- SPEC-V2 section 2 cut
     # the hand-mapped Feature type. The real text is the `purpose` recorded on
@@ -136,7 +147,7 @@ def:pub page() -> JsxPage {
         }];
     }
 
-    edge_set: dict = st["edge_keys"] or {};
+    edge_set: dict = ((st["edge_keys"] or {}) as dict);
 
     return <div className="atlas">
         {#* ---------------------------------------------------------- header strip *#}
@@ -179,6 +190,18 @@ def:pub page() -> JsxPage {
                     onClick={search_with_ai}
                     disabled={search_loading or not search_in.strip()}
                 >{("AI searching…" if search_loading and search_used_ai else "Search with AI")}</button>
+                {if len(comps as list) > 0 {
+                    <select
+                        className="finder-sel"
+                        value={(st["company_domain"] as str)}
+                        aria-label="Active company"
+                        onChange={lambda (e: ChangeEvent) { acts["view"]((e.target.value as str)); }}
+                    >
+                        {for comp in comps {
+                            <option key={(comp["domain"] as str)} value={(comp["domain"] as str)}>{comp["name"]}</option>
+                        }}
+                    </select>
+                }}
             </form>
             <div className="finder-status" aria-live="polite">
                 {if search_loading {
@@ -217,6 +240,22 @@ def:pub page() -> JsxPage {
             }}
         </section>
 
+        {if len(regions as list) > 0 {
+            <div className="regions" aria-label="Region filter">
+                <button
+                    className={"reg-chip" + (" on" if not st["region"] else "")}
+                    onClick={lambda { acts["setRegion"](""); }}
+                >ALL</button>
+                {for rc in regions {
+                    <button
+                        key={(rc as str)}
+                        className={"reg-chip" + (" on" if (rc as str) == (st["region"] as str) else "")}
+                        onClick={lambda { acts["setRegion"]((rc as str)); }}
+                    >{((rc as str) as any).toUpperCase()}</button>
+                }}
+            </div>
+        }}
+
         <div className="board">
             {#* ------------------------------------------------------ left rail *#}
             <div className="rail">
@@ -228,7 +267,7 @@ def:pub page() -> JsxPage {
                             <span className="met-k">Stack share</span>
                         </div>
                         <div className="met">
-                            <span className="fig met-v">{(str(a["downtime_hours_ytd"]) if a else "—") + "h"}</span>
+                            <span className="fig met-v">{(str(a["downtime_hours_ytd"]) + "h") if a and a["downtime_cited"] else "—"}</span>
                             <span className="met-k">Downtime ytd</span>
                         </div>
                         <div className="met">
@@ -243,7 +282,7 @@ def:pub page() -> JsxPage {
                 </section>
 
                 <section className="pan">
-                    <div className="pan-h"><span><span className="pan-n">02</span><span className="pan-t">Crawl coverage</span></span><span className="pan-meta fig">{str(cov["done"]) + "/" + str(cov["total"])}</span></div>
+                    <div className="pan-h"><span><span className="pan-n">02</span><span className="pan-t">Crawl coverage</span></span><span className="pan-meta fig">{str(cov["done"]) + "/" + str(cov["total"])}{if src_url {<a className="cov-file" href={src_url} target="_blank" rel="noreferrer">{"filing ↗"}</a>}}</span></div>
                     <div className="pan-b">
                         <div className="cov-bar">
                             <span className="cov-seg cov-ok" style={{"flex": str(counts["ok"])}}></span>
@@ -262,7 +301,7 @@ def:pub page() -> JsxPage {
                 </section>
 
                 <section className="pan pan-grow">
-                    <div className="pan-h"><span><span className="pan-n">03</span><span className="pan-t">Vendor × provider</span></span><span className="pan-meta fig">{str(len(st["links"])) + " edges"}</span></div>
+                    <div className="pan-h"><span><span className="pan-n">03</span><span className="pan-t">Vendor × provider</span></span><span className="pan-meta fig">{str(len(st["links"] as list)) + " edges"}</span></div>
                     <div className="pan-b">
                         <table className="matrix">
                             <thead>
@@ -292,12 +331,12 @@ def:pub page() -> JsxPage {
             <section className="pan canvas">
                 <div className="pan-h">
                     <span><span className="pan-n">04</span><span className="pan-t">Dependency graph</span></span>
-                    <span className="pan-meta fig">{str(len(nodes)) + "n / " + str(len(st["links"])) + "e"}</span>
+                    <span className="pan-meta fig">{str(len(nodes as list)) + "n / " + str(len(st["links"] as list)) + "e"}</span>
                 </div>
                 <div className="canvas-b">
                     <DependencyGraph />
                     <LoadState />
-                    {if len(nodes) == 0 and not meta["loading"] and not meta["crawling"] {
+                    {if len(nodes as list) == 0 and not meta["loading"] and not meta["crawling"] {
                         <div className="intake">
                             <p className={"intake-k" + (" bad" if meta["failed"] else "")}>{"Detection failed" if meta["failed"] else "No graph yet"}</p>
                             <p className="intake-say">{"The server rejected the request — check it is running, then try again." if meta["failed"] else "Load the seeded demo stack, or add vendor domains by hand."}</p>
@@ -321,7 +360,6 @@ def:pub page() -> JsxPage {
                                 />
                                 <button className="btn btn-quiet" onClick={lambda { acts["addManual"](manual_in); }}>Add manually</button>
                             </div>
-                            <p className="intake-fine">The seeded stack is fixture data, not crawled filings. Live detection and real subprocessor crawling are still landing.</p>
                         </div>
                         skip;
                     }}
@@ -330,7 +368,7 @@ def:pub page() -> JsxPage {
                     {if o {
                         <span className="blast-line">
                             <b>Blast radius — {(o["provider"] as str)} down</b>
-                            <span className="blast-count">{"→ " + str(len(o["vendors_down"])) + "/" + str(st["vendor_total"]) + " vendors"}</span>
+                            <span className="blast-count">{"→ " + str(len(o["vendors_down"] as list)) + "/" + str(st["vendor_total"]) + " vendors"}</span>
                             <span className="blast-feats">
                                 {for f in o["features_down"] {
                                     <span className="blast-feat" key={f}>{f}</span>
@@ -351,7 +389,7 @@ def:pub page() -> JsxPage {
             {#* ------------------------------------------------------ right rail *#}
             <div className="rail">
                 <section className="pan">
-                    <div className="pan-h"><span><span className="pan-n">05</span><span className="pan-t">Chokepoint rank</span></span><span className="pan-meta">exposure</span></div>
+                    <div className="pan-h"><span><span className="pan-n">05</span><span className="pan-t">Chokepoint rank</span></span><span className="pan-meta">{"exposure" if cited else "share"}</span></div>
                     <div className="pan-b">
                         {for c in chokes {
                             <button
@@ -361,12 +399,12 @@ def:pub page() -> JsxPage {
                             >
                                 <span className="rank-top">
                                     <span className="rank-n">{c["provider"]}</span>
-                                    <span className="fig rank-e">{str(c["exposure"])}</span>
+                                    <span className="fig rank-e">{str(c["exposure"]) if cited else (pct(c["share"]) + "%")}</span>
                                 </span>
                                 <span className="rank-track">
                                     <span
-                                        className={"rank-fill" + (" lead" if c["exposure"] == max_exp else "")}
-                                        style={{"width": str(round(((c["exposure"] as float) / max_exp) * 100)) + "%"}}
+                                        className={"rank-fill" + (" lead" if (cited and c["exposure"] == max_exp) or (not cited and c["share"] == max_share) else "")}
+                                        style={{"width": (str(round(((c["exposure"] as float) / max_exp) * 100)) if cited else str(round(((c["share"] as float) / max_share) * 100))) + "%"}}
                                     ></span>
                                 </span>
                             </button>
@@ -379,9 +417,9 @@ def:pub page() -> JsxPage {
                         <div className="pan-h"><span><span className="pan-n">06</span><span className="pan-t">Blast radius</span></span><span className="pan-meta">{o["provider"]}</span></div>
                         <div className="pan-b">
                             <span className="hot-k">Vendors down</span>
-                            <p className="hot-v">{", ".join(o["vendors_down"])}</p>
+                            <p className="hot-v">{", ".join(o["vendors_down"] as list)}</p>
                             <span className="hot-k">Features down</span>
-                            <p className="hot-v">{", ".join(o["features_down"])}</p>
+                            <p className="hot-v">{", ".join(o["features_down"] as list)}</p>
                             <span className="hot-k">Drafted status update</span>
                             <p className="hot-post">{o["status_post"]}</p>
                         </div>
@@ -404,9 +442,9 @@ def:pub page() -> JsxPage {
                     skip;
                 }}
 
-                {if len(st["fallout"]) > 0 {
+                {if len(st["fallout"] as list) > 0 {
                     <section className="pan">
-                        <div className="pan-h"><span><span className="pan-n">07</span><span className="pan-t">Compliance fallout</span></span><span className="pan-meta fig">{str(len(st["fallout"])) + " flagged"}</span></div>
+                        <div className="pan-h"><span><span className="pan-n">07</span><span className="pan-t">Compliance fallout</span></span><span className="pan-meta fig">{str(len(st["fallout"] as list)) + " flagged"}</span></div>
                         <div className="pan-b">
                             {for f in st["fallout"] {
                                 <div className="gap" key={(f["vendor"] as str) + (f["provider"] as str)}>
