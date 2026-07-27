@@ -81,6 +81,13 @@ node Snapshot { has taken_at: str; has company_count: int = 0;
                 has edge_count: int = 0; has edges: list[str] = []; }
 edge CapturedAt: Company --> Snapshot {}
 
+# SPEC §3 graph model, restored: a Region is a first-class node and HostedIn
+# links a company to every region its filing discloses. The raw filing string
+# stays on the Subprocesses edge (provenance); Region nodes carry the
+# normalized, queryable form.
+node Region { has code: str; }
+edge HostedIn: Company --> Region {}
+
 obj GraphView {
     has order: list[Company] = [];
     has dist: dict[str, int] = {};
@@ -108,6 +115,178 @@ def _slugify(s: str) -> str {
         elif not prev_dash { out.append("-"); prev_dash = True; }
     }
     return "".join(out).strip("-");
+}
+
+# ------------------------------------------------------------------ regions
+# A filing's raw "region" field is prose, not an enum ("USA* | USA or EU
+# (Dublin) as selected by customers"). This maps it to the region codes
+# actually disclosed. Honesty rule: "United States" -> "us", never an
+# invented "us-east-1"; an unrecognized token is slugified, not dropped, so
+# nothing silently disappears.
+glob REGION_NAME_CODES: dict[str, str] = {
+    "united states": "us", "usa": "us", "u.s.": "us", "u.s": "us", "us": "us",
+    "north america": "us",
+    "european union": "eu", "eu": "eu", "eea": "eu", "european economic area": "eu",
+    "united kingdom": "uk", "uk": "uk", "england": "uk",
+    "germany": "de", "ireland": "ie", "netherlands": "nl", "the netherlands": "nl",
+    "france": "fr", "spain": "es", "italy": "it", "belgium": "be",
+    "sweden": "se", "finland": "fi", "norway": "no", "switzerland": "ch",
+    "iceland": "is", "poland": "pl", "canada": "ca", "japan": "jp",
+    "australia": "au", "india": "in", "korea": "kr", "south korea": "kr",
+    "singapore": "sg", "brazil": "br", "mexico": "mx", "chile": "cl",
+    "south africa": "za", "israel": "il", "philippines": "ph",
+    "the philippines": "ph", "indonesia": "id", "malaysia": "my",
+    "united arab emirates": "ae",
+    # Extended from the real seed strings (seed/atlas/*.json).
+    "colombia": "co", "greece": "gr", "luxembourg": "lu", "denmark": "dk",
+    "taiwan": "tw", "hong kong": "hk", "bahrain": "bh", "thailand": "th",
+    "new zealand": "nz", "romania": "ro"
+};
+
+# Longest names first so a substring rescue prefers "united states" over "usa".
+glob REGION_NAMES_BY_LEN: list[str] = sorted(
+    REGION_NAME_CODES.keys(), key=len, reverse=True
+);
+
+# Parenthesised locales refine a code only when a city is disclosed:
+# "EU (Dublin)" -> "eu-dublin"; "(Zurich & London)" -> "ch-zurich", "uk-london".
+glob REGION_CITY_CODES: dict[str, str] = {
+    "dublin": "ie", "zurich": "ch", "london": "uk", "frankfurt": "de"
+};
+
+glob REGION_CUSTOMER_HINTS: list[str] = [
+    "customer selected", "see documentation", "closest to the end user",
+    "selected by customer", "customer may select", "location selected",
+    "during deployment"
+];
+
+glob REGION_GLOBAL_HINTS: list[str] = ["worldwide", "globally", "global"];
+
+# Classify one comma-free token. Returns "" for an empty token.
+def _region_token_code(raw_tok: str) -> str {
+    tok = raw_tok.strip();
+    if tok != "u.s." { tok = tok.rstrip("*").rstrip(".").strip(); }
+    # "USA or EU (...) as selected by Customers" — the selection clause is prose.
+    if " as selected by" in tok { tok = tok.split(" as selected by")[0].strip(); }
+    # Salesforce/MongoDB cell notation: "Standard Service – USA", "EU Cell - Germany".
+    if " – " in tok { tok = tok.split(" – ")[-1].strip(); }
+    if " - " in tok { tok = tok.split(" - ")[-1].strip(); }
+    # Continent prefixes: "South America: Chile", "Public Cloud: USA".
+    if ":" in tok { tok = tok.split(":")[-1].strip(); }
+    if tok.startswith("the ") { tok = tok[4:]; }
+    if not tok { return ""; }
+    if tok in REGION_NAME_CODES { return REGION_NAME_CODES[tok]; }
+    # Prose that still names a country ("Support team is located in Romania").
+    # Two-letter codes stay exact-only — "us" hides inside unrelated words.
+    for name in REGION_NAMES_BY_LEN {
+        if len(name) >= 3 and name in tok { return REGION_NAME_CODES[name]; }
+    }
+    for hint in REGION_CUSTOMER_HINTS {
+        if hint in tok { return "customer-select"; }
+    }
+    for hint in REGION_GLOBAL_HINTS {
+        if hint in tok { return "global"; }
+    }
+    return _slugify(tok);
+}
+
+def _region_codes(raw: str) -> list[str] {
+    text = raw.strip();
+    if not text { return []; }
+    low = " ".join(text.lower().split());
+
+    # Parenthesised groups come out before tokenizing: cities inside refine a
+    # code, country names inside still count ("(with the witness region in New
+    # Zealand)"), and the rest is annotation noise ("(data persistence/backups)")
+    # that must not become fake regions.
+    inner_parts: list[str] = [];
+    outer_parts: list[str] = [];
+    depth = 0;
+    for ch in low {
+        if ch == "(" { depth += 1; inner_parts.append(" "); continue; }
+        if ch == ")" {
+            if depth > 0 { depth -= 1; inner_parts.append(" "); }
+            continue;
+        }
+        if depth > 0 { inner_parts.append(ch); } else { outer_parts.append(ch); }
+    }
+    inner = " ".join("".join(inner_parts).split());
+    body = " ".join("".join(outer_parts).split());
+
+    codes: list[str] = [];
+    for sep in ["|", ";", "&", "/", " and ", " or "] {
+        body = body.replace(sep, ",");
+    }
+    for piece in body.split(",") {
+        code = _region_token_code(piece);
+        if code and code not in codes { codes.append(code); }
+    }
+    if inner {
+        for name in REGION_NAMES_BY_LEN {
+            if len(name) >= 3 and name in inner {
+                code = REGION_NAME_CODES[name];
+                if code not in codes { codes.append(code); }
+            }
+        }
+    }
+
+    # City refinement: one city refines the disclosed area code ("EU (Dublin)"
+    # -> "eu-dublin"); several cities each carry their own country.
+    cities: list[str] = [];
+    for city in REGION_CITY_CODES {
+        if city in inner and city not in cities { cities.append(city); }
+    }
+    if cities {
+        if len(cities) == 1 {
+            city = cities[0];
+            if "eu" in codes {
+                codes[codes.index("eu")] = "eu-" + city;
+            } elif len(codes) == 1 {
+                codes[0] = codes[0] + "-" + city;
+            } else {
+                refined = REGION_CITY_CODES[city] + "-" + city;
+                if refined not in codes { codes.append(refined); }
+            }
+        } else {
+            while "eu" in codes { codes.remove("eu"); }
+            for city in cities {
+                refined = REGION_CITY_CODES[city] + "-" + city;
+                if refined not in codes { codes.append(refined); }
+            }
+        }
+    }
+
+    for hint in REGION_CUSTOMER_HINTS {
+        if hint in low {
+            if "customer-select" not in codes { codes.append("customer-select"); }
+            break;
+        }
+    }
+    if not codes {
+        for hint in REGION_GLOBAL_HINTS {
+            if hint in low { codes.append("global"); break; }
+        }
+    }
+    return codes;
+}
+
+# One Region node per code, attached under root like companies are.
+def _region_node(code: str) -> Region {
+    for r in [root -->[?:Region]] {
+        if r.code == code { return r; }
+    }
+    return (root ++> Region(code=code))[0];
+}
+
+# Wire a company to every Region its filing discloses. Idempotent on both the
+# Region node (one per code) and the HostedIn edge (checked before connecting).
+def _host_regions(target: Company, raw_region: str) {
+    for code in _region_codes(raw_region) {
+        r = _region_node(code);
+        if r not in [target ->:HostedIn:->] {
+            target +>:HostedIn:+> r;
+        }
+    }
 }
 
 def _name_from_domain(dom: str) -> str {
@@ -442,11 +621,15 @@ def _node_payload(c: Company, tier: str, indeg: int) -> dict {
         if soc2_cited and evidence is not None
         else c.risk_source_url
     );
+    # Union of this company's disclosed hosting regions (empty on graphs
+    # seeded before HostedIn existed — the edge-level region_codes still work).
+    regions: list[str] = sorted([r.code for r in [c ->:HostedIn:->]]);
     return {
         "id": c.slug,
         "label": c.name or c.domain,
         "tier": tier,
         "inbound_degree": indeg,
+        "regions": regions,
         "soc2": True if soc2_cited else c.soc2,
         "soc2_status": (
             evidence.soc2_status
@@ -484,7 +667,8 @@ def _graph_payload(start: Company) -> dict {
             edges.append({
                 "source": c.slug, "target": t.slug,
                 "kind": "uses" if view.dist[c.slug] == 0 else "subprocesses",
-                "purpose": purpose, "region": region, "handles_pii": pii
+                "purpose": purpose, "region": region, "handles_pii": pii,
+                "region_codes": _region_codes(region)
             });
             indeg[t.slug] = (indeg[t.slug] if t.slug in indeg else 0) + 1;
         }
@@ -537,7 +721,8 @@ def _inbound_payload(center: Company, max_hops: int) -> dict {
             edges.append({
                 "source": d.slug, "target": t.slug,
                 "kind": "subprocesses",
-                "purpose": purpose, "region": region, "handles_pii": pii
+                "purpose": purpose, "region": region, "handles_pii": pii,
+                "region_codes": _region_codes(region)
             });
             indeg[t.slug] = (indeg[t.slug] if t.slug in indeg else 0) + 1;
         }
@@ -717,6 +902,7 @@ async def _crawl_company(c: Company, ttl_days: int, force: bool) -> str {
             purpose=rec.purpose, region=rec.region, confidence=rec.confidence,
             handles_pii=_handles_pii(rec.purpose), first_seen=seen_at, last_seen=_now()
         ):+> target;
+        _host_regions(target, rec.region);
     }
     return "ok";
 }
@@ -776,6 +962,7 @@ def _seed_one(seed: AtlasSeedRecord, idx: dict[str, Company]) -> dict {
             first_seen=seen_at,
             last_seen=seed.fetched_at
         ):+> target;
+        _host_regions(target, subprocessor.region);
         made += 1;
     }
     return {

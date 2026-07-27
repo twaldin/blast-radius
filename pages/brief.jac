@@ -29,7 +29,7 @@ def build_report_text(risk: any) -> str {
     idx = 0;
     for c in st["chokes"] {
         idx = idx + 1;
-        text = text + str(idx) + ". " + choke_sentence(c) + " Affected vendors: " + ", ".join(c["names"]) + "." + NL;
+        text = text + str(idx) + ". " + choke_sentence(c) + " Affected vendors: " + ((", ".join(c["names"] as list)) as str) + "." + NL;
     }
     text = text + NL;
 
@@ -52,7 +52,7 @@ def:pub CopyButton() -> JsxElement {
 
     async def handle_copy() {
         text_out = build_report_text(risk);
-        await navigator.clipboard.writeText(text_out);
+        await (navigator.clipboard as any).writeText(text_out);
         copied = True;
         setTimeout(lambda { copied = False; }, 1600);
     }
@@ -75,7 +75,7 @@ def:pub page() -> JsxPage {
                 <span className="brief-eyebrow">Third-party concentration risk</span>
                 <h1 className="brief-title">{st["org_label"] or "—"}</h1>
                 <p className="brief-meta">
-                    {"Generated " + str(len(st["chokes"])) + " findings across " + str(st["vendor_total"]) + " vendors and " + str(st["provider_total"]) + " shared providers."}
+                    {"Generated " + str(len(st["chokes"] as list)) + " findings across " + str(st["vendor_total"]) + " vendors and " + str(st["provider_total"]) + " shared providers."}
                 </p>
                 <CopyButton />
             </div>
