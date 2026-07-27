@@ -1,77 +1,77 @@
-"""Single source of truth for the Blast Radius client — contract v2.
+"""Single source of truth for the Blast Radius client.
 
 `RiskProvider` is the only module that knows how state is fetched or held.
 Every surface consumes the same generic interface: state / actions / meta.
 
-v2: the client reads the REAL atlas. `atlas {}` lists every mapped company,
-`graph {domain}` is an unbounded BFS read of one company's disclosed stack,
-and every insight walker (chokepoints, fallout, one_look, crawl_progress,
-blast_radius) is scoped to the viewed domain. The fabricated demo fixture
-path (`detect_vendors` / `DEMO_VENDORS`) is gone.
+`expand` runs a real depth-2 crawl, so while it is in flight we poll
+`crawl_progress` for per-vendor provenance — that is the honest coverage strip,
+and it doubles as the live build animation without needing a socket.
 """
 
 cl import from react { createContext, use }
 
 cl {
 glob RiskCtx = createContext(None);
+glob PRUNE_ABOVE: int = 10;
+glob SEED_DOMAIN: str = "jachammer.ai";
 
 async def call_walker(name: str, payload: any) -> any {
-    resp: any = await fetch("/walker/" + name, {
+    resp = await fetch("/walker/" + name, {
         "method": "POST",
         "headers": {"content-type": "application/json"},
         "body": JSON.stringify(payload)
     });
-    if not resp["ok"] { raise Error("walker " + name + " -> " + str(resp["status"])); }
-    body: any = await resp.json();
+    body = await resp.json();
     reports: any = body["data"]["reports"];
     if reports and (len(reports as list) > 0) { return reports[0]; }
     return None;
 }
 
-"""BFS depth from the viewed company over the payload's edges, attached to
-every node as `depth`. The server's `tier` collapses distance >= 2 into
-"provider"; the renderer wants real columns, so we keep the exact hop count."""
-def annotate_depth(raw_nodes: any, raw_edges: any, root_id: str) -> list[any] {
-    adj: dict = {};
-    for e in raw_edges {
-        src: str = e["source"] as str;
-        prev: any = adj[src] if src in adj else [];
-        adj[src] = (prev as list) + [e["target"]];
-    }
-    depth: dict = {};
-    frontier: list[str] = [];
-    if root_id {
-        depth[root_id] = 0;
-        frontier = [root_id];
-    }
-    hop = 0;
-    while len(frontier) > 0 {
-        hop = hop + 1;
-        nxt: list[str] = [];
-        for s in frontier {
-            if s not in adj { continue; }
-            for t in (adj[s] as list) {
-                tid: str = t as str;
-                if tid in depth { continue; }
-                depth[tid] = hop;
-                nxt.append(tid);
-            }
-        }
-        frontier = nxt;
-    }
-    out: list[any] = [];
-    for n in raw_nodes {
-        nid: str = n["id"] as str;
-        fallback: int = 0 if n["tier"] == "org" else (1 if n["tier"] == "vendor" else 2);
-        d: int = (depth[nid] as int) if nid in depth else fallback;
-        out = out + [{**n, "depth": d}];
-    }
-    return out;
-}
+def build_graph(raw_nodes: any, raw_edges: any) -> any {
+    providers = [n for n in raw_nodes if n["tier"] == "provider"];
+    prune = len(providers) > PRUNE_ABOVE;
 
-def edge_region_codes(l: any) -> list[any] {
-    codes: any = l["region_codes"] if "region_codes" in (l as dict) else [];
-    return (codes or []) as list;
+    kept = {};
+    out_nodes = [];
+    folded = 0;
+
+    for n in raw_nodes {
+        deg = (n["inbound_degree"] or 0) as int;
+        if n["tier"] == "provider" and prune and deg < 2 {
+            folded = folded + 1;
+            continue;
+        }
+        kept[n["id"]] = True;
+        out_nodes = out_nodes + [n];
+    }
+
+    if folded > 0 {
+        kept["__other"] = True;
+        out_nodes = out_nodes + [{
+            "id": "__other",
+            "label": "other (" + str(folded) + ")",
+            "tier": "provider",
+            "inbound_degree": 1,
+            "soc2": True,
+            "supply_chain_risk": "",
+            "downtime_hours_ytd": 0.0,
+        }];
+    }
+
+    out_links = [];
+    # Keys are captured here, before the force renderer gets the array.
+    # react-force-graph rewrites link.source/target from ids into node objects
+    # in place, so any consumer reading them afterwards sees objects, not ids.
+    edge_keys: dict = {};
+    for e in raw_edges {
+        src = e["source"];
+        tgt = e["target"] if kept[e["target"]] else "__other";
+        if not kept[src] { continue; }
+        out_links = out_links + [{"source": src, "target": tgt, "kind": e["kind"], "handles_pii": e["handles_pii"]}];
+        edge_keys[(src as str) + ">" + (tgt as str)] = True;
+    }
+
+    return {"nodes": out_nodes, "links": out_links, "edge_keys": edge_keys};
 }
 
 def choke_for(rows: any, provider_id: str) -> any {
@@ -88,67 +88,83 @@ def empty_coverage() -> any {
 }
 
 def:pub RiskProvider(children: any = None) -> JsxElement {
-    has companies: list[any] = [];
-    has atlas_total: int = 0;
-    has company_domain: str = "";
-    has org_label: str = "";
-    has root_id: str = "";
-    has all_nodes: list[any] = [];
-    has all_links: list[any] = [];
-    has region: str = "";
+    has nodes: list[any] = [];
+    has links: list[any] = [];
+    has edge_keys: any = {};
     has chokes: list[any] = [];
     has fallout: list[any] = [];
     has coverage: any = empty_coverage();
     has headline: any = None;
+    has org_label: str = "";
+    has org_domain: str = "";
     has selected: str = "";
     has outage: any = None;
     has outage_hop: int = -1;
     has loading: bool = True;
     has crawling: bool = False;
     has failed: bool = False;
-    has s_q: str = "";
-    has s_hits: list[any] = [];
-    has s_resolved: any = None;
-    has s_busy: bool = False;
-    has s_discovering: bool = False;
-    has s_done: bool = False;
-    has s_discovered: bool = False;
-    has s_error: str = "";
 
-    async def refresh_insights(domain: str) -> None {
+    async def refresh_insights(domain: str = "") -> None {
         ranked = await call_walker("chokepoints", {"domain": domain});
         gaps = await call_walker("compliance_fallout", {"domain": domain});
         one = await call_walker("one_look", {"domain": domain});
-        prog = await call_walker("crawl_progress", {"domain": domain});
-        chokes = ((ranked or []) as list);
-        fallout = ((gaps or []) as list);
+        chokes = ranked or [];
+        fallout = gaps or [];
         headline = one;
-        coverage = prog if prog else empty_coverage();
-        if ranked and len(ranked as list) > 0 {
+        if ranked and len(ranked as list) > 0 and not selected {
             selected = ranked[0]["provider_id"] as str;
-        } else {
-            selected = "";
         }
     }
 
-    async def view(domain: str) -> None {
-        if not domain { return; }
+    async def poll_progress(domain: str = "") -> None {
+        prog = await call_walker("crawl_progress", {"domain": domain});
+        if prog { coverage = prog; }
+    }
+
+    async def load_graph(domain: str = "") -> None {
+        crawling = True;
+        loaded_domain: str = domain;
+        timer: any = setInterval(lambda { poll_progress(domain); }, 700);
         try {
-            loading = True;
-            failed = False;
-            outage = None;
-            outage_hop = -1;
-            selected = "";
-            region = "";
-            g = await call_walker("graph", {"domain": domain});
-            company_domain = domain;
-            root_id = (g["root"] as str) if g else "";
-            org_label = ((g["root_label"] or domain) as str) if g else domain;
-            raw_nodes: any = (g["nodes"] if g else []) or [];
-            raw_links: any = (g["edges"] if g else []) or [];
-            all_nodes = annotate_depth(raw_nodes, raw_links, root_id);
-            all_links = (raw_links as list);
-            await refresh_insights(domain);
+            graph = await call_walker("expand", {"domain": domain});
+            # `expand` only crawls vendors that already exist. On a cold graph
+            # detection has to run first, otherwise every view renders empty.
+            # jachammer.ai resolves through the pre-warmed cache, so the
+            # scripted path never touches the network (spec 10, PLAN B4).
+            if len(graph["nodes"] as list) == 0 and not domain {
+                await call_walker("detect_vendors", {"domain": SEED_DOMAIN});
+                graph = await call_walker(
+                    "expand",
+                    {"domain": SEED_DOMAIN}
+                );
+            }
+            built = build_graph(graph["nodes"], graph["edges"]);
+            nodes = built["nodes"];
+            links = built["links"];
+            edge_keys = built["edge_keys"];
+            loaded_domain = (graph["root_domain"] or domain) as str;
+            org_domain = loaded_domain;
+            org_label = "";
+            for n in graph["nodes"] {
+                if n["tier"] == "org" { org_label = n["label"] as str; }
+            }
+        } finally {
+            # the poll must die even when expand rejects, or it hammers the
+            # server at 700ms behind a failed screen
+            clearInterval(timer);
+            crawling = False;
+        }
+        await poll_progress(loaded_domain);
+        await refresh_insights(loaded_domain);
+    }
+
+    async can with entry {
+        try {
+            seeded: any = await call_walker("ensure_atlas", {});
+            if not seeded or not seeded["ready"] {
+                raise Exception("Committed atlas seed could not be loaded");
+            }
+            await load_graph();
             loading = False;
         } except Exception as e {
             console.error("[blast-radius] load failed", e);
@@ -158,111 +174,26 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         }
     }
 
-    async def boot() -> None {
-        res = await call_walker("atlas", {});
-        if (not res) or ((res["total"] or 0) as int) == 0 {
-            # cold start: a fresh deploy has an empty graph until the committed
-            # filings are imported. seed_atlas is idempotent, so firing it here
-            # is safe even if the server also seeds on boot.
-            await call_walker("seed_atlas", {});
-            res = await call_walker("atlas", {});
-        }
-        if res {
-            companies = ((res["companies"] or []) as list);
-            atlas_total = ((res["total"] or 0) as int);
-        }
-        if len(companies) > 0 {
-            feats: list[any] = [c for c in companies if c["featured"]];
-            first: any = feats[0] if len(feats) > 0 else companies[0];
-            await view(first["domain"] as str);
-        } else {
-            loading = False;
-        }
-    }
-
-    async can with entry {
+    # The judge-types-their-own-domain path: detection seeds the org and its
+    # visible vendors, then the same crawl fills in the second layer.
+    async def ingest(domain: str) -> None {
+        if not domain { return; }
         try {
-            await boot();
+            loading = True;
+            failed = False;
+            selected = "";
+            await call_walker("detect_vendors", {"domain": domain});
+            await load_graph(domain);
+            loading = False;
         } except Exception as e {
-            console.error("[blast-radius] boot failed", e);
+            console.error("[blast-radius] detect failed", e);
             crawling = False;
             failed = True;
             loading = False;
         }
     }
 
-    # ------------------------------------------------------------- search
-    async def run_search(q: str) -> None {
-        trimmed: str = (q or "").strip();
-        s_q = trimmed;
-        s_discovered = False;
-        s_error = "";
-        if not trimmed {
-            s_hits = [];
-            s_resolved = None;
-            s_done = False;
-            s_busy = False;
-            return;
-        }
-        s_busy = True;
-        try {
-            res = await call_walker("search", {"q": trimmed, "limit": 8});
-            s_hits = (((res["results"] if res else []) or []) as list);
-            s_resolved = res["resolved"] if res else None;
-            s_done = True;
-            s_busy = False;
-        } except Exception as e {
-            console.error("[blast-radius] search failed", e);
-            s_hits = [];
-            s_resolved = None;
-            s_error = "Search failed — is the server up?";
-            s_done = True;
-            s_busy = False;
-        }
-    }
-
-    # The judge-types-an-unmapped-company path: same walker, agent unlocked.
-    # Guarded so a backend without allow_discovery degrades to a clean error.
-    async def discover(q: str) -> None {
-        trimmed: str = (q or s_q or "").strip();
-        if not trimmed { return; }
-        s_discovering = True;
-        s_error = "";
-        try {
-            res = await call_walker("search", {"q": trimmed, "limit": 8, "allow_discovery": True});
-            if res and res["resolved"] {
-                s_hits = ((res["results"] or []) as list);
-                s_resolved = res["resolved"];
-                s_discovered = ((res["discovered"] or False) as bool);
-                atlas_res = await call_walker("atlas", {});
-                if atlas_res {
-                    companies = ((atlas_res["companies"] or []) as list);
-                    atlas_total = ((atlas_res["total"] or 0) as int);
-                }
-                await view(res["resolved"]["domain"] as str);
-            } else {
-                s_error = "Nothing found — no readable filing for that name.";
-            }
-            s_discovering = False;
-        } except Exception as e {
-            console.error("[blast-radius] discovery failed", e);
-            s_discovering = False;
-            s_error = "Discovery is not available on this deployment.";
-        }
-    }
-
-    def clear_search() -> None {
-        s_q = "";
-        s_hits = [];
-        s_resolved = None;
-        s_busy = False;
-        s_discovering = False;
-        s_done = False;
-        s_discovered = False;
-        s_error = "";
-    }
-
-    # The text box for what filings cannot see — internal tools, the warehouse.
+    # The text box for what detection cannot see — internal tools, the warehouse.
     async def add_manual(raw: str) -> None {
         parts: list[str] = [];
         for chunk in raw.split(",") {
@@ -272,10 +203,57 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         if not parts { return; }
         try {
             loading = True;
-            await call_walker("add_vendors", {"domains": parts, "domain": company_domain});
-            await view(company_domain);
+            await call_walker("add_vendors", {"domains": parts});
+            await load_graph(org_domain);
+            loading = False;
         } except Exception as e {
             console.error("[blast-radius] add failed", e);
+            crawling = False;
+            failed = True;
+            loading = False;
+        }
+    }
+
+    async def search_company(
+        q: str,
+        allow_discovery: bool
+    ) -> any {
+        if not q.strip() { return None; }
+        return await call_walker("search", {
+            "q": q,
+            "allow_discovery": allow_discovery
+        });
+    }
+
+    async def open_company(domain: str) -> None {
+        if not domain { return; }
+        try {
+            loading = True;
+            failed = False;
+            selected = "";
+            graph = await call_walker("graph", {"domain": domain});
+            if not graph or len(graph["nodes"] as list) == 0 {
+                failed = True;
+                loading = False;
+                return;
+            }
+            built = build_graph(graph["nodes"], graph["edges"]);
+            nodes = built["nodes"];
+            links = built["links"];
+            edge_keys = built["edge_keys"];
+            loaded_domain: str = (
+                graph["root_domain"] or domain
+            ) as str;
+            org_domain = loaded_domain;
+            org_label = (graph["root_label"] or domain) as str;
+            coverage = await call_walker(
+                "crawl_progress",
+                {"domain": loaded_domain}
+            ) or empty_coverage();
+            await refresh_insights(loaded_domain);
+            loading = False;
+        } except Exception as e {
+            console.error("[blast-radius] company load failed", e);
             failed = True;
             loading = False;
         }
@@ -290,8 +268,8 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         active = choke_for(chokes, selected);
         if not active { return; }
         res = await call_walker("blast_radius", {
-            "failed_provider": active["provider"],
-            "domain": company_domain
+            "domain": org_domain,
+            "failed_provider": active["provider"]
         });
         if not res { return; }
         outage = res;
@@ -305,92 +283,39 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         outage_hop = -1;
     }
 
-    def set_region(code: str) -> None {
-        region = code or "";
-    }
-
-    # -------------------------------------------------- derived, per render
-    links_f: list[any] = all_links if not region
-        else [l for l in all_links if region in edge_region_codes(l)];
-    kept: dict = {};
-    if region {
-        if root_id { kept[root_id] = True; }
-        for l in links_f {
-            kept[l["source"] as str] = True;
-            kept[l["target"] as str] = True;
-        }
-    }
-    nodes_f: list[any] = all_nodes if not region
-        else [n for n in all_nodes if (n["id"] as str) in kept];
-
-    edge_keys: dict = {};
-    for l in links_f {
-        edge_keys[(l["source"] as str) + ">" + (l["target"] as str)] = True;
-    }
-
-    region_seen: dict = {};
-    regions: list[str] = [];
-    for l in all_links {
-        for rc in edge_region_codes(l) {
-            code: str = rc as str;
-            if code and code not in region_seen {
-                region_seen[code] = True;
-                regions = regions + [code];
-            }
-        }
-    }
-    regions = sorted(regions);
-
-    vendors: list[any] = [n for n in nodes_f if n["tier"] == "vendor"];
-    providers: list[any] = [n for n in nodes_f if n["tier"] == "provider"];
+    vendors: any = [n for n in nodes if n["tier"] == "vendor"];
+    providers: any = [n for n in nodes if n["tier"] == "provider"];
 
     value: any = {
         "state": {
-            "companies": companies,
-            "atlas_total": atlas_total,
-            "company_domain": company_domain,
-            "org_label": org_label,
-            "root_id": root_id,
-            "nodes": nodes_f,
-            "links": links_f,
+            "nodes": nodes,
+            "links": links,
             "edge_keys": edge_keys,
             "vendors": vendors,
             "providers": providers,
-            "vendor_total": len(vendors),
-            "provider_total": len(providers),
-            "regions": regions,
-            "region": region,
             "chokes": chokes,
             "fallout": fallout,
             "coverage": coverage,
             "headline": headline,
+            "org_label": org_label,
+            "org_domain": org_domain,
+            "vendor_total": len(vendors),
+            "provider_total": len(providers),
             "selected": selected,
             "active": choke_for(chokes, selected),
-            "top": chokes[0] if len(chokes) > 0 else None,
+            "top": chokes[0] if chokes and len(chokes as list) > 0 else None,
             "outage": outage,
             "outage_hop": outage_hop,
-            "down_ids": (outage["vendor_ids"] as list) if outage else [],
-            "search": {
-                "q": s_q,
-                "hits": s_hits,
-                "resolved": s_resolved,
-                "busy": s_busy,
-                "discovering": s_discovering,
-                "done": s_done,
-                "discovered": s_discovered,
-                "error": s_error
-            }
+            "down_ids": outage["vendor_ids"] if outage else []
         },
         "actions": {
-            "view": view,
             "select": select,
             "simulate": simulate,
             "clear": clear,
-            "setRegion": set_region,
-            "search": run_search,
-            "discover": discover,
-            "clearSearch": clear_search,
-            "addManual": add_manual
+            "ingest": ingest,
+            "addManual": add_manual,
+            "search": search_company,
+            "openCompany": open_company
         },
         "meta": {
             "loading": loading,

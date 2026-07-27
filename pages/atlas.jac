@@ -21,9 +21,88 @@ def:pub page() -> JsxPage {
     acts: any = risk["actions"];
     meta: any = risk["meta"];
 
-    has search_in: str = "";
-    has timer: any = None;
+    has domain_in: str = "";
     has manual_in: str = "";
+    has search_in: str = "";
+    has search_results: list[any] = [];
+    has search_loading: bool = False;
+    has search_complete: bool = False;
+    has search_used_ai: bool = False;
+    has search_discovered: bool = False;
+    has search_error: str = "";
+
+    async def run_search(allow_discovery: bool) -> None {
+        query: str = search_in.strip();
+        if not query or search_loading { return; }
+        search_loading = True;
+        search_complete = False;
+        search_used_ai = allow_discovery;
+        search_discovered = False;
+        search_error = "";
+        try {
+            payload: any = await acts["search"](
+                query,
+                allow_discovery
+            );
+            search_results = (
+                payload["results"] as list[any]
+                if payload and payload["results"]
+                else []
+            );
+            search_discovered = (
+                payload["discovered"] as bool
+                if payload
+                else False
+            );
+            search_complete = True;
+        } except Exception as e {
+            console.error("[blast-radius] search failed", e);
+            search_results = [];
+            search_error = "Search failed. Check the server and try again.";
+            search_complete = True;
+        } finally {
+            search_loading = False;
+        }
+    }
+
+    async def submit_registry(e: FormEvent) -> None {
+        e.preventDefault();
+        await run_search(False);
+    }
+
+    async def search_with_ai() -> None {
+        await run_search(True);
+    }
+
+    async def choose_result(result: any) -> None {
+        domain: str = result["domain"] as str;
+        if not domain { return; }
+        search_loading = True;
+        try {
+            # Registry rows are read-only offers. A URL-shaped discovery query
+            # deliberately misses the seven text tiers, resolves the trusted
+            # registry URL, and persists through `_upsert_company`.
+            if result["state"] == "registry" {
+                mapped: any = await acts["search"](
+                    "https://" + domain + "/",
+                    True
+                );
+                search_discovered = (
+                    mapped["discovered"] as bool
+                    if mapped
+                    else False
+                );
+            }
+            await acts["openCompany"](domain);
+            search_results = [];
+            search_complete = False;
+        } except Exception as e {
+            console.error("[blast-radius] result load failed", e);
+            search_error = "The company was found, but its graph could not be opened.";
+        } finally {
+            search_loading = False;
+        }
+    }
 
     a: any = st["active"];
     o: any = st["outage"];
@@ -32,65 +111,7 @@ def:pub page() -> JsxPage {
     counts: any = cov["counts"];
     chokes: any = st["chokes"];
     nodes: any = st["nodes"];
-    s: any = st["search"];
-
-    # Citation gating: the backend re-ranks by share when the top choke row's
-    # downtime figure is not backed by a cited source. Mirror that here --
-    # never render an uncited downtime number, and label the rank panel after
-    # the metric it is actually sorted by.
-    top_cited: bool = False;
-    if chokes and len(chokes as list) > 0 and chokes[0]["downtime_cited"] {
-        top_cited = True;
-    }
-    metric_key: str = "exposure" if top_cited else "share";
-    max_met: float = (chokes[0][metric_key] as float) if chokes and len(chokes as list) > 0 else 1.0;
-
-    # Provenance: the current company's own filing must be inspectable.
-    cur_src: str = "";
-    for co in st["companies"] {
-        if (co["domain"] as str) == (st["company_domain"] as str) {
-            cur_src = ((co["source_url"] or "") as str);
-            break;
-        }
-    }
-
-    def on_query(q: str) -> None {
-        search_in = q;
-        if timer {
-            (clearTimeout as any)(timer);
-            timer = None;
-        }
-        if (q or "").strip() {
-            timer = setTimeout(lambda { acts["search"](q); }, 300);
-        } else {
-            acts["clearSearch"]();
-        }
-    }
-
-    def submit_query() -> None {
-        if timer {
-            (clearTimeout as any)(timer);
-            timer = None;
-        }
-        if (search_in or "").strip() {
-            acts["search"](search_in);
-        }
-    }
-
-    def pick_hit(hit: any) -> None {
-        if timer {
-            (clearTimeout as any)(timer);
-            timer = None;
-        }
-        if hit["match"] == "registry" {
-            # Known but unmapped: same path as "Map it now" -- let the agent map it.
-            acts["discover"]((s["q"] as str));
-        } else {
-            acts["view"]((hit["domain"] as str));
-            acts["clearSearch"]();
-            search_in = "";
-        }
-    }
+    max_exp: float = (chokes[0]["exposure"] as float) if chokes and len(chokes as list) > 0 else 1.0;
 
     # Vendor nodes no longer carry a `features` list -- SPEC-V2 section 2 cut
     # the hand-mapped Feature type. The real text is the `purpose` recorded on
@@ -115,7 +136,7 @@ def:pub page() -> JsxPage {
         }];
     }
 
-    edge_set: dict = ((st["edge_keys"] or {}) as dict);
+    edge_set: dict = st["edge_keys"] or {};
 
     return <div className="atlas">
         {#* ---------------------------------------------------------- header strip *#}
@@ -130,104 +151,71 @@ def:pub page() -> JsxPage {
             </div>
         </header>
 
-        {#* ---------------------------------------------------------- search strip *#}
-        <div className="sbar">
-            <div className="sbar-row">
-                <span className="sbar-tag">Company</span>
-                <div className="sbox">
-                    <input
-                        className="sbox-in"
-                        value={search_in}
-                        placeholder="Search the atlas — figma.com, Okta, a domain or a name…"
-                        onChange={lambda (e: ChangeEvent) { on_query(e.target.value); }}
-                        onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter" { submit_query(); } }}
-                    />
-                    {if s["busy"] {
-                        <span className="spin sbox-spin"></span>
-                        skip;
-                    }}
-                </div>
-                <select
-                    className="sbar-sel"
-                    value={st["company_domain"]}
-                    onChange={lambda (e: ChangeEvent) { acts["view"]((e.target.value as str)); }}
-                >
-                    {if not (st["company_domain"] as str) {
-                        <option value="">Pick a company…</option>
-                        skip;
-                    }}
-                    {for co in st["companies"] {
-                        <option key={(co["domain"] as str)} value={(co["domain"] as str)}>{co["name"]}</option>
-                    }}
-                </select>
+        <section className="finder" aria-label="Company search">
+            <div className="finder-copy">
+                <span className="finder-k">Search atlas</span>
+                <span className="finder-note">Registry first · AI only after a miss</span>
             </div>
-
-            {if s["done"] and len(s["hits"] as list) > 0 {
-                <div className="sres">
-                    {for hit in s["hits"] {
-                        <button key={(hit["id"] as str)} className="shit" onClick={lambda { pick_hit(hit); }}>
-                            <span className="shit-n">{hit["name"]}</span>
-                            <span className="shit-d">{hit["domain"]}</span>
-                            <span className="shit-s">{hit["state"]}</span>
-                            <span className="fig shit-f">{str(hit["filing_count"]) + " filings"}</span>
-                            {if hit["match"] == "registry" {
-                                <span className="shit-tag">not mapped yet</span>
-                                skip;
-                            }}
-                            <span className={"chip" + (" chip-reg" if hit["match"] == "registry" else "")}>{((hit["match"] as str) as any).toUpperCase()}</span>
+            <form className="finder-form" onSubmit={submit_registry}>
+                <input
+                    className="finder-in"
+                    value={search_in}
+                    placeholder="Company or domain — e.g. Airbyte"
+                    aria-label="Company or domain"
+                    onChange={lambda (e: ChangeEvent) {
+                        search_in = e.target.value;
+                        search_complete = False;
+                        search_error = "";
+                    }}
+                />
+                <button
+                    className="btn"
+                    type="submit"
+                    disabled={search_loading or not search_in.strip()}
+                >{("Searching…" if search_loading and not search_used_ai else "Search registry")}</button>
+                <button
+                    className="btn btn-quiet"
+                    type="button"
+                    onClick={search_with_ai}
+                    disabled={search_loading or not search_in.strip()}
+                >{("AI searching…" if search_loading and search_used_ai else "Search with AI")}</button>
+            </form>
+            <div className="finder-status" aria-live="polite">
+                {if search_loading {
+                    <span>{"Agent checking first-party sources…" if search_used_ai else "Checking graph and registry…"}</span>
+                }}
+                {if search_error {
+                    <span className="finder-bad">{search_error}</span>
+                }}
+                {if search_complete and not search_loading and len(search_results) == 0 and not search_error {
+                    <span>{"No authoritative source found." if search_used_ai else "No registry match. Try Search with AI."}</span>
+                }}
+                {if search_discovered and not search_loading {
+                    <span className="finder-good">New company mapped by discovery.</span>
+                }}
+            </div>
+            {if len(search_results) > 0 {
+                <div className="finder-results" role="listbox">
+                    {for result in search_results {
+                        <button
+                            key={(result["id"] as str) + (result["domain"] as str)}
+                            className="finder-hit"
+                            type="button"
+                            onClick={lambda { choose_result(result); }}
+                        >
+                            <span>
+                                <b>{result["name"]}</b>
+                                <small>{result["domain"]}</small>
+                            </span>
+                            <span className="finder-source">
+                                <em>{result["match"]}</em>
+                                <span>{"Map from registry →" if result["state"] == "registry" else "Open graph →"}</span>
+                            </span>
                         </button>
                     }}
                 </div>
-                skip;
             }}
-
-            {if s["done"] and len(s["hits"] as list) == 0 and (s["q"] as str) {
-                <div className="sres sres-empty">
-                    <span className="sres-none">No match in the atlas.</span>
-                    {if s["discovering"] {
-                        <span className="sdisc"><span className="spin"></span>Agent reading filings…</span>
-                        skip;
-                    }}
-                    {if not s["discovering"] {
-                        <button className="btn btn-map" onClick={lambda { acts["discover"]((s["q"] as str)); }}>Map it now →</button>
-                        skip;
-                    }}
-                </div>
-                skip;
-            }}
-
-            {if s["discovered"] and s["resolved"] {
-                <div className="sres sres-found">
-                    <span className="chip chip-disc">Discovered</span>
-                    <span className="sres-rn">{s["resolved"]["name"]}</span>
-                    <span className="sres-rd">{s["resolved"]["domain"]}</span>
-                </div>
-                skip;
-            }}
-
-            {if (s["error"] as str) {
-                <div className="sres sres-err"><span className="serr">{s["error"]}</span></div>
-                skip;
-            }}
-        </div>
-
-        {#* ---------------------------------------------------------- region filter *#}
-        {if len(st["regions"] as list) > 0 {
-            <div className="regs">
-                <button
-                    className={"reg" + (" on" if not (st["region"] as str) else "")}
-                    onClick={lambda { acts["setRegion"](""); }}
-                >ALL</button>
-                {for code in st["regions"] {
-                    <button
-                        key={(code as str)}
-                        className={"reg" + (" on" if (st["region"] as str) == code else "")}
-                        onClick={lambda { acts["setRegion"]((code as str)); }}
-                    >{((code as str) as any).toUpperCase()}</button>
-                }}
-            </div>
-            skip;
-        }}
+        </section>
 
         <div className="board">
             {#* ------------------------------------------------------ left rail *#}
@@ -240,7 +228,7 @@ def:pub page() -> JsxPage {
                             <span className="met-k">Stack share</span>
                         </div>
                         <div className="met">
-                            <span className="fig met-v">{((str(a["downtime_hours_ytd"]) + "h") if a and a["downtime_cited"] else "—")}</span>
+                            <span className="fig met-v">{(str(a["downtime_hours_ytd"]) if a else "—") + "h"}</span>
                             <span className="met-k">Downtime ytd</span>
                         </div>
                         <div className="met">
@@ -255,16 +243,7 @@ def:pub page() -> JsxPage {
                 </section>
 
                 <section className="pan">
-                    <div className="pan-h">
-                        <span><span className="pan-n">02</span><span className="pan-t">Crawl coverage</span></span>
-                        <span className="pan-meta fig">
-                            {str(cov["done"]) + "/" + str(cov["total"])}
-                            {if cur_src {
-                                <a className="cov-file" href={cur_src} target="_blank" rel="noreferrer">filing ↗</a>
-                                skip;
-                            }}
-                        </span>
-                    </div>
+                    <div className="pan-h"><span><span className="pan-n">02</span><span className="pan-t">Crawl coverage</span></span><span className="pan-meta fig">{str(cov["done"]) + "/" + str(cov["total"])}</span></div>
                     <div className="pan-b">
                         <div className="cov-bar">
                             <span className="cov-seg cov-ok" style={{"flex": str(counts["ok"])}}></span>
@@ -283,7 +262,7 @@ def:pub page() -> JsxPage {
                 </section>
 
                 <section className="pan pan-grow">
-                    <div className="pan-h"><span><span className="pan-n">03</span><span className="pan-t">Vendor × provider</span></span><span className="pan-meta fig">{str(len(st["links"] as list)) + " edges"}</span></div>
+                    <div className="pan-h"><span><span className="pan-n">03</span><span className="pan-t">Vendor × provider</span></span><span className="pan-meta fig">{str(len(st["links"])) + " edges"}</span></div>
                     <div className="pan-b">
                         <table className="matrix">
                             <thead>
@@ -313,25 +292,36 @@ def:pub page() -> JsxPage {
             <section className="pan canvas">
                 <div className="pan-h">
                     <span><span className="pan-n">04</span><span className="pan-t">Dependency graph</span></span>
-                    <span className="pan-meta fig">{str(len(nodes as list)) + "n / " + str(len(st["links"] as list)) + "e"}</span>
+                    <span className="pan-meta fig">{str(len(nodes)) + "n / " + str(len(st["links"])) + "e"}</span>
                 </div>
                 <div className="canvas-b">
                     <DependencyGraph />
                     <LoadState />
-                    {if len(nodes as list) == 0 and not meta["loading"] and not meta["crawling"] {
+                    {if len(nodes) == 0 and not meta["loading"] and not meta["crawling"] {
                         <div className="intake">
                             <p className={"intake-k" + (" bad" if meta["failed"] else "")}>{"Detection failed" if meta["failed"] else "No graph yet"}</p>
-                            <p className="intake-say">{"The server rejected the request — check it is running, then try again." if meta["failed"] else "Search a company above, or add vendor domains by hand."}</p>
+                            <p className="intake-say">{"The server rejected the request — check it is running, then try again." if meta["failed"] else "Load the seeded demo stack, or add vendor domains by hand."}</p>
+                            <div className="intake-row">
+                                <input
+                                    className="intake-in"
+                                    value={domain_in}
+                                    placeholder="jachammer.ai"
+                                    onChange={lambda (e: ChangeEvent) { domain_in = e.target.value; }}
+                                    onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter" { acts["ingest"](domain_in or "jachammer.ai"); } }}
+                                />
+                                <button className="btn" onClick={lambda { acts["ingest"](domain_in or "jachammer.ai"); }}>Detect vendors</button>
+                            </div>
                             <div className="intake-row">
                                 <input
                                     className="intake-in"
                                     value={manual_in}
-                                    placeholder="notion.so, linear.app — comma-separated domains"
+                                    placeholder="notion.so, linear.app — what detection cannot see"
                                     onChange={lambda (e: ChangeEvent) { manual_in = e.target.value; }}
                                     onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter" { acts["addManual"](manual_in); } }}
                                 />
                                 <button className="btn btn-quiet" onClick={lambda { acts["addManual"](manual_in); }}>Add manually</button>
                             </div>
+                            <p className="intake-fine">The seeded stack is fixture data, not crawled filings. Live detection and real subprocessor crawling are still landing.</p>
                         </div>
                         skip;
                     }}
@@ -340,7 +330,7 @@ def:pub page() -> JsxPage {
                     {if o {
                         <span className="blast-line">
                             <b>Blast radius — {(o["provider"] as str)} down</b>
-                            <span className="blast-count">{"→ " + str(len(o["vendors_down"] as list)) + "/" + str(st["vendor_total"]) + " vendors"}</span>
+                            <span className="blast-count">{"→ " + str(len(o["vendors_down"])) + "/" + str(st["vendor_total"]) + " vendors"}</span>
                             <span className="blast-feats">
                                 {for f in o["features_down"] {
                                     <span className="blast-feat" key={f}>{f}</span>
@@ -361,7 +351,7 @@ def:pub page() -> JsxPage {
             {#* ------------------------------------------------------ right rail *#}
             <div className="rail">
                 <section className="pan">
-                    <div className="pan-h"><span><span className="pan-n">05</span><span className="pan-t">Chokepoint rank</span></span><span className="pan-meta">{metric_key}</span></div>
+                    <div className="pan-h"><span><span className="pan-n">05</span><span className="pan-t">Chokepoint rank</span></span><span className="pan-meta">exposure</span></div>
                     <div className="pan-b">
                         {for c in chokes {
                             <button
@@ -371,12 +361,12 @@ def:pub page() -> JsxPage {
                             >
                                 <span className="rank-top">
                                     <span className="rank-n">{c["provider"]}</span>
-                                    <span className="fig rank-e">{(str(c["exposure"]) if top_cited else (pct(c["share"]) + "%"))}</span>
+                                    <span className="fig rank-e">{str(c["exposure"])}</span>
                                 </span>
                                 <span className="rank-track">
                                     <span
-                                        className={"rank-fill" + (" lead" if (c[metric_key] as float) == max_met else "")}
-                                        style={{"width": str(round(((c[metric_key] as float) / max_met) * 100)) + "%"}}
+                                        className={"rank-fill" + (" lead" if c["exposure"] == max_exp else "")}
+                                        style={{"width": str(round(((c["exposure"] as float) / max_exp) * 100)) + "%"}}
                                     ></span>
                                 </span>
                             </button>
@@ -389,9 +379,9 @@ def:pub page() -> JsxPage {
                         <div className="pan-h"><span><span className="pan-n">06</span><span className="pan-t">Blast radius</span></span><span className="pan-meta">{o["provider"]}</span></div>
                         <div className="pan-b">
                             <span className="hot-k">Vendors down</span>
-                            <p className="hot-v">{", ".join(o["vendors_down"] as list)}</p>
+                            <p className="hot-v">{", ".join(o["vendors_down"])}</p>
                             <span className="hot-k">Features down</span>
-                            <p className="hot-v">{", ".join(o["features_down"] as list)}</p>
+                            <p className="hot-v">{", ".join(o["features_down"])}</p>
                             <span className="hot-k">Drafted status update</span>
                             <p className="hot-post">{o["status_post"]}</p>
                         </div>
@@ -414,9 +404,9 @@ def:pub page() -> JsxPage {
                     skip;
                 }}
 
-                {if len(st["fallout"] as list) > 0 {
+                {if len(st["fallout"]) > 0 {
                     <section className="pan">
-                        <div className="pan-h"><span><span className="pan-n">07</span><span className="pan-t">Compliance fallout</span></span><span className="pan-meta fig">{str(len(st["fallout"] as list)) + " flagged"}</span></div>
+                        <div className="pan-h"><span><span className="pan-n">07</span><span className="pan-t">Compliance fallout</span></span><span className="pan-meta fig">{str(len(st["fallout"])) + " flagged"}</span></div>
                         <div className="pan-b">
                             {for f in st["fallout"] {
                                 <div className="gap" key={(f["vendor"] as str) + (f["provider"] as str)}>

@@ -38,7 +38,8 @@ import from contracts {
 }
 import from extract {
     resolve_url, fetch_page, extract_and_resolve,
-    canonicalize, clean_provider_name, PROVIDER_ALIASES
+    canonicalize, clean_provider_name, discover_and_resolve,
+    PROVIDER_ALIASES
 }
 import from demo_data {
     detect_all, provider_profile,
@@ -533,6 +534,7 @@ def _result_for(c: Company, how: str) -> dict {
 
 def _by_name_len(d: dict) -> int { return len((d["name"] as str)); }
 
+
 # The single write chokepoint. Nothing else may create a Company.
 def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bool) -> Company {
     dom = domain.lower().replace("www.", "").strip();
@@ -549,10 +551,10 @@ def _upsert_company(domain: str, name: str, idx: dict[str, Company], use_llm: bo
         }
     }
     prof = provider_profile(label);
-    made: Company = (root ++> Company(
+    made: Company = root ++> Company(
         domain=dom, name=label, slug=prof.slug or _slugify(label) or _slugify(dom),
         category=prof.category, is_sink=prof.is_sink
-    ))[0];
+    );
     idx[key] = made;
     return made;
 }
@@ -972,6 +974,91 @@ def _seed_one(seed: AtlasSeedRecord, idx: dict[str, Company]) -> dict {
     };
 }
 
+def _import_atlas_seed(directory: str) -> dict {
+    (seeds, validation_errors) = load_seed_directory(_seed_dir(directory));
+    if validation_errors {
+        return {
+            "ready": False,
+            "imported": False,
+            "seeded": 0,
+            "ok": 0,
+            "edges": 0,
+            "companies": len(_all_companies()),
+            "detail": [],
+            "errors": validation_errors
+        };
+    }
+    rows: list[dict] = [];
+    idx: dict[str, Company] = _index();
+    for seed in seeds {
+        rows.append(_seed_one(seed, idx));
+    }
+    ok: int = 0;
+    edges: int = 0;
+    for row in rows {
+        if row["status"] == "ok" {
+            ok += 1;
+        }
+        edges += row["edges"] as int;
+    }
+    return {
+        "ready": True,
+        "imported": True,
+        "seeded": len(rows),
+        "ok": ok,
+        "edges": edges,
+        "companies": len(_all_companies()),
+        "detail": rows,
+        "errors": []
+    };
+}
+
+def _committed_atlas_is_ready(directory: str) -> bool {
+    (seeds, validation_errors) = load_seed_directory(_seed_dir(directory));
+    if validation_errors or not seeds {
+        return False;
+    }
+    for seed in seeds {
+        if seed.crawl_status != "ok" {
+            continue;
+        }
+        company: Company | None = _find_company(seed.domain);
+        if (
+            company is None
+            or company.discovery_method != "seed"
+            or company.crawl_status != "ok"
+            or len([company ->:Subprocesses:->]) == 0
+        ) {
+            return False;
+        }
+    }
+    return True;
+}
+
+def _ready_atlas_summary -> dict {
+    ok: int = 0;
+    edges: int = 0;
+    for company in _all_companies() {
+        if (
+            company.discovery_method == "seed"
+            and company.crawl_status == "ok"
+        ) {
+            ok += 1;
+            edges += len([company ->:Subprocesses:->]);
+        }
+    }
+    return {
+        "ready": True,
+        "imported": False,
+        "seeded": 0,
+        "ok": ok,
+        "edges": edges,
+        "companies": len(_all_companies()),
+        "detail": [],
+        "errors": []
+    };
+}
+
 # ------------------------------------------------------------------ walkers = endpoints
 # Resolve the seed directory next to THIS module first, falling back to the
 # process working directory. `Path("seed/atlas")` alone is relative to wherever
@@ -983,62 +1070,36 @@ def _seed_dir(rel: str) -> Path {
     return beside if beside.exists() else Path(rel);
 }
 
-"""Load the committed filings if, and only if, the graph is empty.
+"""Ensure every readable committed filing exists in the current graph.
 
-`seed_atlas` is idempotent and safe to call by hand, but nothing ever called it,
-so a container with a fresh database served an empty atlas until a human
-remembered the curl. This is the missing caller. It is a no-op the moment any
-company exists, so a crawled or already-seeded graph is never touched.
+A graph containing only discovered placeholders is still unseeded. Checking the
+committed roots instead of merely testing whether *any* company exists repairs
+partial databases without rewriting a complete atlas.
 """
 def _ensure_seeded() -> None {
-    if _all_companies() { return; }
-    (seeds, validation_errors) = load_seed_directory(_seed_dir("seed/atlas"));
-    if validation_errors { return; }
-    idx: dict[str, Company] = _index();
-    for seed in seeds {
-        _seed_one(seed, idx);
-    }
+    if _committed_atlas_is_ready("seed/atlas") { return; }
+    _import_atlas_seed("seed/atlas");
 }
 
 # POST /walker/seed_atlas {}  -> import committed seed/atlas/*.json. Idempotent.
 walker:pub seed_atlas {
     has directory: str = "seed/atlas";
     can run with Root entry {
-        (seeds, validation_errors) = load_seed_directory(
-            _seed_dir(self.directory)
-        );
-        if validation_errors {
-            report {
-                "seeded": 0,
-                "ok": 0,
-                "edges": 0,
-                "companies": len(_all_companies()),
-                "detail": [],
-                "errors": validation_errors
-            };
-            disengage;
+        report _import_atlas_seed(self.directory);
+    }
+}
+
+# POST /walker/ensure_atlas {} -> cheap after the first successful import.
+# The client calls this before its first graph read, so a fresh `.jac/data`
+# never renders a one-node placeholder merely because nobody ran a manual curl.
+walker:pub ensure_atlas {
+    has directory: str = "seed/atlas";
+    can run with Root entry {
+        if _committed_atlas_is_ready(self.directory) {
+            report _ready_atlas_summary();
+        } else {
+            report _import_atlas_seed(self.directory);
         }
-        rows: list[dict] = [];
-        idx: dict[str, Company] = _index();
-        for seed in seeds {
-            rows.append(_seed_one(seed, idx));
-        }
-        ok: int = 0;
-        edges: int = 0;
-        for row in rows {
-            if row["status"] == "ok" {
-                ok += 1;
-            }
-            edges += row["edges"] as int;
-        }
-        report {
-            "seeded": len(rows),
-            "ok": ok,
-            "edges": edges,
-            "companies": len(_all_companies()),
-            "detail": rows,
-            "errors": []
-        };
     }
 }
 
@@ -1238,14 +1299,20 @@ walker:pub one_look {
 
 # POST /walker/search {"q": "aws"}  -> canonicalization-backed resolution ladder.
 # Strongest tier wins; we never fall through to weaker tiers once one matched.
-walker:pub search {
+async walker:pub search {
     has q: str = "";
     has limit: int = 20;
-    can run with Root entry {
+    has allow_discovery: bool = False;
+    async can run with Root entry {
         _ensure_seeded();
         ql = self.q.lower().strip();
         if not ql {
-            report {"query": self.q, "resolved": None, "results": []};
+            report {
+                "query": self.q,
+                "resolved": None,
+                "results": [],
+                "discovered": False
+            };
             disengage;
         }
         qk = _canon_key(self.q);
@@ -1345,12 +1412,57 @@ walker:pub search {
                 }
             }
         }
+        discovered: bool = False;
+        if not results and self.allow_discovery {
+            discovery_domain: str = (
+                ql.removeprefix("https://")
+                .removeprefix("http://")
+                .split("/", 1)[0]
+                .removeprefix("www.")
+            );
+            if "." not in discovery_domain {
+                discovery_domain = _despace(self.q) + ".com";
+            }
+            discovery_name: str = clean_provider_name(self.q);
+            if not discovery_name or discovery_name == discovery_name.lower() {
+                discovery_name = _name_from_domain(discovery_domain);
+            }
+            source_url: str = await discover_and_resolve(
+                discovery_domain,
+                discovery_name
+            );
+            if source_url {
+                found: Company = _upsert_company(
+                    discovery_domain,
+                    discovery_name,
+                    _index(),
+                    False
+                );
+                found.subprocessor_url = source_url;
+                found.discovery_method = "discovery";
+                found.crawl_status = "pending";
+                results.append(_result_for(found, "discovery"));
+                discovered = True;
+            }
+        }
         results = results[:self.limit];
         resolved: dict | None = None;
-        if results and (results[0]["match"] == "exact" or results[0]["match"] == "alias") {
+        if (
+            results
+            and (
+                results[0]["match"] == "exact"
+                or results[0]["match"] == "alias"
+                or results[0]["match"] == "discovery"
+            )
+        ) {
             resolved = results[0];
         }
-        report {"query": self.q, "resolved": resolved, "results": results};
+        report {
+            "query": self.q,
+            "resolved": resolved,
+            "results": results,
+            "discovered": discovered
+        };
     }
 }
 
