@@ -1,8 +1,9 @@
 """The dependency figure, drawn as a circuit schematic.
 
-Columns of squares left -> right — org bar, vendors, providers, regions —
-with orthogonal PCB traces between them. Geometry is a pure function of the
-payload (see graph_core); this file is rendering and interaction only:
+One ring of squares — org, vendors, providers, region squares — wired
+point-to-point with hard orthogonal Manhattan traces that run through the
+ring interior onto a shared central spine. Geometry is a pure function of
+the payload (see graph_core); this file is rendering and interaction only:
 hover/selection classes, keyboard-operable providers, and the staged outage
 cascade, all driven by CSS classes so the blast is a transition, not a
 per-frame repaint.
@@ -35,8 +36,8 @@ def:pub DependencyGraph() -> JsxElement {
 
     ranked_ids: list[str] = [c["provider_id"] as str for c in st["chokes"]];
 
-    # ---- region column synthesis: strict dedupe, node lists first, then
-    # edge region_codes; nothing anywhere -> no region column at all
+    # ---- region synthesis: strict dedupe, node lists first, then edge
+    # region_codes; nothing anywhere -> no region squares at all
     region_codes: list[str] = [];
     for n in nodes {
         if "regions" in (n as dict) and n["regions"] {
@@ -66,8 +67,7 @@ def:pub DependencyGraph() -> JsxElement {
     pos: dict = {};
     for n in placed {
         pos[(n["id"] as str)] = {
-            "x": n["__x"], "y": n["__y"], "h": n["__h"],
-            "col": n["__col"], "bh": n["__bh"], "n": n
+            "x": n["__x"], "y": n["__y"], "h": n["__h"], "col": n["__col"], "n": n
         };
     }
 
@@ -135,6 +135,7 @@ def:pub DependencyGraph() -> JsxElement {
     }
 
     def meta_line(n: any) -> str {
+        if n["tier"] == "org" { return "ROOT ORG"; }
         m = "IN-DEGREE " + str(n["inbound_degree"] or 0);
         dt = n["downtime_hours_ytd"] or 0;
         if dt > 0 { m = m + " · " + str(dt) + "H YTD"; }
@@ -168,32 +169,28 @@ def:pub DependencyGraph() -> JsxElement {
 
     return <div className="circuit-surface">
         <svg
-            className="circuit"
+            className={"circuit" + (" is-dense" if model["dense"] else "")}
+            width={vb_w}
+            height={vb_h}
             viewBox={"0 0 " + str(vb_w) + " " + str(vb_h)}
             preserveAspectRatio="xMidYMin meet"
             role="img"
             aria-label="Supply-chain dependency diagram"
         >
-            {#* ------------------------------------- column guides + headers *#}
+            {#* --------------------------------------- graph-paper furniture *#}
             <g className="cir-grid">
-                {for c in (model["cols"] as list) {
-                    <line key={"g-" + (c["title"] as str)} x1={c["x"]} y1={44} x2={c["x"]} y2={vb_h - 14} />
+                {for gx in (model["guides"] as list) {
+                    <line key={"g-" + str(gx)} x1={gx} y1={0} x2={gx} y2={vb_h} />
                 }}
             </g>
-            {for c in (model["cols"] as list) {
-                <text key={"h-" + (c["title"] as str)} className="cir-head" x={c["x"]} y={30} textAnchor={"middle"}>
-                    {c["title"]}
-                </text>
-            }}
-
-            {#* ------------------------------------------------------ traces *#}
+            {#* -------------------------------------------------------- traces *#}
             <g className="cir-traces">
                 {for t in trace_rows {
                     <path key={t["k"]} className={t["cls"]} d={t["d"]} />
                 }}
             </g>
 
-            {#* -------------------------------------------------------- nodes *#}
+            {#* ---------------------------------------------------------- nodes *#}
             {for n in placed {
                 <g
                     key={n["id"]}
@@ -217,140 +214,67 @@ def:pub DependencyGraph() -> JsxElement {
                         width={((n["__h"] as float) + 10) * 2}
                         height={((n["__h"] as float) + 10) * 2}
                     />
-
-                    {if n["tier"] == "org" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - 7}
-                            y={(n["__y"] as float) - (n["__bh"] as float) / 2}
-                            width={14}
-                            height={n["__bh"]}
-                        />
+                    <rect
+                        className="shape"
+                        x={(n["__x"] as float) - (n["__h"] as float)}
+                        y={(n["__y"] as float) - (n["__h"] as float)}
+                        width={(n["__h"] as float) * 2}
+                        height={(n["__h"] as float) * 2}
+                    />
+                    {if n["id"] == core_id and choke_txt and not outage {
                         <text
-                            className="cir-lbl-org"
-                            x={(n["__x"] as float) - 16}
-                            y={(n["__y"] as float) - (n["__bh"] as float) / 2 - 8}
-                            textAnchor={"end"}
+                            className="cir-lbl-choke"
+                            x={n["__lx"]}
+                            y={n["__lcy"]}
+                            textAnchor={n["__la"]}
                         >
-                            {(n["label"] as any).toUpperCase()}
+                            {choke_txt}
                         </text>
-                        <text
-                            className="cir-lbl-orgsub"
-                            x={(n["__x"] as float) - 16}
-                            y={(n["__y"] as float) - (n["__bh"] as float) / 2 + 6}
-                            textAnchor={"end"}
-                        >ROOT ORG</text>
                         skip;
                     }}
-
-                    {if n["tier"] == "vendor" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - (n["__h"] as float)}
-                            y={(n["__y"] as float) - (n["__h"] as float)}
-                            width={(n["__h"] as float) * 2}
-                            height={(n["__h"] as float) * 2}
-                        />
+                    <text
+                        className={"cir-lbl-name" + (" cir-lbl-vend" if n["tier"] == "vendor" else "") + (" cir-lbl-region" if n["tier"] == "region" else "")}
+                        x={n["__lx"]}
+                        y={n["__ly"]}
+                        textAnchor={n["__la"]}
+                    >
+                        {(n["label"] as any).toUpperCase()}
+                    </text>
+                    {if n["__meta"] and n["tier"] != "region" {
                         <text
-                            className="cir-lbl-vend"
-                            x={(n["__x"] as float) - 16}
-                            y={(n["__y"] as float) - 11}
-                            textAnchor={"end"}
+                            className="cir-lbl-meta"
+                            x={n["__lx"]}
+                            y={n["__lmy"]}
+                            textAnchor={n["__la"]}
                         >
-                            {(n["label"] as any).toUpperCase()}
+                            {meta_line(n)}
                         </text>
-                        if n["__meta"] {
-                            <text
-                                className="cir-lbl-vmeta"
-                                x={(n["__x"] as float) - 16}
-                                y={(n["__y"] as float) - 22}
-                                textAnchor={"end"}
-                            >
-                                {meta_line(n)}
-                            </text>
-                            skip;
-                        }
-                        if down_now(n) {
-                            <text
-                                className="cir-x"
-                                x={(n["__x"] as float) - (n["__h"] as float) - 5}
-                                y={(n["__y"] as float) + 4}
-                                textAnchor={"end"}
-                            >✕</text>
-                            skip;
-                        }
                         skip;
                     }}
-
-                    {if n["tier"] == "provider" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - (n["__h"] as float)}
-                            y={(n["__y"] as float) - (n["__h"] as float)}
-                            width={(n["__h"] as float) * 2}
-                            height={(n["__h"] as float) * 2}
-                        />
-                        if n["id"] == core_id and choke_txt and not outage {
-                            <text
-                                className="cir-lbl-choke"
-                                x={(n["__x"] as float) + (n["__h"] as float) + 14}
-                                y={(n["__y"] as float) - 14}
-                            >
-                                {choke_txt}
-                            </text>
-                            skip;
-                        }
+                    {if down_now(n) and n["tier"] == "vendor" {
                         <text
-                            className="cir-lbl-name"
-                            x={(n["__x"] as float) + (n["__h"] as float) + 14}
-                            y={(n["__y"] as float) + (4 if n["__meta"] else 3)}
-                        >
-                            {(n["label"] as any).toUpperCase()}
-                        </text>
-                        if n["__meta"] {
-                            <text
-                                className="cir-lbl-meta"
-                                x={(n["__x"] as float) + (n["__h"] as float) + 14}
-                                y={(n["__y"] as float) + 18}
-                            >
-                                {meta_line(n)}
-                            </text>
-                            skip;
-                        }
-                        skip;
-                    }}
-
-                    {if n["tier"] == "region" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - (n["__h"] as float)}
-                            y={(n["__y"] as float) - (n["__h"] as float)}
-                            width={(n["__h"] as float) * 2}
-                            height={(n["__h"] as float) * 2}
-                        />
-                        <text
-                            className="cir-lbl-region"
-                            x={(n["__x"] as float) + (n["__h"] as float) + 10}
-                            y={(n["__y"] as float) + 3}
-                        >
-                            {(n["label"] as any).toUpperCase()}
-                        </text>
+                            className="cir-x"
+                            x={n["__xx"]}
+                            y={n["__xy"]}
+                            textAnchor={n["__xa"]}
+                        >✕</text>
                         skip;
                     }}
                 </g>
             }}
 
-            {#* -------------------------------------------------- blast stamp *#}
+            {#* ---------------------------------------------------- blast stamp *#}
             {if outage and failed_id in (pos as dict) {
                 fx: float = ((pos[failed_id])["x"] as float);
                 fy: float = ((pos[failed_id])["y"] as float);
                 fh: float = ((pos[failed_id])["h"] as float);
+                sx: float = fx - fh - 14 - 59;
                 <g className="cir-stamp">
-                    <rect x={fx - fh - 14 - 118} y={fy - 26} width={118} height={52} />
-                    <text className="cir-stamp-pct" x={fx - fh - 14 - 59} y={fy + 4} textAnchor={"middle"}>
+                    <rect x={sx - 59} y={fy - 26} width={118} height={52} />
+                    <text className="cir-stamp-pct" x={sx} y={fy + 4} textAnchor={"middle"}>
                         {stamp_pct}
                     </text>
-                    <text className="cir-stamp-cap" x={fx - fh - 14 - 59} y={fy + 18} textAnchor={"middle"}>
+                    <text className="cir-stamp-cap" x={sx} y={fy + 18} textAnchor={"middle"}>
                         OF STACK DOWN
                     </text>
                 </g>

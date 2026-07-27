@@ -5,8 +5,7 @@
 .circuit-surface {
   position: absolute;
   inset: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
   background: var(--paper);
 }
 
@@ -16,13 +15,13 @@
 
 .circuit {
   display: block;
-  width: 100%;
-  height: auto;
+  margin: 0 auto;
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
 }
 
 .circuit-mini {
+  width: 100%;
   height: 100%;
 }
 
@@ -38,6 +37,19 @@
   fill: var(--ink-3);
   font-size: 9px;
   letter-spacing: 0.22em;
+}
+
+/* dense graphs: smaller labels, no meta lines (geometry drops the meta) */
+.circuit.is-dense .cir-lbl-name {
+  font-size: 8px;
+}
+
+.circuit.is-dense .cir-lbl-vend {
+  font-size: 7.5px;
+}
+
+.circuit.is-dense .cir-lbl-choke {
+  font-size: 8px;
 }
 
 /* ------------------------------------------------------------------ traces

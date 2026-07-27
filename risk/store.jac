@@ -179,15 +179,15 @@ def:pub RiskProvider(children: any = None) -> JsxElement {
         loaded_domain: str = domain;
         timer: any = setInterval(lambda { poll_progress(domain); }, 700);
         try {
-            graph = await call_walker("expand", {"domain": domain});
-            # `expand` only crawls vendors that already exist. On a cold graph
-            # detection has to run first, otherwise every view renders empty.
-            # jachammer.ai resolves through the pre-warmed cache, so the
-            # scripted path never touches the network (spec 10, PLAN B4).
+            # `graph` is a pure unbounded BFS READ — instant on the seeded
+            # atlas. Crawling only ever happens through the explicit walkers
+            # (detect_vendors / add_vendors / discovery); calling `expand`
+            # here live-crawled every pending leaf on page load and hung boot.
+            graph = await call_walker("graph", {"domain": domain});
             if len(graph["nodes"] as list) == 0 and not domain {
                 await call_walker("detect_vendors", {"domain": SEED_DOMAIN});
                 graph = await call_walker(
-                    "expand",
+                    "graph",
                     {"domain": SEED_DOMAIN}
                 );
             }

@@ -298,8 +298,12 @@ def _name_from_domain(dom: str) -> str {
 def _is_stale(iso: str, ttl_days: int) -> bool {
     if not iso { return True; }
     try {
-        return (datetime.now() - datetime.fromisoformat(iso)).days >= ttl_days;
-    } except ValueError {
+        then = datetime.fromisoformat(iso.replace("Z", "+00:00"));
+        # seed timestamps are offset-aware, _now() is naive; strip the offset
+        # so the 7-day TTL comparison never mixes the two and explodes.
+        if then.tzinfo is not None { then = then.replace(tzinfo=None); }
+        return (datetime.now() - then).days >= ttl_days;
+    } except Exception {
         return True;
     }
 }

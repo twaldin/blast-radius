@@ -1,7 +1,7 @@
 """Figure 1 — the circuit schematic, stripped for reading at a glance.
 
-Static SVG, same geometry helpers as the Atlas figure. No interaction, no
-outage state, no region column: this one exists to show the convergence,
+Static SVG, same ring geometry as the Atlas figure. No interaction, no
+outage state, no region squares: this one exists to show the convergence,
 not to be operated.
 """
 
@@ -28,8 +28,7 @@ def:pub MiniGraph() -> JsxElement {
     pos: dict = {};
     for n in placed {
         pos[(n["id"] as str)] = {
-            "x": n["__x"], "y": n["__y"], "h": n["__h"],
-            "col": n["__col"], "bh": n["__bh"], "n": n
+            "x": n["__x"], "y": n["__y"], "h": n["__h"], "col": n["__col"], "n": n
         };
     }
 
@@ -54,23 +53,17 @@ def:pub MiniGraph() -> JsxElement {
 
     return <div className="circuit-surface is-static">
         <svg
-            className="circuit circuit-mini"
+            className={"circuit circuit-mini" + (" is-dense" if model["dense"] else "")}
             viewBox={"0 0 " + str(vb_w) + " " + str(vb_h)}
             preserveAspectRatio="xMidYMid meet"
             role="img"
             aria-label="Supply-chain dependency diagram"
         >
             <g className="cir-grid">
-                {for c in (model["cols"] as list) {
-                    <line key={"g-" + (c["title"] as str)} x1={c["x"]} y1={44} x2={c["x"]} y2={vb_h - 14} />
+                {for gx in (model["guides"] as list) {
+                    <line key={"g-" + str(gx)} x1={gx} y1={0} x2={gx} y2={vb_h} />
                 }}
             </g>
-            {for c in (model["cols"] as list) {
-                <text key={"h-" + (c["title"] as str)} className="cir-head" x={c["x"]} y={30} textAnchor={"middle"}>
-                    {c["title"]}
-                </text>
-            }}
-
             <g className="cir-traces">
                 {for t in trace_rows {
                     <path key={t["k"]} className="cir-trace" d={t["d"]} />
@@ -79,67 +72,30 @@ def:pub MiniGraph() -> JsxElement {
 
             {for n in placed {
                 <g key={n["id"]} className={"cir-node cir-node-" + (n["tier"] as str) + (" is-core" if n["id"] == core_id else "")}>
-                    {if n["tier"] == "org" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - 7}
-                            y={(n["__y"] as float) - (n["__bh"] as float) / 2}
-                            width={14}
-                            height={n["__bh"]}
-                        />
+                    <rect
+                        className="shape"
+                        x={(n["__x"] as float) - (n["__h"] as float)}
+                        y={(n["__y"] as float) - (n["__h"] as float)}
+                        width={(n["__h"] as float) * 2}
+                        height={(n["__h"] as float) * 2}
+                    />
+                    {if n["id"] == core_id and choke_txt {
                         <text
-                            className="cir-lbl-org"
-                            x={(n["__x"] as float) - 16}
-                            y={(n["__y"] as float) - (n["__bh"] as float) / 2 - 8}
-                            textAnchor={"end"}
+                            className="cir-lbl-choke"
+                            x={n["__lx"]}
+                            y={n["__lcy"]}
+                            textAnchor={n["__la"]}
                         >
-                            {(n["label"] as any).toUpperCase()}
+                            {choke_txt}
                         </text>
                         skip;
                     }}
-                    {if n["tier"] == "vendor" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - (n["__h"] as float)}
-                            y={(n["__y"] as float) - (n["__h"] as float)}
-                            width={(n["__h"] as float) * 2}
-                            height={(n["__h"] as float) * 2}
-                        />
-                        if show_vend {
-                            <text
-                                className="cir-lbl-vend"
-                                x={(n["__x"] as float) - 16}
-                                y={(n["__y"] as float) - 11}
-                                textAnchor={"end"}
-                            >
-                                {(n["label"] as any).toUpperCase()}
-                            </text>
-                            skip;
-                        }
-                        skip;
-                    }}
-                    {if n["tier"] == "provider" {
-                        <rect
-                            className="shape"
-                            x={(n["__x"] as float) - (n["__h"] as float)}
-                            y={(n["__y"] as float) - (n["__h"] as float)}
-                            width={(n["__h"] as float) * 2}
-                            height={(n["__h"] as float) * 2}
-                        />
-                        if n["id"] == core_id and choke_txt {
-                            <text
-                                className="cir-lbl-choke"
-                                x={(n["__x"] as float) + (n["__h"] as float) + 14}
-                                y={(n["__y"] as float) - 14}
-                            >
-                                {choke_txt}
-                            </text>
-                            skip;
-                        }
+                    {if n["tier"] != "vendor" or show_vend {
                         <text
-                            className="cir-lbl-name"
-                            x={(n["__x"] as float) + (n["__h"] as float) + 14}
-                            y={(n["__y"] as float) + 3}
+                            className={"cir-lbl-name" + (" cir-lbl-vend" if n["tier"] == "vendor" else "")}
+                            x={n["__lx"]}
+                            y={n["__ly"]}
+                            textAnchor={n["__la"]}
                         >
                             {(n["label"] as any).toUpperCase()}
                         </text>
